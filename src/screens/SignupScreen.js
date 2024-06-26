@@ -1,7 +1,7 @@
 import React, { useState }  from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // or any other icon library
-import { auth } from '../utils/firebase';
+import { auth } from '../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 export default function SignUp({navigation}) {
@@ -16,6 +16,7 @@ export default function SignUp({navigation}) {
       const user = userCredential.user;
       console.log(user.email)
       console.log(user)
+      navigation.navigate('Welcome')
       // ...
     })
     .catch((error) => {
@@ -46,7 +47,7 @@ export default function SignUp({navigation}) {
           placeholder="Password" 
           value={userPassword}
           onChangeText={text => setUserPassword(text)}
-          secureTextEntry={showPassword} 
+          secureTextEntry={!showPassword} 
           style={styles.input} />
         <Icon name="eye-outline" onPress={() => setShowPassword(!showPassword)} size={20} color="#666" style={styles.inputIcon} />
       </View>
