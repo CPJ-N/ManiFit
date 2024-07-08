@@ -6,8 +6,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 //App Screens & Componets
 import Home from './src/screens/Home';
 import Welcome from './src/screens/Welcome';
-import Login from './src/screens/LoginScreen';
-import SignUp from './src/screens/SignupScreen';
+import Login from './src/screens/AuthScreens/LoginScreen';
+import SignUp from './src/screens/AuthScreens/SignupScreen';
+import { BOTTOM_TABS, LOGIN, REGISTER } from './src/constants/screenNames';
+import BottomNavigation from './src/navigation/BottomNavigation';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,10 +17,9 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Welcome" component={Welcome} />
-        <Stack.Screen name="Signup" component={SignUp} />
+        <Stack.Screen name={LOGIN} component={Login} />
+        <Stack.Screen name={REGISTER} component={SignUp} />
+        <Stack.Screen name={BOTTOM_TABS} component={BottomNavigation}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

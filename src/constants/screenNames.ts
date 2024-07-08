@@ -1,4 +1,6 @@
-export const LOGIN = 'login';
-export const REGISTER = 'register';
-export const HOME = 'home';
-export const WELCOME = 'welcome';
+export const LOGIN = 'LOGIN';
+export const REGISTER = 'REGISTER';
+export const HOME = 'HOME';
+export const WELCOME = 'WELCOME';
+
+export const BOTTOM_TABS = 'BOTTOM_TABS';
