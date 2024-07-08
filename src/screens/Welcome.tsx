@@ -1,17 +1,16 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { auth } from '../utils/firebase'
+import { auth } from '../config/firebase'
 import { signOut } from 'firebase/auth'
-import { useNavigation } from '@react-navigation/native'
+import ExerciseManager from '../components/ExcerciseManager'
 
-export default function Welcome() {
-  const navigation = useNavigation()
+export default function Welcome({navigation}) {
 
   const handleSignOut = () => {
     signOut(auth)
     .then((res) => {
       console.log(res)
-      navigation.navigate('Home')
+      navigation.navigate('Home') // Update the navigate function call
       console.log('signed out')
     })
     .catch((error) => {
@@ -22,13 +21,15 @@ export default function Welcome() {
 
   return (
     <View style={styles.container}>
-      <Text>Welcome</Text>
+      {/* <Text>Welcome</Text>
+      
       <Text>Email: {auth.currentUser?.email}</Text>
       <TouchableOpacity
        style={styles.button}
        onPress={handleSignOut}>
         <Text style={styles.buttonText}> Sign Out </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      <ExerciseManager />
     </View>
   )
 }

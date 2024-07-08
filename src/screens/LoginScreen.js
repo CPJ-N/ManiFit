@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, KeyboardAvo
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Assuming you're using this library
 import CheckBox from '@react-native-community/checkbox';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../utils/firebase';
+import { auth } from '../config/firebase';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Login() {
@@ -63,7 +63,7 @@ export default function Login() {
           placeholder="Password" 
           value={userPassword}
           onChangeText={text => setUserPassword(text)}
-          secureTextEntry={showPassword} 
+          secureTextEntry={!showPassword} 
           style={styles.input} 
           placeholderTextColor="grey"
         />
