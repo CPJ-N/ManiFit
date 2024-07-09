@@ -4,6 +4,8 @@ import { auth } from '../config/firebase'
 import { signOut } from 'firebase/auth'
 import ExerciseManager from '../components/ExcerciseManager'
 
+// TO DO: Change the Welcome component to Excercise Home Page
+
 export default function Welcome({navigation}) {
 
   const handleSignOut = () => {

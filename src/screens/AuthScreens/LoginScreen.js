@@ -3,8 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, KeyboardAvo
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Assuming you're using this library
 import CheckBox from '@react-native-community/checkbox';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth } from '../../config/firebase';
 import { useNavigation } from '@react-navigation/native';
+import { BOTTOM_TABS, HOME, WELCOME } from '../../constants/screenNames';
 
 export default function Login() {
   const [isSelected, setSelection] = useState(false);
@@ -16,7 +17,7 @@ export default function Login() {
   useEffect(() =>{
     const unsubscribe = auth.onAuthStateChanged(user => {
       if(user){
-        navigation.replace('Welcome')
+        navigation.replace({BOTTOM_TABS, screen: {HOME}})
       }
     })
 
@@ -30,7 +31,7 @@ export default function Login() {
       const user = userCredential.user;
       console.log(user.email)
       console.log(user)
-      navigation.navigate('Welcome')
+      navigation.navigate(BOTTOM_TABS, {screen: {WELCOME}})
       // ...
     })
     .catch((error) => {
