@@ -1,18 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
-export default function Home({navigation}) {
+export default function TempHome() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Text>Hello</Text>
       <TouchableOpacity
-        onPress={() => navigation.navigate('Login')}
+        // onPress={() => navigation.navigate('Login')}
         style={styles.loginButton}>
         <Text style={styles.loginButtonText}>Log in</Text>
       </TouchableOpacity>
       <TouchableOpacity 
-        onPress={() => navigation.navigate('Signup')}
+        // onPress={() => navigation.navigate('Signup')}
         style={styles.loginButton}>
         <Text style={styles.loginButtonText}>Sign Up</Text>
       </TouchableOpacity>

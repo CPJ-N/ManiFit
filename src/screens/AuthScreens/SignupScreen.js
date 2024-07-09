@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, KeyboardAvo
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // or any other icon library
 import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { BOTTOM_TABS, WELCOME } from '../../constants/screenNames';
+import { BOTTOM_TABS, HOME, WELCOME } from '../../constants/screenNames';
 
 export default function SignUp({navigation}) {
   const [showPassword, setShowPassword] = useState(false)
@@ -17,7 +17,7 @@ export default function SignUp({navigation}) {
       const user = userCredential.user;
       console.log(user.email)
       console.log(user)
-      navigation.navigate(BOTTOM_TABS, {screen: {WELCOME}})
+      navigation.navigate(BOTTOM_TABS, {screen: {HOME}})
       // ...
     })
     .catch((error) => {

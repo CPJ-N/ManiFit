@@ -5,7 +5,7 @@ import CheckBox from '@react-native-community/checkbox';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { useNavigation } from '@react-navigation/native';
-import { BOTTOM_TABS, WELCOME } from '../../constants/screenNames';
+import { BOTTOM_TABS, HOME, WELCOME } from '../../constants/screenNames';
 
 export default function Login() {
   const [isSelected, setSelection] = useState(false);
@@ -17,7 +17,7 @@ export default function Login() {
   useEffect(() =>{
     const unsubscribe = auth.onAuthStateChanged(user => {
       if(user){
-        navigation.replace({BOTTOM_TABS, screen: {WELCOME}})
+        navigation.replace({BOTTOM_TABS, screen: {HOME}})
       }
     })
 
