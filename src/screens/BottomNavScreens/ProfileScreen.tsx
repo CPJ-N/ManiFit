@@ -1,12 +1,164 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { auth } from '../../config/firebase'
+import { signOut } from 'firebase/auth'
+import { FAVORITE, LOGIN } from '../../constants/screenNames';
 
-const ProfileScreen = () => {
-  return (
-    <View>
-      <Text>ProfileScreen</Text>
-    </View>
-  )
-}
 
-export default ProfileScreen
+export default function ProfileScreen({navigation}) {
+    const menuItems = [
+        { name: 'Profile', icon: 'person-circle-outline' },
+        { name: 'Favorite', icon: 'heart-outline' },
+        { name: 'Privacy Policy', icon: 'shield-checkmark-outline' },
+        { name: 'Settings', icon: 'settings-outline' },
+        { name: 'Help', icon: 'help-circle-outline' },
+        { name: 'Logout', icon: 'log-out-outline' },
+    ];
+
+    const handlePress = (name: string) => {
+
+        switch (name) {
+            case "Favorite":
+                navigation.navigate(FAVORITE);
+                break;
+            case "Logout":
+                handleLogOut();
+                break;
+            default:
+                console.log("Value is something else");
+        }
+    }
+    
+
+    const handleLogOut = () => {
+        signOut(auth)
+        .then((res) => {
+          console.log(res)
+          navigation.navigate(LOGIN)
+          console.log('signed out')
+        })
+        .catch((error) => {
+          console.log(error)
+          alert(error.message)
+        })
+      }
+
+    return (
+        <ScrollView style={styles.container}>
+            <View style={styles.header}>
+                {/* <Text style={styles.headerText}>My Profile</Text> */}
+            </View>
+
+            <View style={styles.userInfoSection}>
+                <Image 
+                    source={{ uri: 'https://images.pexels.com/photos/3806244/pexels-photo-3806244.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }}
+                    style={styles.profileImage} 
+                />
+                <Text style={styles.name}>Madison Smith</Text>
+                <Text style={styles.email}>madisons@example.com</Text>
+                <Text style={styles.birthday}>Birthday: April 1st</Text>
+                <View style={styles.statsContainer}>
+                    <View style={styles.stat}>
+                        <Text style={styles.statValue}>75 Kg</Text>
+                        <Text style={styles.statLabel}>Weight</Text>
+                    </View>
+                    <View style={styles.stat}>
+                        <Text style={styles.statValue}>28</Text>
+                        <Text style={styles.statLabel}>Years Old</Text>
+                    </View>
+                    <View style={styles.stat}>
+                        <Text style={styles.statValue}>1.65 CM</Text>
+                        <Text style={styles.statLabel}>Height</Text>
+                    </View>
+                </View>
+            </View>
+
+            <View style={styles.menu}>
+                {menuItems.map((item, index) => (
+                    <TouchableOpacity 
+                        key={index} 
+                        style={styles.menuItem} 
+                        onPress={() => handlePress(item.name)}>
+                        <Ionicons name={item.icon} size={24} color="#4B4B4B" />
+                        <Text style={styles.menuItemText}>{item.name}</Text>
+                        <Ionicons name="chevron-forward-outline" size={24} color="#4B4B4B" />
+                    </TouchableOpacity>
+                ))}
+            </View>
+        </ScrollView>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f4f4f4',
+    },
+    header: {
+        backgroundColor: '#ffd20a',
+        padding: 12,
+    },
+    headerText: {
+        color: '#1f1f1f',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    userInfoSection: {
+        backgroundColor: '#ffd20a',
+        paddingVertical: 40,
+        alignItems: 'center',
+        borderBottomRightRadius: 50,
+        borderBottomLeftRadius: 50,
+
+    },
+    profileImage: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        marginBottom: 10,
+    },
+    name: {
+        color: '#1f1f1f',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    email: {
+        color: '#3f381a',
+    },
+    birthday: {
+        color: '#3f381a',
+        marginBottom: 20,
+    },
+    statsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+    },
+    stat: {
+        alignItems: 'center',
+    },
+    statValue: {
+        color: '#1f1f1f',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    statLabel: {
+        color: '#3f381a',
+    },
+    menu: {
+        marginTop: 20,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        alignItems: 'center',
+    },
+    menuItemText: {
+        flex: 1,
+        fontSize: 16,
+        marginLeft: 20,
+        color: '#333',
+    },
+});
