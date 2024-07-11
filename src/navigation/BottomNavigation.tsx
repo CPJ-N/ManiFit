@@ -1,18 +1,18 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { FAVORITE, HOME, PROFILE, RESOURCES } from '../constants/screenNames';
+import { FAVORITE, HOME, PROFILE_TABS, RESOURCES } from '../constants/screenNames';
 
 // Screens
 import Home from '../screens/BottomNavScreens/Home';
 import FavoriteScreen from '../screens/BottomNavScreens/FavoriteScreen';
 import ResourcesScreen from '../screens/BottomNavScreens/ResourcesScreen';
-import ProfileScreen from '../screens/BottomNavScreens/ProfileScreen';
+import ProfileNavigation from './ProfileNavigation';
 
 const BottomTabs = createBottomTabNavigator();
 
 export default function BottomNavigation() {
     return (
-            <BottomTabs.Navigator screenOptions={{headerShown: false}}>
+            <BottomTabs.Navigator screenOptions={{headerShown: false, tabBarShowLabel: false}}>
                 <BottomTabs.Screen name={HOME} component={Home} 
                     options={{
                         tabBarIcon: ({color, size}) => (
@@ -31,7 +31,7 @@ export default function BottomNavigation() {
                         <Ionicons name="bookmarks-outline" size={size} color={color} />
                     ),
                 }}/>
-                <BottomTabs.Screen name={PROFILE} component={ProfileScreen} 
+                <BottomTabs.Screen name={PROFILE_TABS} component={ProfileNavigation} 
                     options={{
                         tabBarIcon: ({color, size}) => (
                         <Ionicons name="person-outline" size={size} color={color} />

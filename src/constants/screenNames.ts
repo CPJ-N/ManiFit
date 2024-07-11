@@ -5,6 +5,8 @@ export const WELCOME = 'WELCOME';
 export const FAVORITE = 'FAVORITE';
 export const RESOURCES = 'RESOURCES';
 export const PROFILE = 'PROFILE';
+export const EDIT_PROFILE = 'EDIT_PROFILE';
 
 export const AUTH_TABS = 'AUTH_TABS';
 export const BOTTOM_TABS = 'BOTTOM_TABS';
+export const PROFILE_TABS = 'PROFILE_TABS';

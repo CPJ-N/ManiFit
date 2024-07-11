@@ -9,7 +9,7 @@ import SignUp from './src/screens/AuthScreens/SignupScreen';
 import { AUTH_TABS, BOTTOM_TABS, LOGIN, REGISTER } from './src/constants/screenNames';
 import BottomNavigation from './src/navigation/BottomNavigation';
 import LoadingScreen from './src/screens/LoadingScreen';
-import AuthNavigator from './src/navigation/AuthNavigation';
+import AuthNavigation from './src/navigation/AuthNavigation';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +22,7 @@ export default function App() {
         {/* <Stack.Screen name="loading Screen" component={LoadingScreen} /> */}
         {/* <Stack.Screen name={LOGIN} component={Login} />
         <Stack.Screen name={REGISTER} component={SignUp} /> */}
-        <Stack.Screen name={AUTH_TABS} component={AuthNavigator} />
+        <Stack.Screen name={AUTH_TABS} component={AuthNavigation} />
         <Stack.Screen name={BOTTOM_TABS} component={BottomNavigation}/>
       </Stack.Navigator>
     </NavigationContainer>

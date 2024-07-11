@@ -19,6 +19,7 @@ export default function Home () {
           <View style={styles.icons}>
             <Icon name="search" type="feather" color="#fff" size={25} />
             <Icon name="bell" type="feather" color="#fff" size={25} style={{ marginLeft: 20 }} />
+            <Icon name="plus" type="feather" color="#fff" size={25} style={{ marginLeft: 20 }} />
           </View>
         </View>
 
