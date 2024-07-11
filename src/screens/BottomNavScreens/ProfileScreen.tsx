@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'rea
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth } from '../../config/firebase'
 import { signOut } from 'firebase/auth'
-import { FAVORITE, LOGIN } from '../../constants/screenNames';
+import { AUTH_TABS, EDIT_PROFILE, FAVORITE, LOGIN } from '../../constants/screenNames';
 
 
 export default function ProfileScreen({navigation}) {
@@ -19,6 +19,9 @@ export default function ProfileScreen({navigation}) {
     const handlePress = (name: string) => {
 
         switch (name) {
+            case "Profile":
+                navigation.navigate(EDIT_PROFILE);
+                break;
             case "Favorite":
                 navigation.navigate(FAVORITE);
                 break;
@@ -35,7 +38,7 @@ export default function ProfileScreen({navigation}) {
         signOut(auth)
         .then((res) => {
           console.log(res)
-          navigation.navigate(LOGIN)
+          navigation.navigate(AUTH_TABS, {screen: {LOGIN}})
           console.log('signed out')
         })
         .catch((error) => {
@@ -56,7 +59,7 @@ export default function ProfileScreen({navigation}) {
                     style={styles.profileImage} 
                 />
                 <Text style={styles.name}>Madison Smith</Text>
-                <Text style={styles.email}>madisons@example.com</Text>
+                <Text style={styles.email}>{auth.currentUser?.email}</Text>
                 <Text style={styles.birthday}>Birthday: April 1st</Text>
                 <View style={styles.statsContainer}>
                     <View style={styles.stat}>
@@ -113,8 +116,8 @@ const styles = StyleSheet.create({
 
     },
     profileImage: {
-        width: 100,
-        height: 100,
+        width: 135,
+        height: 135,
         borderRadius: 50,
         marginBottom: 10,
     },
