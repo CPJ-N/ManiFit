@@ -5,7 +5,7 @@ import CheckBox from '@react-native-community/checkbox';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { useNavigation } from '@react-navigation/native';
-import { BOTTOM_TABS, HOME, WELCOME } from '../../constants/screenNames';
+import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
 
 export default function Login() {
   const [isSelected, setSelection] = useState(false);
@@ -31,7 +31,7 @@ export default function Login() {
       const user = userCredential.user;
       console.log(user.email)
       console.log(user)
-      navigation.navigate(BOTTOM_TABS, {screen: {WELCOME}})
+      navigation.navigate(BOTTOM_TABS, {screen: {HOME}})
       // ...
     })
     .catch((error) => {

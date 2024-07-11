@@ -1,6 +1,6 @@
-import { collection, addDoc } from "firebase/firestore";
-import { db } from '../config/firebase';  // Your Firebase initialization file
+import { db } from '../config/firebase';
 import { Exercise } from "../constants/dataModels/excercise.model";
+import { collection, addDoc } from "firebase/firestore";
 
 export const addExercise = async (exercise: Exercise) => {
   try {
