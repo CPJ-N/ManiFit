@@ -10,6 +10,8 @@ interface ExerciseProps {
   onDelete: (id: string) => void;
 }
 
+// TODO: update the design of exercise details display
+
 const onEdit = (id: string) => {
     // TODO: Implement onEdit function logic
 };
