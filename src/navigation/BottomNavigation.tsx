@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import { EXERCISE_TABS, FAVORITE, HOME, PROFILE_TABS } from '../constants/screenNames';
 
 // Screens
@@ -7,6 +8,7 @@ import Home from '../screens/BottomNavScreens/Home';
 import FavoriteScreen from '../screens/BottomNavScreens/FavoriteScreen';
 import ProfileNavigation from './ProfileNavigation';
 import ExerciseNavigation from './ExerciseNavigation';
+
 
 const BottomTabs = createBottomTabNavigator();
 
