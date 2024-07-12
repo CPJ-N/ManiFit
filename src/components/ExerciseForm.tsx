@@ -1,76 +1,149 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { Exercise } from '../constants/dataModels/excercise.model';
+import { addExercise } from '../utils/exerciseController';
 
-// Define the type for the Exercise form's data
-export interface ExerciseData {
-  name: string;
-  sets: number;
-  reps: number;
-}
+// export interface Exercise {
+//   id: string;
+//   name: string;
+//   description: string;
+//   duration?: number;
+//   repetitions?: number;
+//   sets?: number;
+//   weight?: number;
+//   image?: string;
+//   video?: string;
+//   trainerId: string;
+//   category: string;
+// }
 
-interface ExerciseFormProps {
-  onSubmit: (data: ExerciseData) => void;
-}
+export default function ExerciseForm() {
+  const [exercise, setExercise] = useState<Exercise>({
+    id: '',
+    name: '',
+    description: '',
+    duration: undefined,
+    repetitions: undefined,
+    sets: undefined,
+    weight: undefined,
+    image: '',
+    video: '',
+    trainerId: '',  // Assume trainerId is passed or set contextually
+    category: ''
+  });
 
-const ExerciseForm: React.FC<ExerciseFormProps> = ({ onSubmit }) => {
-  const [name, setName] = useState('');
-  const [sets, setSets] = useState('');
-  const [reps, setReps] = useState('');
+  const handleChange = (name: keyof Exercise, value: string | number) => {
+    setExercise(prev => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = () => {
-    // Convert sets and reps to numbers and create the data object
-    const exerciseData = {
-      name,
-      sets: parseInt(sets),
-      reps: parseInt(reps),
-    };
-
-    // Call the onSubmit function passed by the parent component
-    onSubmit(exerciseData);
+  const handleSubmit = async () => {
+    if (!exercise.name || !exercise.description) {
+      Alert.alert('Error', 'Please fill out all required fields.');
+      return;
+    }
+    
+    await addExercise(exercise);
+    Alert.alert('Success', 'Exercise added successfully.');
   };
 
   return (
-    <View style={styles.formContainer}>
-      <Text style={styles.label}>Name:</Text>
-      <TextInput
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
-      <Text style={styles.label}>Sets:</Text>
-      <TextInput
-        value={sets}
-        onChangeText={setSets}
-        style={styles.input}
-        keyboardType="numeric"
-      />
-      <Text style={styles.label}>Reps:</Text>
-      <TextInput
-        value={reps}
-        onChangeText={setReps}
-        style={styles.input}
-        keyboardType="numeric"
-      />
-      <Button title="Save Exercise" onPress={handleSubmit} />
-    </View>
+    <SafeAreaView style={{backgroundColor: '#000',}}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.label}>Name</Text>
+        <TextInput
+          style={styles.input}
+          value={exercise.name}
+          onChangeText={(text) => handleChange('name', text)}
+        />
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={styles.input}
+          value={exercise.description}
+          onChangeText={(text) => handleChange('description', text)}
+        />
+        <Text style={styles.label}>Duration (in minutes)</Text>
+        <TextInput
+          style={styles.input}
+          keyboardType="numeric"
+          value={exercise.duration?.toString()}
+          onChangeText={(text) => handleChange('duration', Number(text))}
+        />
+        <Text style={styles.label}>Repetitions</Text>
+        <TextInput
+          style={styles.input}
+          keyboardType="numeric"
+          value={exercise.repetitions?.toString()}
+          onChangeText={(text) => handleChange('repetitions', Number(text))}
+        />
+        <Text style={styles.label}>Sets</Text>
+        <TextInput
+          style={styles.input}
+          keyboardType="numeric"
+          value={exercise.sets?.toString()}
+          onChangeText={(text) => handleChange('sets', Number(text))}
+        />
+        <Text style={styles.label}>Weight (in kg)</Text>
+        <TextInput
+          style={styles.input}
+          keyboardType="numeric"
+          value={exercise.weight?.toString()}
+          onChangeText={(text) => handleChange('weight', Number(text))}
+        />
+        <Text style={styles.label}>Category</Text>
+        <Picker
+          selectedValue={exercise.category}
+          onValueChange={(itemValue, itemIndex) => handleChange('category', itemValue.toString())}
+          style={styles.picker}
+        >
+          <Picker.Item label="Cardio" value="cardio" />
+          <Picker.Item label="Strength" value="strength" />
+          <Picker.Item label="Flexibility" value="flexibility" />
+          <Picker.Item label="Balance" value="balance" />
+        </Picker>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Add Exercise</Text>
+      </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  formContainer: {
+  container: {
     padding: 20,
-  },
-  label: {
-    fontSize: 18,
-    marginBottom: 10,
+    paddingBottom: 60,
   },
   input: {
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    height: 40,
-    borderColor: 'gray',
     borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    marginBottom: 20,
+    borderRadius: 5,
+    backgroundColor: '#fff',
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#fff'
+  },
+  picker: {
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+  },
+  button: {
+    backgroundColor: '#FFD20A',
+    marginHorizontal: 20,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  buttonText: {
+    color: '#333',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
-
-export default ExerciseForm;
