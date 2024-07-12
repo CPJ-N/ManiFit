@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { Icon } from 'react-native-elements';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { Exercise } from '../constants/dataModels/excercise.model'; // Import the Exercise interface
 import { getAllExercises } from '../utils/exerciseController'; // Import the API function to get all exercises
+import { EXERCISE_FORM } from '../constants/screenNames';
+import ExerciseItem from './ExerciseItem';
 
-const ExerciseList = () => {
+function ExerciseList({navigation}) {
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -21,26 +24,40 @@ const ExerciseList = () => {
         // Add functionality to filter exercises based on search term
     };
 
+    const handleEdit = (id: string) => {
+        console.log('Edit:', id);
+    };
+
+    const handleDelete = (id: string) => {
+        console.log('Delete:', id);
+    };
+
     return (
-        <View style={styles.container}>
-            <TextInput
+        <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          {/* <Text style={styles.greeting}>Hi, Madison</Text> */}
+          <TextInput
                 placeholder="Search exercises..."
                 style={styles.searchInput}
                 value={searchTerm}
                 onChangeText={handleSearch}
             />
-            <FlatList
-                data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => (
-                    <TouchableOpacity style={styles.listItem}>
-                        <Text style={styles.exerciseName}>{item.name}</Text>
-                        <Text style={styles.exerciseDetail}>{item.description}</Text>
-                        {/* Add more details if necessary */}
-                    </TouchableOpacity>
-                )}
-            />
+          <View style={styles.icons}>
+            <Icon name="plus" type="feather" color="#fff" size={25} onPress={() => navigation.navigate(EXERCISE_FORM)}/>
+          </View>
         </View>
+        <FlatList
+            data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+                <ExerciseItem
+                    exercise={item}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
+                )}
+        />
+        </SafeAreaView>
     );
 };
 
@@ -48,32 +65,25 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
+        backgroundColor: '#000',
     },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 20,
+      },
     searchInput: {
+        flex: 1,
         fontSize: 16,
         padding: 10,
         backgroundColor: '#f0f0f0',
         borderRadius: 10,
-        marginBottom: 20,
     },
-    listItem: {
-        padding: 20,
-        backgroundColor: '#fff',
-        marginBottom: 10,
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-    },
-    exerciseName: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    exerciseDetail: {
-        fontSize: 14,
-        color: '#666',
-    },
+    icons: {
+        flexDirection: 'row',
+        marginLeft: 10,
+    }
 });
 
 export default ExerciseList;

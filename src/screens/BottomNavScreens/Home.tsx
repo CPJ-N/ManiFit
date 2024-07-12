@@ -2,7 +2,6 @@ import React from 'react';
 import { ScrollView, View, Text, Image, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ExerciseList from '../../components/ExcerciseList';
 
 interface RecommendationProps {
   title: string;
@@ -40,9 +39,6 @@ export default function Home () {
           <Text style={styles.sectionTitle}>Articles & Tips</Text>
           <TipsCard />
         </View>
-    
-        <ExerciseList />
-        
       </ScrollView>
     </SafeAreaView>
   );

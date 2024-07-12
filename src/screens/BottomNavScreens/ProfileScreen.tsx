@@ -5,6 +5,10 @@ import { auth } from '../../config/firebase'
 import { signOut } from 'firebase/auth'
 import { AUTH_TABS, EDIT_PROFILE, FAVORITE, LOGIN } from '../../constants/screenNames';
 
+// TODO: Add redux toolkit for state management
+// TODO: Add functionality to update user profile
+// TODO: Add functionality to go to all menu options
+// TODO: Add functionality to create user DOC for sign up
 
 export default function ProfileScreen({navigation}) {
     const menuItems = [
@@ -116,8 +120,8 @@ const styles = StyleSheet.create({
 
     },
     profileImage: {
-        width: 100,
-        height: 100,
+        width: 135,
+        height: 135,
         borderRadius: 50,
         marginBottom: 10,
     },
