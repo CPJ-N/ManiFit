@@ -2,6 +2,8 @@ import { StatusBar } from 'expo-status-bar';
 import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Provider } from 'react-redux';
+import { store } from './src/store/reduxStore';
 
 //App Screens & Componets
 import Login from './src/screens/AuthScreens/LoginScreen';
@@ -17,14 +19,14 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        {/* <Stack.Screen name="loading Screen" component={LoadingScreen} /> */}
-        {/* <Stack.Screen name={LOGIN} component={Login} />
-        <Stack.Screen name={REGISTER} component={SignUp} /> */}
-        <Stack.Screen name={AUTH_TABS} component={AuthNavigation} />
-        <Stack.Screen name={BOTTOM_TABS} component={BottomNavigation}/>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          {/* <Stack.Screen name="loading Screen" component={LoadingScreen} /> */}
+          <Stack.Screen name={AUTH_TABS} component={AuthNavigation} />
+          <Stack.Screen name={BOTTOM_TABS} component={BottomNavigation}/>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }

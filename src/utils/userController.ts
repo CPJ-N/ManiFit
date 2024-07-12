@@ -2,7 +2,7 @@ import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from 'firebase/
 import { db } from '../config/firebase';
 import { User } from '../constants/dataModels/userInfo.model';
 
-// TO DO: Test out these api calls in  app
+// TODO: Test out these api calls in  app
 
 // Create user info
 const createUser = async (userInfo: User) => {
