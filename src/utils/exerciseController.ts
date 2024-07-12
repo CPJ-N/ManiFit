@@ -1,17 +1,18 @@
-import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc } from "firebase/firestore";
 import { db } from '../config/firebase';  // Your Firebase initialization file
 import { Exercise } from "../constants/dataModels/excercise.model";
+import { EXERCISES, ROUTINES } from "../constants/firebaseCollections";
 
 export const addExercise = async (exercise: Exercise) => {
   try {
-    const docRef = await addDoc(collection(db, "exercises"), exercise);
+    const docRef = await addDoc(collection(db, EXERCISES), exercise);
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
   }
 };
 export const addExerciseToRoutine = (routineId: string, exerciseId: string) => {
-    const routineRef = doc(db, "routines", routineId);
+    const routineRef = doc(db, ROUTINES, routineId);
   
     // Atomically add a new exercise to the "exercises" array field.
     updateDoc(routineRef, {
@@ -22,7 +23,7 @@ export const addExerciseToRoutine = (routineId: string, exerciseId: string) => {
 
 export const getAllExercises = async (): Promise<Exercise[]> => {
   try {
-    const querySnapshot = await getDocs(collection(db, "Exercise"));
+    const querySnapshot = await getDocs(collection(db, EXERCISES));
     const exercises: Exercise[] = [];
     querySnapshot.forEach((doc) => {
       exercises.push(doc.data() as Exercise);
@@ -43,3 +44,13 @@ export const getAllExercises = async (): Promise<Exercise[]> => {
 //     throw new Error("Failed to update exercise");
 //   }
 // };
+
+export const deleteExercise = async (exerciseId: string) => {
+  try {
+    await deleteDoc(doc(db, EXERCISES, exerciseId));
+    console.log("Exercise deleted successfully");
+  } catch (error) {
+    console.error("Error deleting exercise: ", error);
+    throw new Error("Failed to delete exercise");
+  }
+}

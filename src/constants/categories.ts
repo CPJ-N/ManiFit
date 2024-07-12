@@ -1,4 +1,4 @@
-export const excerciseCategories = [
+export const exerciseCategories = [
     {
       name: 'back',
       image: require('../assets/images/back.png'),
