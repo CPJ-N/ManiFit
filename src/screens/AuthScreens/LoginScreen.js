@@ -31,6 +31,11 @@ export default function Login() {
       const user = userCredential.user;
       console.log(user.email)
       console.log(user)
+      dispatch(setUser({
+        uid: user.uid, 
+        email: user.email
+      }));
+
       navigation.navigate(BOTTOM_TABS, {screen: {HOME}})
       // ...
     })
