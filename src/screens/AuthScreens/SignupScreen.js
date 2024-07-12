@@ -4,11 +4,17 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // or any o
 import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BOTTOM_TABS, HOME, LOGIN, WELCOME } from '../../constants/screenNames';
+import { createUser } from '../../utils/userController';
+import { User } from '../../constants/dataModels/userInfo.model';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../store/userSlice';
+// import { AppDispatch } from '../store/reduxStore';
 
 export default function SignUp({navigation}) {
   const [showPassword, setShowPassword] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [userPassword, setUserPassword] = useState('')
+  const dispatch = useDispatch();
 
   const handleSignUp = () => {
     createUserWithEmailAndPassword(auth, userEmail, userPassword)
@@ -17,8 +23,16 @@ export default function SignUp({navigation}) {
       const user = userCredential.user;
       console.log(user.email)
       console.log(user)
+
+      const newUser = {
+        uid: user.uid, 
+        email: user.email
+      }
+
+      createUser(newUser);
+      dispatch(setUser(newUser));
+
       navigation.navigate(BOTTOM_TABS, {screen: {HOME}})
-      // ...
     })
     .catch((error) => {
       const errorCode = error.code;
