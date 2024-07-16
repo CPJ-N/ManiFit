@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { Exercise } from '../constants/dataModels/excercise.model';
+import { Exercise } from '../constants/dataModels/exercise.model';
 import { Icon } from 'react-native-elements';
-import { deleteExercise } from '../utils/exerciseController';
 
 interface ExerciseProps {
   exercise: Exercise;
@@ -12,25 +11,20 @@ interface ExerciseProps {
 
 // TODO: update the design of exercise details display
 
-const onEdit = (id: string) => {
-    // TODO: Implement onEdit function logic
-};
-
-const onDelete = async (id: string) => {
-    await deleteExercise(id);
-};
-export default function ExerciseItem({ exercise,}: ExerciseProps) {
+export default function ExerciseItem({ exercise, onEdit, onDelete }: ExerciseProps) {
+// export default function ExerciseItem({ exercise }: { exercise: Exercise }) {
+  console.log(exercise);
   return (
     <View style={styles.container}>
       {exercise.image && <Image source={{ uri: exercise.image }} style={styles.image} />}
       <View style={styles.header}>
         <Text style={styles.title}>{exercise.name}</Text>
           <View style={styles.icons}>
-            <Icon name="edit" type="feather" color="#000" size={20} style={{padding: 10}} onPress={() => onEdit}/>
-            <Icon name="trash-2" type="feather" color="#000" size={20} style={{padding: 10}} onPress={() => onDelete}/>
+            <Icon name="edit" type="feather" color="#000" size={20} style={{padding: 10}} onPress={() => onEdit(exercise.id)}/>
+            <Icon name="trash-2" type="feather" color="#000" size={20} style={{padding: 10}} onPress={() => onDelete(exercise.id)}/>
           </View>
         </View>
-      <Text style={styles.detail}>{exercise.description}</Text>
+      {/* <Text style={styles.detail}>{exercise.description}</Text> */}
       {exercise.duration && <Text style={styles.detail}>Duration: {exercise.duration} mins</Text>}
       {exercise.weight && <Text style={styles.detail}>Weight: {exercise.weight} kg</Text>}
       {exercise.sets && <Text style={styles.detail}>Sets: {exercise.sets}</Text>}
