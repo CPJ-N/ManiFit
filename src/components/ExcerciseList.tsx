@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from 'react-native-elements';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { Exercise } from '../constants/dataModels/excercise.model'; // Import the Exercise interface
+import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
 import { getAllExercises } from '../utils/exerciseController'; // Import the API function to get all exercises
-import { EXERCISE_FORM } from '../constants/screenNames';
+import { EXERCISE_EDIT, EXERCISE_FORM } from '../constants/screenNames';
 import ExerciseItem from './ExerciseItem';
+import { deleteExercise } from '../utils/exerciseController';
 
 function ExerciseList({navigation}) {
     const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -13,7 +14,7 @@ function ExerciseList({navigation}) {
     useEffect(() => {
         const fetchExercises = async () => {
             const fetchedExercises = await getAllExercises();
-            console.log(fetchedExercises);
+            // console.log(fetchedExercises);
             setExercises(fetchedExercises);
         };
         fetchExercises();
@@ -24,18 +25,20 @@ function ExerciseList({navigation}) {
         // Add functionality to filter exercises based on search term
     };
 
-    const handleEdit = (id: string) => {
-        console.log('Edit:', id);
+
+    const handleEdit = (exerciseInfo: Exercise) => {
+        navigation.navigate(EXERCISE_EDIT, { exerciseInfo });
+        console.log(`Edit: ${exerciseInfo}`);
     };
 
-    const handleDelete = (id: string) => {
-        console.log('Delete:', id);
+    const handleDelete = (exerciseId: string) => {
+        deleteExercise(exerciseId);
+        console.log(`Delete: ${exerciseId}`);
     };
 
     return (
         <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          {/* <Text style={styles.greeting}>Hi, Madison</Text> */}
           <TextInput
                 placeholder="Search exercises..."
                 style={styles.searchInput}
@@ -52,9 +55,12 @@ function ExerciseList({navigation}) {
             renderItem={({ item }) => (
                 <ExerciseItem
                     exercise={item}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
+                    onEdit={() => handleEdit(item)}
+                    onDelete={() => handleDelete(item.id)}
                 />
+                // <ExerciseItem
+                //     exercise={item}
+                // />
                 )}
         />
         </SafeAreaView>
