@@ -35,9 +35,8 @@ export default function RoutineList ({navigation}) {
     </SafeAreaView>
   );
 
-  function handleRoutinePress(exercises: Exercise[]) {
+  function handleRoutinePress(exercises:string[]) {
     navigation.navigate(EXERCISE_LIST, { exercises });
     console.log('Routine selected:', exercises);
-    // Navigation or further action
   }
 };

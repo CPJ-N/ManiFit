@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Exercise } from '../constants/dataModels/exercise.model'
 import { Icon } from 'react-native-elements';
+import { getExercise } from '../utils/exerciseController';
 
 interface ExerciseProps {
-  item: Exercise;
+  exerciseId: string;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   viewDetails: (exercise: Exercise) => void;
@@ -12,17 +13,29 @@ interface ExerciseProps {
 
 
 
-const ExerciseCard = ({ item, viewDetails }: { item: Exercise, viewDetails: (exercise: Exercise) => void}) => {
+const ExerciseCard = ({ exerciseId, viewDetails }: { exerciseId: string, viewDetails: (exercise: Exercise) => void}) => {
+
+  const [exercise, setExercise] = useState<Exercise>(null);
+
+    useEffect(() => {
+        const fetchExercises = async () => {
+            const fetchedExercise = await getExercise(exerciseId);
+            console.log(fetchedExercise);
+            setExercise(fetchedExercise);
+        };
+        fetchExercises();
+    }, []);
+
   return (
-    <TouchableOpacity style={styles.card} onPress={()=>viewDetails(item)}>
-      <Image source={{ uri: item.image }} style={styles.image} />
+    <TouchableOpacity style={styles.card} onPress={()=>viewDetails(exercise)}>
+      {exercise?.image && <Image source={{ uri: exercise.image }} style={styles.image} />}
       <View style={styles.info}>
       {/* <View style={styles.icons}>
             <Icon name="edit" type="feather" color="#000" size={20} style={{padding: 5}}/>
             <Icon name="trash-2" type="feather" color="#000" size={20} style={{padding: 5}}/>
           </View> */}
-        <Text style={styles.title}>{item.name}</Text>
-        <Text style={styles.details}>{`${item.duration} Minutes · ${item.sets} Kcal · ${item.repetitions} Exercises`}</Text>
+        <Text style={styles.title}>{exercise?.name}</Text>
+        <Text style={styles.details}>{`${exercise?.duration} Minutes · ${exercise?.sets} Kcal · ${exercise?.repetitions} Exercises`}</Text>
       </View>
     </TouchableOpacity>
   )
