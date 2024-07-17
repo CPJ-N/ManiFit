@@ -8,7 +8,12 @@ import ExerciseItem from './ExerciseItem';
 import { deleteExercise } from '../utils/exerciseController';
 import ExerciseCard from './ExerciseCard';
 
-function ExerciseList({navigation}) {
+interface ExerciseListProps {
+    navigation: any,
+    routineExercises: Exercise[]
+}
+
+function ExerciseList({navigation, routineExercises}: ExerciseListProps) {
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 

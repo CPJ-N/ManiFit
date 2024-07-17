@@ -5,7 +5,7 @@ import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BOTTOM_TABS, HOME, LOGIN, WELCOME } from '../../constants/screenNames';
 import { createUser } from '../../utils/userController';
-import { User } from '../../constants/dataModels/userInfo.model';
+import { User } from '../../constants/dataModels/userDetails.model';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 // import { AppDispatch } from '../store/reduxStore';
