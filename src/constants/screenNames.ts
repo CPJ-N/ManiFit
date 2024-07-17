@@ -8,6 +8,7 @@ export const EDIT_PROFILE = 'EDIT_PROFILE';
 export const EXERCISE_FORM = 'EXERCISE_FORM';
 export const EXERCISE_LIST = 'EXERCISE_LIST';
 export const EXERCISE_EDIT = 'EXERCISE_EDIT';
+export const EXERCISE_DETAILS = 'EXERCISE_DETAILS';
 
 export const AUTH_TABS = 'AUTH_TABS';
 export const BOTTOM_TABS = 'BOTTOM_TABS';

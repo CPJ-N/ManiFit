@@ -7,7 +7,7 @@ import { Exercise } from '../constants/dataModels/exercise.model';
 import { Picker } from '@react-native-picker/picker';
 
 
-export default function EditExerciseScreen({navigation}) {
+export default function EditExercise({navigation}) {
     // Access the current route
     const route = useRoute();
 

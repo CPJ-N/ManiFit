@@ -28,7 +28,7 @@ export default function BottomNavigation() {
                         <Ionicons name="albums-outline" size={size} color={color} />
                     ),
                 }}/>
-                <BottomTabs.Screen name={FAVORITE} component={ImageUploadScreen}
+                <BottomTabs.Screen name={FAVORITE} component={FavoriteScreen}
                     options={{
                         tabBarIcon: ({color, size}) => (
                         <Ionicons name="bookmarks-outline" size={size} color={color} />

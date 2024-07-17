@@ -3,9 +3,10 @@ import { Icon } from 'react-native-elements';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
 import { getAllExercises } from '../utils/exerciseController'; // Import the API function to get all exercises
-import { EXERCISE_EDIT, EXERCISE_FORM } from '../constants/screenNames';
+import { EXERCISE_DETAILS, EXERCISE_EDIT, EXERCISE_FORM } from '../constants/screenNames';
 import ExerciseItem from './ExerciseItem';
 import { deleteExercise } from '../utils/exerciseController';
+import ExerciseCard from './ExerciseCard';
 
 function ExerciseList({navigation}) {
     const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -28,13 +29,18 @@ function ExerciseList({navigation}) {
 
     const handleEdit = (exerciseInfo: Exercise) => {
         navigation.navigate(EXERCISE_EDIT, { exerciseInfo });
-        console.log(`Edit: ${exerciseInfo}`);
+        console.log(`Edit Exercise: ${exerciseInfo.id}`);
     };
 
     const handleDelete = (exerciseId: string) => {
         deleteExercise(exerciseId);
-        console.log(`Delete: ${exerciseId}`);
+        console.log(`Delete Exercise: ${exerciseId}`);
     };
+
+    const viewDetails = (exerciseInfo: Exercise) => {
+        navigation.navigate(EXERCISE_DETAILS, { exerciseInfo });
+        console.log(`View Exercise Details: ${exerciseInfo.id}`);
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -49,7 +55,7 @@ function ExerciseList({navigation}) {
             <Icon name="plus" type="feather" color="#fff" size={25} onPress={() => navigation.navigate(EXERCISE_FORM)}/>
           </View>
         </View>
-        <FlatList
+        {/* <FlatList
             data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
@@ -61,6 +67,16 @@ function ExerciseList({navigation}) {
                 // <ExerciseItem
                 //     exercise={item}
                 // />
+                )}
+        /> */}
+        <FlatList
+            data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+                <ExerciseCard
+                    item={item}
+                    viewDetails={viewDetails}
+                />
                 )}
         />
         </SafeAreaView>
