@@ -30,7 +30,7 @@ function ExerciseList({navigation}) {
     // }, []);
 
     useEffect(() => {
-        setExerciseIds(routineExerciseIds);
+        routineExerciseIds ? setExerciseIds(routineExerciseIds) : [];
     }, [routineExerciseIds]);
 
     const handleSearch = (text: string) => {

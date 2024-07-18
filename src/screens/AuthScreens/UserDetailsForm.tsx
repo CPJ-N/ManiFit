@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { UserDetails } from '../constants/dataModels/userDetails.model';
+import { UserDetails } from '../../constants/dataModels/userDetails.model';
+import { auth } from '../../config/firebase'
+import { createUser } from '../../utils/userController';
+import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
 
-export default function UserDetailsForm() {
-  const navigation = useNavigation();
+export default function UserDetailsForm({ navigation }) {
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     fullName: 'Madison Smith',
@@ -17,8 +18,10 @@ export default function UserDetailsForm() {
     isTrainer: false,
   });
 
-  const handleUpdate = () => {
+  const handleSubmit = () => {
+    createUser(userDetails);
     console.log('userDetails updated:', userDetails);
+    navigation.navigate(BOTTOM_TABS, {screen: {HOME}});
   };
 
   const handleChange = (value: string, field: keyof UserDetails) => {
@@ -31,16 +34,19 @@ export default function UserDetailsForm() {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>My Profile</Text>
+        <Text style={styles.headerText}>Setup Your Profile</Text>
       </View>
       <View style={styles.profileSection}>
-        <Image
-          source={{ uri: 'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
-          style={styles.profileImage}
-        />
+        <View style={{ position: 'relative' }}>
+          <Image
+            source={{ uri: 'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
+            style={styles.profileImage}
+          />
+          <Ionicons name="pencil" size={20} color="#fff" style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor:'grey', padding:5, borderRadius:20 }} />
+        </View> 
         <View style={styles.infoContainer}>
           {/* <Text style={styles.name}>{userDetails.fullName}</Text> */}
-          <Text style={styles.detailsText}>{userDetails.email}</Text>
+          <Text style={styles.detailsText}>{auth.currentUser?.email}</Text>
           {/* <Text style={styles.detailsText}>Birthday: {userDetails.dateOfBirth}</Text> */}
         </View>
       </View>
@@ -57,8 +63,8 @@ export default function UserDetailsForm() {
           </View>
         ))}
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-        <Text style={styles.buttonText}>Update Profile</Text>
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Submit Profile</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -96,11 +102,12 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 150,
+    height: 150,
+    borderRadius: 50,
   },
   infoContainer: {
+    paddingTop: 5,
     alignItems: 'center',
   },
   name: {
@@ -110,8 +117,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    marginBottom: 5,
-    color: '#fff'
+    marginTop: 5,
+    color: '#000'
   },
   detailsText: {
     fontSize: 16,
