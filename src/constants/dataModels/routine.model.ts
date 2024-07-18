@@ -1,9 +1,9 @@
 import { Exercise } from "./exercise.model";
 
 export interface Routine {
-  id: string;
+  id?: string;
   name: string;
-  description: string;
+  description?: string;
   exercises: Exercise[];
-  trainerId: string;
+  trainerId?: string;
 }

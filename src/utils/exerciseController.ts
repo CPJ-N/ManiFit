@@ -48,7 +48,11 @@ export const getExercise = async (exerciseId: string): Promise<Exercise> => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      return docSnap.data() as Exercise;
+      const exercise = {
+        id: docSnap.id,
+        ...docSnap.data(),
+      } as Exercise;
+      return exercise;
     } else {
       throw new Error("No such document");
     }

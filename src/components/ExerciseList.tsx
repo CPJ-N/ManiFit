@@ -7,19 +7,31 @@ import { EXERCISE_DETAILS, EXERCISE_EDIT, EXERCISE_FORM } from '../constants/scr
 import ExerciseItem from './ExerciseItem';
 import { deleteExercise } from '../utils/exerciseController';
 import ExerciseCard from './ExerciseCard';
+import { useRoute } from '@react-navigation/native';
+
 
 function ExerciseList({navigation}) {
+    const route = useRoute();
+
+    // Assuming the data you want is passed as a parameter named 'exerciseData'
+    const routineExerciseIds = (route.params as { exercises: string[] }).exercises;
+
+    const [exerciseIds, setExerciseIds] = useState<string[]>();
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // useEffect(() => {
+    //     const fetchExercises = async () => {
+    //         const fetchedExercises = await getAllExercises();
+    //         // console.log(fetchedExercises);
+    //         setExercises(fetchedExercises);
+    //     };
+    //     fetchExercises();
+    // }, []);
+
     useEffect(() => {
-        const fetchExercises = async () => {
-            const fetchedExercises = await getAllExercises();
-            // console.log(fetchedExercises);
-            setExercises(fetchedExercises);
-        };
-        fetchExercises();
-    }, []);
+        setExerciseIds(routineExerciseIds);
+    }, [routineExerciseIds]);
 
     const handleSearch = (text: string) => {
         setSearchTerm(text);
@@ -70,11 +82,12 @@ function ExerciseList({navigation}) {
                 )}
         /> */}
         <FlatList
-            data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
-            keyExtractor={item => item.id}
+            // data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
+            data={exerciseIds}
+            keyExtractor={item => item}
             renderItem={({ item }) => (
                 <ExerciseCard
-                    item={item}
+                    exerciseId={item}
                     viewDetails={viewDetails}
                 />
                 )}
