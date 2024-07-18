@@ -7,6 +7,7 @@ export const PROFILE = 'PROFILE';
 export const EDIT_PROFILE = 'EDIT_PROFILE';
 export const EXERCISE_FORM = 'EXERCISE_FORM';
 export const EXERCISE_LIST = 'EXERCISE_LIST';
+export const EXERCISE_SCREEN = 'EXERCISE_SCREEN';
 
 export const AUTH_TABS = 'AUTH_TABS';
 export const BOTTOM_TABS = 'BOTTOM_TABS';
