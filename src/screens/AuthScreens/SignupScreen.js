@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, KeyboardAvo
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // or any other icon library
 import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { BOTTOM_TABS, HOME, LOGIN, WELCOME } from '../../constants/screenNames';
+import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM, WELCOME } from '../../constants/screenNames';
 import { createUser } from '../../utils/userController';
 import { User } from '../../constants/dataModels/userDetails.model';
 import { useDispatch } from 'react-redux';
@@ -29,10 +29,11 @@ export default function SignUp({navigation}) {
         email: user.email
       }
 
-      createUser(newUser);
+      // createUser(newUser);
       dispatch(setUser(newUser));
 
-      navigation.navigate(BOTTOM_TABS, {screen: {HOME}})
+      navigation.navigate(USER_DETAILS_FORM);
+      // navigation.navigate(BOTTOM_TABS, {screen: {HOME}});
     })
     .catch((error) => {
       const errorCode = error.code;

@@ -36,7 +36,7 @@ export default function ExerciseForm({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: '#000',}}>
+    <SafeAreaView style={{backgroundColor: '#000', flex: 1}}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.label}>Name *</Text>
         <TextInput
