@@ -1,9 +1,9 @@
-import { Routine } from "./routine.model";
 
 // Session.ts
 export interface Session {
-    sessionId: string;
-    routines: Routine[]; // Array of routine IDs included in the session
+    sessionId?: string;
+    name: string;
+    routines: string[]; // Array of routine IDs included in the session
     createdBy: string; // Trainer ID
     assignees: Assignee[]; // Array of objects containing trainee IDs and specific session dates
 }

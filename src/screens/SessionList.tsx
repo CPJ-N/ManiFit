@@ -1,7 +1,9 @@
 // SessionList.tsx
-import React from 'react';
-import { View, FlatList, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, Text, StyleSheet, TextInput, SafeAreaView } from 'react-native';
 import SessionItem from '../components/SessionItem';
+import { Icon } from 'react-native-elements';
+import { SESSION_FORM } from '../constants/screenNames';
 
 interface Session {
   sessionId: string;
@@ -31,15 +33,32 @@ const sampleSessions: Session[] = [
   }
 ];
 
-const SessionsList: React.FC = () => {
+export default function SessionsList ({navigation}) {
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const handleSearch = (text: string) => {
+        setSearchTerm(text);
+        // Add functionality to filter exercises based on search term
+    };
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TextInput
+                placeholder="Search exercises..."
+                style={styles.searchInput}
+                value={searchTerm}
+                onChangeText={handleSearch}
+            />
+          <View style={styles.icons}>
+            <Icon name="plus" type="feather" color="#000" size={25} onPress={() => navigation.navigate(SESSION_FORM)}/>
+          </View>
+        </View>
       <FlatList
         data={sampleSessions}
         keyExtractor={(item) => item.sessionId}
         renderItem={({ item }) => <SessionItem session={item} />}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -49,6 +68,22 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     backgroundColor: '#fff',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+  },
+searchInput: {
+    flex: 1,
+    fontSize: 16,
+    padding: 10,
+    backgroundColor: '#f4f4f4',
+    borderRadius: 10,
+},
+icons: {
+    flexDirection: 'row',
+    marginLeft: 10,
+}
 });
 
-export default SessionsList;

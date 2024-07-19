@@ -12,6 +12,7 @@ export const EXERCISE_EDIT = 'EXERCISE_EDIT';
 export const EXERCISE_DETAILS = 'EXERCISE_DETAILS';
 export const ROUTINE_LIST = 'ROUTINE_LIST';
 export const SESSION_LIST = 'SESSION_LIST';
+export const SESSION_FORM = 'SESSION_FORM';
 
 export const AUTH_TABS = 'AUTH_TABS';
 export const BOTTOM_TABS = 'BOTTOM_TABS';

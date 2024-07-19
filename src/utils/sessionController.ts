@@ -1,8 +1,9 @@
 import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc } from "firebase/firestore";
 import { db } from '../config/firebase';  // Your Firebase initialization file
 import { SESSIONS } from "../constants/firebaseCollections";
+import { Session } from "../constants/dataModels/session.model";
 
-export const addSession = async (session: any) => {
+export const createSession = async (session: Session) => {
     try {
         const docRef = await addDoc(collection(db, SESSIONS), session);
         console.log("Document written with ID: ", docRef.id);

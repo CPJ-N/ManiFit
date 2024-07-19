@@ -5,6 +5,21 @@ import { UserDetails } from '../../constants/dataModels/userDetails.model';
 import { auth } from '../../config/firebase'
 import { createUser } from '../../utils/userController';
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
+import { Picker } from '@react-native-picker/picker';
+
+// Define the interface for the item
+interface ListItem {
+  id: string;
+  name: string;
+}
+
+const FitnessGoals: ListItem[] = [
+  { id: '1', name: 'Lose Wight' },
+  { id: '2', name: 'Gain Wight' },
+  { id: '3', name: 'Muscle Mass Gail' },
+  { id: '4', name: 'Shape Body' },
+  { id: '5', name: 'Others' },
+];
 
 export default function UserDetailsForm({ navigation }) {
 
@@ -17,6 +32,25 @@ export default function UserDetailsForm({ navigation }) {
     height: '1.65 CM',
     isTrainer: false,
   });
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const renderOptionsItem = ({ item } : { item: ListItem }) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() => handleSelectItem(item.id)}
+    >
+      <Text style={styles.text}>{item.name}</Text>
+      <Text style={styles.text}>{selectedIds.includes(item.id) ? '✓' : ''}</Text>
+    </TouchableOpacity>
+  );
+
+  const handleSelectItem = (id: string) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter(item => item !== id));
+    } else {
+      setSelectedIds([...selectedIds, id]);
+    }
+  };
 
   const handleSubmit = () => {
     createUser(userDetails);
@@ -24,7 +58,7 @@ export default function UserDetailsForm({ navigation }) {
     navigation.navigate(BOTTOM_TABS, {screen: {HOME}});
   };
 
-  const handleChange = (value: string, field: keyof UserDetails) => {
+  const handleChange = (value: any, field: keyof UserDetails) => {
     setUserDetails({ ...userDetails, [field]: value });
   };
 
@@ -50,7 +84,7 @@ export default function UserDetailsForm({ navigation }) {
           {/* <Text style={styles.detailsText}>Birthday: {userDetails.dateOfBirth}</Text> */}
         </View>
       </View>
-      <View style={styles.inputContainer}>
+      {/* <View style={styles.inputContainer}>
         {Object.keys(userDetails).map((key) => (
           <View key={key}>
             <Text style={styles.label}>{key}</Text>
@@ -62,7 +96,47 @@ export default function UserDetailsForm({ navigation }) {
             />
           </View>
         ))}
-      </View>
+      </View> */}
+      <Text style={styles.label}>Full Name</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => handleChange(text, 'fullName')}
+        value={userDetails['fullName'].toString()}
+      />
+      <Text style={styles.label}>Phone Number</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => handleChange(text, 'mobileNumber')}
+        value={userDetails['mobileNumber'].toString()}
+      />
+      <Text style={styles.label}>Date Of Birth</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => handleChange(text, 'dateOfBirth')}
+        value={userDetails['dateOfBirth'].toString()}
+      />
+      <Text style={styles.label}>Weight</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => handleChange(text, 'weight')}
+        value={userDetails['weight'].toString()}
+      />
+      <Text style={styles.label}>Height</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => handleChange(text, 'height')}
+        value={userDetails['height'].toString()}
+      />
+      
+      <Text style={styles.label}>Are you a Trainer?</Text>
+        <Picker
+          selectedValue={userDetails.isTrainer}
+          onValueChange={(itemValue, itemIndex) => handleChange(itemValue, 'isTrainer')}
+          style={styles.picker}
+        >
+          <Picker.Item label="Yes" value={true} />
+          <Picker.Item label="No" value={false} />
+        </Picker>
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit Profile</Text>
       </TouchableOpacity>
@@ -120,6 +194,11 @@ const styles = StyleSheet.create({
     marginTop: 5,
     color: '#000'
   },
+  picker: {
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+  },
   detailsText: {
     fontSize: 16,
     color: '#666',
@@ -148,5 +227,15 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  item: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  text: {
+    fontSize: 16,
   },
 });
