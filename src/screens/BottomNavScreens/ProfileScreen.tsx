@@ -31,6 +31,9 @@ export default function ProfileScreen({navigation}) {
             case "Favorite":
                 navigation.navigate(FAVORITE);
                 break;
+            case "Privacy Policy":
+                console.log(auth.currentUser?.uid);
+                break;
             case "Logout":
                 handleLogOut();
                 break;
@@ -64,14 +67,14 @@ export default function ProfileScreen({navigation}) {
                     source={{ uri: 'https://images.pexels.com/photos/3806244/pexels-photo-3806244.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }}
                     style={styles.profileImage} 
                 />
-                <Text style={styles.name}>Madison Smith</Text>
+                <Text style={styles.name}>{userInfo?.fullName}</Text>
                 {/* <Text style={styles.email}>{auth.currentUser?.email}</Text> */}
                 <Text style={styles.email}>{userInfo?.email}</Text>
 
                 <Text style={styles.birthday}>Birthday: April 1st</Text>
                 <View style={styles.statsContainer}>
                     <View style={styles.stat}>
-                        <Text style={styles.statValue}>75 Kg</Text>
+                        <Text style={styles.statValue}>{userInfo?.weight}</Text>
                         <Text style={styles.statLabel}>Weight</Text>
                     </View>
                     <View style={styles.stat}>
@@ -79,7 +82,7 @@ export default function ProfileScreen({navigation}) {
                         <Text style={styles.statLabel}>Years Old</Text>
                     </View>
                     <View style={styles.stat}>
-                        <Text style={styles.statValue}>1.65 CM</Text>
+                        <Text style={styles.statValue}>{userInfo?.height}</Text>
                         <Text style={styles.statLabel}>Height</Text>
                     </View>
                 </View>
