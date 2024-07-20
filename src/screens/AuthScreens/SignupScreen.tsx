@@ -5,7 +5,6 @@ import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM, WELCOME } from '../../constants/screenNames';
 import { createUser } from '../../utils/userController';
-import { User } from '../../constants/dataModels/userDetails.model';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 // import { AppDispatch } from '../store/reduxStore';
@@ -21,8 +20,8 @@ export default function SignUp({navigation}) {
     .then((userCredential) => {
       // Signed in
       const user = userCredential.user;
-      console.log(user.email)
-      console.log(user)
+      // console.log(user.email)
+      // console.log(user)
 
       const newUser = {
         uid: user.uid, 
@@ -30,7 +29,7 @@ export default function SignUp({navigation}) {
       }
 
       // createUser(newUser);
-      dispatch(setUser(newUser));
+      // dispatch(setUser(newUser));
 
       navigation.navigate(USER_DETAILS_FORM);
       // navigation.navigate(BOTTOM_TABS, {screen: {HOME}});

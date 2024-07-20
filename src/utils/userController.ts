@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, updateDoc, } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { UserDetails } from '../constants/dataModels/userDetails.model';
 import { USER_DETAILS } from '../constants/firebaseCollections';
@@ -6,10 +6,12 @@ import { USER_DETAILS } from '../constants/firebaseCollections';
 // TODO: Test out these api calls in  app
 
 // Create user info
-const createUser = async (userInfo: UserDetails) => {
+const createUser = async (userInfo: UserDetails, userId: string) => {
     try {
-        const docRef = await addDoc(collection(db, USER_DETAILS), userInfo);
-        console.log('User created with ID: ', docRef.id);
+        console.log(userInfo);
+        // const docRef = await addDoc(collection(db, USER_DETAILS), userInfo);
+        const docRef = await setDoc(doc(collection(db, USER_DETAILS), userId), userInfo);
+        console.log('User created with ID: ', docRef);
     } catch (error) {
         console.error('Error creating user: ', error);
     }
@@ -44,8 +46,27 @@ const getUser = async (userId: string) => {
         if (userDocSnap.exists()) {
             const userInfo = userDocSnap.data() as UserDetails;
             console.log('User info: ', userInfo);
+            return userInfo;
         } else {
             console.log('User not found');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error getting user: ', error);
+    }
+};
+
+//get user using their email this is inside the doc
+export const getUserByEmail = async (email: string) => {
+    try {
+        const userDocSnap = await getDoc(doc(db, USER_DETAILS, email)); 
+        if (userDocSnap.exists()) {
+            const userInfo = userDocSnap.data() as UserDetails;
+            console.log('User info: ', userInfo);
+            return userInfo;
+        } else {
+            console.log('User not found');
+            return null;
         }
     } catch (error) {
         console.error('Error getting user: ', error);

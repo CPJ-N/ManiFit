@@ -6,6 +6,8 @@ import { auth } from '../../config/firebase'
 import { createUser } from '../../utils/userController';
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
 import { Picker } from '@react-native-picker/picker';
+import { setUser } from '../../store/userSlice';
+import { useDispatch } from 'react-redux';
 
 // Define the interface for the item
 interface ListItem {
@@ -25,7 +27,7 @@ export default function UserDetailsForm({ navigation }) {
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     fullName: 'Madison Smith',
-    email: 'madisons@example.com',
+    email: auth.currentUser?.email,
     mobileNumber: '+123 567 89000',
     dateOfBirth: '01 / 04 / 199X',
     weight: '75 Kg',
@@ -33,6 +35,7 @@ export default function UserDetailsForm({ navigation }) {
     isTrainer: false,
   });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const dispatch = useDispatch();
 
   const renderOptionsItem = ({ item } : { item: ListItem }) => (
     <TouchableOpacity
@@ -52,8 +55,9 @@ export default function UserDetailsForm({ navigation }) {
     }
   };
 
-  const handleSubmit = () => {
-    createUser(userDetails);
+  const handleSubmit = async () => {
+    await createUser(userDetails, auth.currentUser?.uid);
+    dispatch(setUser(userDetails));
     console.log('userDetails updated:', userDetails);
     navigation.navigate(BOTTOM_TABS, {screen: {HOME}});
   };
