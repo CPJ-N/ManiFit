@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'rea
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth } from '../../config/firebase'
 import { signOut } from 'firebase/auth'
-import { AUTH_TABS, EDIT_PROFILE, FAVORITE, LOGIN } from '../../constants/screenNames';
+import { AUTH_TABS, COMPLETE_EXERCISE_LIST, EDIT_PROFILE, EXERCISE_TABS, FAVORITE, LOGIN } from '../../constants/screenNames';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 
@@ -33,6 +33,10 @@ export default function ProfileScreen({navigation}) {
                 break;
             case "Privacy Policy":
                 console.log(auth.currentUser?.uid);
+                break;
+            case "Help":
+                navigation.navigate(EXERCISE_TABS)
+                console.log('Help');
                 break;
             case "Logout":
                 handleLogOut();
