@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Icon } from 'react-native-elements';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
-import { getAllExercises } from '../utils/exerciseController'; // Import the API function to get all exercises
 import { EXERCISE_DETAILS, EXERCISE_EDIT, EXERCISE_FORM } from '../constants/screenNames';
-import ExerciseItem from './ExerciseItem';
-import { deleteExercise } from '../utils/exerciseController';
 import ExerciseCard from './ExerciseCard';
 import { useRoute } from '@react-navigation/native';
+import { deleteExercise } from '../utils/controllers/exerciseController';
 
 
 function ExerciseList({navigation}) {

@@ -1,5 +1,5 @@
-export interface User {
-    uid: string; // Unique identifier for the user
+export interface UserDetails {
+    uid?: string; // Unique identifier for the user
     email: string; // Email address of the user
     fullName: string; // Full name of the user
     mobileNumber?: string; // Mobile number of the user

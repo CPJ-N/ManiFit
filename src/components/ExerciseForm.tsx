@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Exercise } from '../constants/dataModels/exercise.model';
-import { addExercise } from '../utils/exerciseController';
 import { ROUTINE_LIST } from '../constants/screenNames';
 import { auth } from '../config/firebase';
+import { addExercise } from '../utils/controllers/exerciseController';
 
 export default function ExerciseForm({ navigation }) {
   const [exercise, setExercise] = useState<Exercise>({

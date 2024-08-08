@@ -1,7 +1,7 @@
 import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc } from "firebase/firestore";
-import { db } from '../config/firebase';  // Your Firebase initialization file
-import { Exercise } from "../constants/dataModels/exercise.model";
-import { EXERCISES } from "../constants/firebaseCollections";
+import { Exercise } from "../../constants/dataModels/exercise.model";
+import { EXERCISES } from "../../constants/firebaseCollections";
+import { db } from "../../config/firebase";
 
 export const addExercise = async (exercise: Exercise) => {
   try {

@@ -19,7 +19,7 @@ const EditProfileScreen = ({navigation}) => {
     dateOfBirth: userInfo?.dateOfBirth,
     weight: userInfo?.weight,
     height: userInfo?.height,
-    isTrainer: userInfo?.isTrainer, // Add the missing isTrainer property
+    isTrainer: userInfo?.isTrainer,
   });
 
   const handleUpdate = () => {
@@ -58,7 +58,7 @@ const EditProfileScreen = ({navigation}) => {
             key={key}
             style={styles.input}
             onChangeText={(text) => handleChange(text, key as keyof UserDetails)}
-            value={profile[key as keyof UserDetails].toString()}
+            value={(profile[key as keyof UserDetails] ?? '').toString()}
           />
         ))}
       </View>

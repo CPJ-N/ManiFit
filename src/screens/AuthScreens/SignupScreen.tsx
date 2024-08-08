@@ -4,7 +4,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // or any o
 import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM, WELCOME } from '../../constants/screenNames';
-import { createUser } from '../../utils/userController';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 // import { AppDispatch } from '../store/reduxStore';
