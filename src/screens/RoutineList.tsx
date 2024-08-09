@@ -19,6 +19,8 @@ import { getAllRoutines } from '../utils/controllers/routineController';
 	•	Save the configured routine to the database with the associated exercise details.
 */
 
+//TODO: manage exercise rendering when selection a routine
+
 export default function RoutineList ({navigation}) {
   const [routines, setRoutines] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -32,12 +34,11 @@ export default function RoutineList ({navigation}) {
     const fetchRoutines = async () => {
       const routines = await getAllRoutines();
       setRoutines(routines);
-      console.log(routines);
       setLoading(false);
     };
   
     fetchRoutines();
-  }, []);
+  }, [routines]);
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;

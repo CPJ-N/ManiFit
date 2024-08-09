@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, SafeAreaView, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import { ROUTINE_LIST } from '../constants/screenNames';
-import { getImageUrl } from '../utils/imageHelpers/getImageUrl';
 import { addRoutine } from '../utils/controllers/routineController';
 import { auth } from '../config/firebase';
 import { exerciseImageUrlPrefix } from '../constants/serverConstant';
+import { ExerciseDetails } from '../constants/dataModels/exercise.model';
 
 export default function ConfigureExercisesScreen({ route, navigation }){
   const { selectedExercises, name, description } = route.params;
@@ -47,13 +47,21 @@ export default function ConfigureExercisesScreen({ route, navigation }){
   const saveRoutine = () => {
     // Save the routine with the exercise details to the database
     // Code to save the routine goes here
+    const exerciseDetailsConcise: ExerciseDetails[] = exerciseDetails.map((exercise) => ({
+      exerciseId: exercise.id,
+      sets: exercise.sets,
+      repetitions: exercise.repetitions,
+      duration: exercise.duration,
+      weight: exercise.weight,
+      specialInstructions: exercise.specialInstructions,
+    }));
     addRoutine({
       name: name,
       description: description,
-      exercises: exerciseDetails,
+      exercises: exerciseDetailsConcise,
       createdBy: auth.currentUser?.uid,
     })
-    console.log('Routine saved', exerciseDetails);
+    console.log('Routine saved', exerciseDetailsConcise);
     navigation.navigate(ROUTINE_LIST);
   };
 

@@ -22,13 +22,18 @@ export default function CreateRoutineForm({ navigation }) {
     }
     
     // await addRoutine(routine);
-    navigation.navigate(SELECT_ROUTINE_EXERCISES, routine);
+    const rotuineInfo = routine;
+    setRoutine({
+      name: '',
+      description: ''
+    })
+    navigation.navigate(SELECT_ROUTINE_EXERCISES, rotuineInfo);
     // console.log('Success', 'Exercise added successfully.');
     // Alert.alert('Success', 'Exercise added successfully.');
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: '#000', flex: 1}}>
+    <SafeAreaView style={{backgroundColor: '#fff', flex: 1}}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.label}>Name *</Text>
         <TextInput
@@ -68,7 +73,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
-    color: '#fff'
+    color: '#000'
   },
   picker: {
     marginBottom: 20,

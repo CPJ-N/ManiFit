@@ -15,12 +15,13 @@ import AuthNavigation from './src/navigation/AuthNavigation';
 
 const Stack = createNativeStackNavigator();
 
-// TO DO: Add redux toolkit for state management
+// TODO: configure redux toolkit state management for loading screen
 
 export default function App() {
   return (
     <Provider store={store}>
       <NavigationContainer>
+        <StatusBar style="auto" />
         <Stack.Navigator screenOptions={{headerShown: false}}>
           {/* <Stack.Screen name="loading Screen" component={LoadingScreen} /> */}
           <Stack.Screen name={AUTH_TABS} component={AuthNavigation} />

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Button, TextInput, SafeAreaView, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { CONFIGURE_EXERCISES } from '../constants/screenNames';
-import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
+// import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
 import { getImageUrl } from '../utils/imageHelpers/getImageUrl';
 import { getAllExercises } from '../utils/controllers/exerciseController';
 import { exerciseImageUrlPrefix } from '../constants/serverConstant';
@@ -11,7 +11,7 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
   const { routineId } = route.params || {};
   const { name, description } = route.params;
   const [searchQuery, setSearchQuery] = useState('');
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exercises, setExercises] = useState<any[]>([]);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [imageUrls, setImageUrls] = useState<{ [key: string]: string }>({});
 
@@ -19,8 +19,13 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
       const fetchExercises = async () => {
           const fetchedExercises = await getAllExercises();
           // console.log(fetchedExercises);
-          setExercises(fetchedExercises);
-
+          
+          const exercisesWithSelection = fetchedExercises.map(exercise => ({
+            ...exercise,
+            isSelected: false,
+          }));
+          
+          setExercises(exercisesWithSelection);
           // const urls = await Promise.all(
           //   fetchedExercises.map(async (exercise) => {
           //     if (exercise.images && exercise.images.length > 0) {
@@ -36,16 +41,38 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
       fetchExercises();
   }, []);
 
+  // const addExercise = (exercise) => {
+  //   setSelectedExercises((prev) => [...prev, exercise]);
+  //   // remove the exercise from the list of exercises
+  //   // setExercises((prev) => prev.filter((ex) => ex.id !== exercise && ex.id));
+
+  //   console.log(exercise.name);
+  // };
+
+  // const removeExercise = (exercise) => {
+  //   setSelectedExercises((prev) => prev.filter((ex) => ex.id !== exercise.id));
+  // };
+
   const addExercise = (exercise) => {
     setSelectedExercises((prev) => [...prev, exercise]);
-    // remove the exercise from the list of exercises
-    // setExercises((prev) => prev.filter((ex) => ex.id !== exercise && ex.id));
-
-    console.log(exercise.name);
+    setExercises((prev) =>
+      prev.map((ex) =>
+        ex.id === exercise.id ? { ...ex, isSelected: true } : ex
+      )
+    );
+    console.log(`adding: ${exercise.name}`);
   };
 
   const removeExercise = (exercise) => {
-    setSelectedExercises((prev) => prev.filter((ex) => ex.id !== exercise.id));
+    setSelectedExercises((prev) =>
+      prev.filter((ex) => ex.id !== exercise.id)
+    );
+    setExercises((prev) =>
+      prev.map((ex) =>
+        ex.id === exercise.id ? { ...ex, isSelected: false } : ex
+      )
+    );
+    console.log(`removing: ${exercise.name}`);
   };
 
   const filteredExercises = exercises.filter((exercise) =>
@@ -66,7 +93,11 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
         data={filteredExercises}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => addExercise(item)}>
+          <TouchableOpacity 
+            style={styles.card} 
+            onPress={() =>
+              item.isSelected ? removeExercise(item) : addExercise(item)
+            }>
             {/* {imageUrls[item.id] && <Image source={{ uri: imageUrls[item.id] }} style={styles.image} />} */}
             {<Image source={{ uri: `${exerciseImageUrlPrefix}/${item.images[0]}` }} style={styles.image} />}
             <View style={styles.info}>
