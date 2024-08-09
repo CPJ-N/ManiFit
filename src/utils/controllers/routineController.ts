@@ -1,8 +1,10 @@
 import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc } from "firebase/firestore";
-import { db } from '../config/firebase';  // Your Firebase initialization file
-import { ROUTINES } from "../constants/firebaseCollections";
+import { db } from "../../config/firebase";
+import { ROUTINES } from "../../constants/firebaseCollections";
+import { Routine } from "../../constants/dataModels/routine.model";
 
-export const addRoutine = async (routine: any) => {
+
+export const addRoutine = async (routine: Routine) => {
     try {
       const docRef = await addDoc(collection(db, ROUTINES), routine);
       console.log("Document written with ID: ", docRef.id);

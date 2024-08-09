@@ -3,11 +3,11 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
 import { auth } from '../../config/firebase'
-import { createUser } from '../../utils/userController';
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
 import { Picker } from '@react-native-picker/picker';
 import { setUser } from '../../store/userSlice';
 import { useDispatch } from 'react-redux';
+import { createUser } from '../../utils/controllers/userController';
 
 // Define the interface for the item
 interface ListItem {
@@ -30,8 +30,8 @@ export default function UserDetailsForm({ navigation }) {
     email: auth.currentUser?.email,
     mobileNumber: '+123 567 89000',
     dateOfBirth: '01 / 04 / 199X',
-    weight: '75 Kg',
-    height: '1.65 CM',
+    weight: 75,
+    height: 1.65,
     isTrainer: false,
   });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);

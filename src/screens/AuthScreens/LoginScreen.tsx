@@ -5,9 +5,9 @@ import CheckBox from '@react-native-community/checkbox';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
-import { getUser, getUserByEmail } from '../../utils/userController';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
+import { getUser } from '../../config/userService';
 
 export default function Login({navigation}) {
   const [isSelected, setSelection] = useState(false);

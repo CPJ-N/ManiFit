@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Exercise } from '../constants/dataModels/exercise.model'
 import { Icon } from 'react-native-elements';
-import { getExercise } from '../utils/exerciseController';
+import { getExercise } from '../utils/controllers/exerciseController';
 
 interface ExerciseProps {
   exerciseId: string;

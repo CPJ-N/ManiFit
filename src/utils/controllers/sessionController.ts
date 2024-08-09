@@ -1,7 +1,8 @@
 import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc } from "firebase/firestore";
-import { db } from '../config/firebase';  // Your Firebase initialization file
-import { SESSIONS } from "../constants/firebaseCollections";
-import { Session } from "../constants/dataModels/session.model";
+import { Session } from "../../constants/dataModels/session.model";
+import { db } from "../../config/firebase";
+import { SESSIONS } from "../../constants/firebaseCollections";
+
 
 export const createSession = async (session: Session) => {
     try {

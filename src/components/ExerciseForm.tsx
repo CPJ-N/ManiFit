@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Exercise } from '../constants/dataModels/exercise.model';
-import { addExercise } from '../utils/exerciseController';
-import { EXERCISE_LIST } from '../constants/screenNames';
+import { ROUTINE_LIST } from '../constants/screenNames';
+import { auth } from '../config/firebase';
+import { addExercise } from '../utils/controllers/exerciseController';
 
 export default function ExerciseForm({ navigation }) {
   const [exercise, setExercise] = useState<Exercise>({
@@ -15,7 +16,7 @@ export default function ExerciseForm({ navigation }) {
     weight: undefined,
     image: '',
     video: '',
-    trainerId: '1234',  // Assume trainerId is passed or set contextually
+    trainerId: auth.currentUser?.uid,
     category: ''
   });
 
@@ -30,7 +31,7 @@ export default function ExerciseForm({ navigation }) {
     }
     
     await addExercise(exercise);
-    navigation.navigate(EXERCISE_LIST);
+    navigation.navigate(ROUTINE_LIST);
     console.log('Success', 'Exercise added successfully.');
     // Alert.alert('Success', 'Exercise added successfully.');
   };

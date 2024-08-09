@@ -1,131 +1,235 @@
 import React from 'react';
-import { ScrollView, View, Text, Image, StyleSheet } from 'react-native';
-import { Icon } from 'react-native-elements';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { exerciseCategories } from '../../constants/categories';
 
-interface RecommendationProps {
+interface WorkoutVideo {
   title: string;
+  image: any;
   duration: string;
-  kcal: string;
+  exercises: number;
 }
+const workoutVideos = exerciseCategories
+// const workoutVideos: WorkoutVideo[] = [
+//   {
+//     title: 'Loop Band Exercises',
+//     image: require('../../assets/images/slide5.png'),
+//     duration: '45 Minutes',
+//     exercises: 5,
+//   },
+//   {
+//     title: 'Workouts For Beginners',
+//     image: require('../../assets/images/slide5.png'),
+//     duration: '45 Minutes',
+//     exercises: 5,
+//   },
+//   {
+//     title: 'Full Body Stretch',
+//     image: require('../../assets/images/slide5.png'),
+//     duration: '45 Minutes',
+//     exercises: 5,
+//   },
+//   {
+//     title: 'Low Impact Workouts',
+//     image: require('../../assets/images/slide5.png'),
+//     duration: '45 Minutes',
+//     exercises: 5,
+//   },
+//   {
+//     title: 'Strength Training',
+//     image: require('../../assets/images/slide5.png'),
+//     duration: '45 Minutes',
+//     exercises: 5,
+//   },
+//   {
+//     title: 'Split Squats Vs Lunges',
+//     image: require('../../assets/images/slide5.png'),
+//     duration: '45 Minutes',
+//     exercises: 5,
+//   },
+// ];
 
-export default function Home () {
+const Home: React.FC = () => {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
-      <ScrollView style={styles.container}>
-        <View style={styles.header}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <View style={styles.header}>
+        <View>
           <Text style={styles.greeting}>Hi, Madison</Text>
-          <View style={styles.icons}>
-            <Icon name="search" type="feather" color="#fff" size={25} />
-            <Icon name="bell" type="feather" color="#fff" size={25} style={{ marginLeft: 20 }} />
-            <Icon name="plus" type="feather" color="#fff" size={25} style={{ marginLeft: 20 }} />
-          </View>
+          <Text style={styles.subGreeting}>It's Time To Challenge Your Limits.</Text>
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recommendations</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }}>
-            <RecommendationCard title="Squat Exercise" duration="12 Minutes" kcal="120 Kcal" />
-            <RecommendationCard title="Full Body Stretching" duration="12 Minutes" kcal="120 Kcal" />
-          </ScrollView>
+        <View style={styles.headerIcons}>
+          <Ionicons name="search" size={24} color="white" style={styles.icon} />
+          <Ionicons name="notifications" size={24} color="white" style={styles.icon} />
+          <Ionicons name="person" size={24} color="white" style={styles.icon} />
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Weekly Challenge</Text>
-          <ChallengeCard />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Articles & Tips</Text>
-          <TipsCard />
-        </View>
+      </View>
+      <View style={styles.quickActions}>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="barbell" size={24} color="#FFD20A" />
+          <Text style={styles.actionText}>Workout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="stats-chart" size={24} color="#FFD20A" />
+          <Text style={styles.actionText}>Progress Tracking</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="nutrition" size={24} color="#FFD20A" />
+          <Text style={styles.actionText}>Nutrition</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="people" size={24} color="#FFD20A" />
+          <Text style={styles.actionText}>Community</Text>
+        </TouchableOpacity>
+      </View>
+      <ScrollView contentContainerStyle={styles.videoGrid}>
+      <Text style={styles.sectionTitle}>Quick & Easy Workout Videos</Text>
+      <Text style={styles.sectionSubtitle}>Discover Fresh Workouts: Elevate Your Training</Text>
+        {workoutVideos.map((video, index) => (
+          <TouchableOpacity key={index} style={styles.videoCard}>
+            <Image source={video.image} style={styles.videoImage} />
+            <View style={styles.videoInfo}>
+              <Text style={styles.videoTitle}>{video.name}</Text>
+              {/* <Text style={styles.videoTitle}>{video.title}</Text> */}
+              {/* <View style={styles.videoMetrics}>
+                <Ionicons name="time" size={16} color="#8A2BE2" />
+                <Text style={styles.videoMetricText}>{video.duration}</Text>
+                <Ionicons name="barbell" size={16} color="#8A2BE2" />
+                <Text style={styles.videoMetricText}>{video.exercises} Exercises</Text>
+              </View> */}
+            </View>
+            {/* <TouchableOpacity style={styles.playButton}>
+              <Ionicons name="play" size={24} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.favoriteButton}>
+              <Ionicons name="star-outline" size={20} color="white" />
+            </TouchableOpacity> */}
+          </TouchableOpacity>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const RecommendationCard: React.FC<RecommendationProps> = ({ title, duration, kcal }) => (
-    <View style={styles.recommendationCard}>
-        <Image source={require('../../assets/images/slide5.png')} style={styles.recommendationImage} />
-        <Text style={styles.cardTitle}>{title}</Text>
-        <Text style={styles.cardSubTitle}>{duration} | {kcal}</Text>
-    </View>
-);
-
-const ChallengeCard: React.FC = () => (
-  <View style={styles.challengeCard}>
-    <Text style={styles.challengeText}>Plank With Hip Twist</Text>
-  </View>
-);
-
-const TipsCard: React.FC = () => (
-  <View style={styles.tipsCard}>
-    <Text style={styles.tipsText}>15 Quick & Effective Daily Routines</Text>
-  </View>
-);
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#1E1E1E',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: 16,
   },
   greeting: {
     fontSize: 24,
-    color: '#fff',
     fontWeight: 'bold',
+    color: '#FFD20A',
   },
-  icons: {
+  subGreeting: {
+    fontSize: 14,
+    color: 'gray',
+  },
+  headerIcons: {
     flexDirection: 'row',
   },
-  section: {
-    marginTop: 20,
-    paddingHorizontal: 20,
+  icon: {
+    marginLeft: 16,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 16,
+  },
+  actionButton: {
+    alignItems: 'center',
+  },
+  actionText: {
+    color: 'white',
+    marginTop: 4,
+    fontSize: 12,
   },
   sectionTitle: {
-    fontSize: 18,
-    color: '#fff',
+    fontSize: 20,
     fontWeight: 'bold',
+    color: 'white',
+    marginLeft: 16,
+    marginTop: 16,
   },
-  recommendationCard: {
-    backgroundColor: '#333',
-    borderRadius: 10,
-    padding: 10,
-    marginRight: 10,
+  sectionSubtitle: {
+    fontSize: 14,
+    color: 'gray',
+    marginLeft: 16,
+    marginBottom: 16,
   },
-  recommendationImage: {
-    width: 150,
-    height: 100,
-    borderRadius: 10,
+  videoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    padding: 8,
   },
-  cardTitle: {
-    color: '#fff',
+  videoCard: {
+    width: '48%',
+    marginBottom: 16,
+    backgroundColor: '#2A2A2A',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  videoImage: {
+    width: '100%',
+    height: 120,
+    resizeMode: 'cover',
+  },
+  videoInfo: {
+    padding: 8,
+  },
+  videoTitle: {
+    color: 'white',
     fontWeight: 'bold',
+    marginBottom: 4,
   },
-  cardSubTitle: {
-    color: '#aaa',
+  videoMetrics: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  challengeCard: {
-    backgroundColor: '#444',
-    padding: 20,
-    borderRadius: 10,
+  videoMetricText: {
+    color: 'gray',
+    fontSize: 12,
+    marginLeft: 4,
+    marginRight: 8,
   },
-  challengeText: {
-    color: '#fff',
-    fontSize: 16,
+  playButton: {
+    position: 'absolute',
+    right: 8,
+    bottom: 8,
+    backgroundColor: '#8A2BE2',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  tipsCard: {
-    backgroundColor: '#555',
-    padding: 20,
-    borderRadius: 10,
-  },
-  tipsText: {
-    color: '#fff',
-    fontSize: 16,
-  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });
+
+export default Home;

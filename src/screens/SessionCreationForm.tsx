@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, SafeAreaView } from 'react-native';
-import { createSession } from '../utils/sessionController';
 import { Routine } from '../constants/dataModels/routine.model';
-import { Session } from '../constants/dataModels/session.model';
+import { createSession } from '../utils/controllers/sessionController';
 
 interface SessionFormState {
   name: string;
@@ -133,36 +132,3 @@ const routines: Routine[] = [
     }
   ];
   
-const sessions: Session[] = [
-  {
-    sessionId: "s1",
-    name: "Morning Workout",
-    routines: [routines[0], routines[1]],
-    createdBy: "t1",
-    assignees: [
-      {
-        traineeId: "tr1",
-        date: "2024-07-20",
-        status: "planned"
-      },
-      {
-        traineeId: "tr2",
-        date: "2024-07-21",
-        status: "missed"
-      }
-    ]
-  },
-  {
-    sessionId: "s2",
-    name: "Evening Cardio",
-    routines: [routines[1]],
-    createdBy: "t1",
-    assignees: [
-      {
-        traineeId: "tr3",
-        date: "2024-07-22",
-        status: "completed"
-      }
-    ]
-  }
-];

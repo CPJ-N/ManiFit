@@ -1,7 +1,7 @@
 import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, updateDoc, } from 'firebase/firestore';
-import { db } from '../config/firebase';
-import { UserDetails } from '../constants/dataModels/userDetails.model';
-import { USER_DETAILS } from '../constants/firebaseCollections';
+import { UserDetails } from '../../constants/dataModels/userDetails.model';
+import { db } from '../../config/firebase';
+import { USER_DETAILS } from '../../constants/firebaseCollections';
 
 // TODO: Test out these api calls in  app
 

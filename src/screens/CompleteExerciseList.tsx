@@ -3,33 +3,25 @@ import { Icon } from 'react-native-elements';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
 import { EXERCISE_DETAILS, EXERCISE_EDIT, EXERCISE_FORM } from '../constants/screenNames';
-import ExerciseCard from './ExerciseCard';
+import ExerciseItem from '../components/ExerciseItem';
+import ExerciseCard from '../components/ExerciseCard';
 import { useRoute } from '@react-navigation/native';
-import { deleteExercise } from '../utils/controllers/exerciseController';
+import { deleteExercise, getAllExercises } from '../utils/controllers/exerciseController';
 
 
-function ExerciseList({navigation}) {
-    const route = useRoute();
+export default function CompleteExerciseList({navigation}) {
 
-    // Assuming the data you want is passed as a parameter named 'exerciseData'
-    const routineExerciseIds = (route.params as { exercises: string[] }).exercises;
-
-    const [exerciseIds, setExerciseIds] = useState<string[]>();
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // useEffect(() => {
-    //     const fetchExercises = async () => {
-    //         const fetchedExercises = await getAllExercises();
-    //         // console.log(fetchedExercises);
-    //         setExercises(fetchedExercises);
-    //     };
-    //     fetchExercises();
-    // }, []);
-
     useEffect(() => {
-        routineExerciseIds ? setExerciseIds(routineExerciseIds) : [];
-    }, [routineExerciseIds]);
+        const fetchExercises = async () => {
+            const fetchedExercises = await getAllExercises();
+            // console.log(fetchedExercises);
+            setExercises(fetchedExercises);
+        };
+        fetchExercises();
+    }, []);
 
     const handleSearch = (text: string) => {
         setSearchTerm(text);
@@ -65,7 +57,7 @@ function ExerciseList({navigation}) {
             <Icon name="plus" type="feather" color="#fff" size={25} onPress={() => navigation.navigate(EXERCISE_FORM)}/>
           </View>
         </View>
-        {/* <FlatList
+        <FlatList
             data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
@@ -78,18 +70,8 @@ function ExerciseList({navigation}) {
                 //     exercise={item}
                 // />
                 )}
-        /> */}
-        <FlatList
-            // data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
-            data={exerciseIds}
-            keyExtractor={item => item}
-            renderItem={({ item }) => (
-                <ExerciseCard
-                    exerciseId={item}
-                    viewDetails={viewDetails}
-                />
-                )}
         />
+
         </SafeAreaView>
     );
 };
@@ -118,5 +100,3 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     }
 });
-
-export default ExerciseList;
