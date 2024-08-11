@@ -1,15 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Routine } from '../constants/dataModels/routine.model';
-
-interface RoutineItemProps {
-  routine: Routine;
-  onPress: (routineId: string) => void;
-}
 
 const RoutineItem = ({ routine, onPress }) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={() => onPress(routine.exercises)}>
+    <TouchableOpacity style={styles.container} onPress={() => onPress(routine)}>
       <Text style={styles.title}>{routine.name}</Text>
       <Text style={styles.details}>{routine.description}</Text>
       {/* <Text style={styles.details}>Exercises: {routine.numberOfExercises}</Text> */}

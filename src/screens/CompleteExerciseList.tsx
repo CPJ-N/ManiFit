@@ -66,9 +66,6 @@ export default function CompleteExerciseList({navigation}) {
                     onEdit={() => handleEdit(item)}
                     onDelete={() => handleDelete(item.id)}
                 />
-                // <ExerciseItem
-                //     exercise={item}
-                // />
                 )}
         />
 

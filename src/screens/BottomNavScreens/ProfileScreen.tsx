@@ -6,6 +6,7 @@ import { signOut } from 'firebase/auth'
 import { AUTH_TABS, COMPLETE_EXERCISE_LIST, EDIT_PROFILE, EXERCISE_TABS, FAVORITE, LOGIN } from '../../constants/screenNames';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
+import { StatusBar } from 'expo-status-bar';
 
 // TODO: Add functionality to update user profile
 // TODO: Add functionality to go to all menu options
@@ -62,9 +63,10 @@ export default function ProfileScreen({navigation}) {
 
     return (
         <ScrollView style={styles.container}>
-            <View style={styles.header}>
-                {/* <Text style={styles.headerText}>My Profile</Text> */}
-            </View>
+            <StatusBar style="dark" />
+            {/* <View style={styles.header}>
+                <Text style={styles.headerText}>My Profile</Text>
+            </View> */}
 
             <View style={styles.userInfoSection}>
                 <Image 
@@ -98,9 +100,9 @@ export default function ProfileScreen({navigation}) {
                         key={index} 
                         style={styles.menuItem} 
                         onPress={() => handlePress(item.name)}>
-                        <Ionicons name={item.icon} size={24} color="#4B4B4B" />
+                        <Ionicons name={item.icon} size={24} color="#f4f4f4" />
                         <Text style={styles.menuItemText}>{item.name}</Text>
-                        <Ionicons name="chevron-forward-outline" size={24} color="#4B4B4B" />
+                        <Ionicons name="chevron-forward-outline" size={24} color="#f4f4f4" />
                     </TouchableOpacity>
                 ))}
             </View>
@@ -111,7 +113,7 @@ export default function ProfileScreen({navigation}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f4f4f4',
+        backgroundColor: '#1E1E1E',
     },
     header: {
         backgroundColor: '#ffd20a',
@@ -124,6 +126,7 @@ const styles = StyleSheet.create({
     },
     userInfoSection: {
         backgroundColor: '#ffd20a',
+        paddingTop: 40,
         paddingVertical: 40,
         alignItems: 'center',
         borderBottomRightRadius: 50,
@@ -178,6 +181,6 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16,
         marginLeft: 20,
-        color: '#333',
+        color: '#f4f4f4',
     },
 });

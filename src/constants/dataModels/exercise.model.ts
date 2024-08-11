@@ -3,6 +3,7 @@ export interface Exercise {
     id?: string;
     name: string;
     description: string;
+    instructions: string[];
     duration?: number;
     repetitions?: number;
     sets?: number;

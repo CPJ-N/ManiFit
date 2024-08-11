@@ -7,10 +7,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { exerciseCategories } from '../../constants/categories';
+import { StatusBar } from 'expo-status-bar';
 
 interface WorkoutVideo {
   title: string;
@@ -61,7 +61,8 @@ const workoutVideos = exerciseCategories
 const Home: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar style="light" />
+      {/* <StatusBar barStyle="light-content" /> */}
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>Hi, Madison</Text>
@@ -129,7 +130,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: 20,
+    marginTop: 20,
   },
   greeting: {
     fontSize: 24,
@@ -138,7 +140,7 @@ const styles = StyleSheet.create({
   },
   subGreeting: {
     fontSize: 14,
-    color: 'gray',
+    color: '#f4f4f4',
   },
   headerIcons: {
     flexDirection: 'row',

@@ -3,6 +3,8 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Exercise } from '../constants/dataModels/exercise.model';
 import { EXERCISE_EDIT } from '../constants/screenNames';
+import { exerciseImageUrlPrefix } from '../constants/serverConstant';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function ExcerciseDetails ({navigation}) {
 
@@ -20,42 +22,63 @@ export default function ExcerciseDetails ({navigation}) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
+      {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}> */}
+          <Ionicons name="arrow-back" size={24} color="#333" style={styles.backButton} onPress={() => navigation.goBack()}/>
+        {/* </TouchableOpacity> */}
         <Text style={styles.title}>{exerciseInfo.name}</Text>
-        <View style={styles.detailsContainer}>
-          {/* <Text style={styles.detailsText}>15 Minutes</Text> */}
+        {/* <View style={styles.detailsContainer}>
+          <Text style={styles.detailsText}>15 Minutes</Text>
           {exerciseInfo.category && <Text style={styles.detailsText}>{exerciseInfo.category}</Text>}
-          {/* <Text style={styles.detailsText}>150 Cal</Text> */}
-        </View>
+          <Text style={styles.detailsText}>150 Cal</Text>
+        </View> */}
       </View>
 
       <View style={styles.imageContainer}>
-        {exerciseInfo.image ? 
+        {/* {exerciseInfo.image ? 
         (<Image source={{ uri: exerciseInfo.image }} style={styles.image} />):
         (<Image
           source={{ uri: 'https://via.placeholder.com/350x200' }} // Replace with your image URL
           style={styles.image}
-        />)}
+        />)} */}
+        {exerciseInfo?.images && <Image source={{ uri: `${exerciseImageUrlPrefix}/${exerciseInfo.images[0]}`}} style={styles.image} />}
+         {/* {exerciseInfo.image && (<Image source={{ uri: exerciseInfo.image }} style={styles.image} />)}: */}
+         {/* {exerciseInfo.images && (<Image source={{ uri: `${exerciseImageUrlPrefix}/${exerciseInfo.images[0]}` }} style={styles.image} />)}: */}
       </View>
 
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Details</Text>
+        {/* <Text style={styles.sectionTitle}>Details</Text> */}
         {exerciseInfo.duration && <Text style={styles.ingredientText}>Duration: {exerciseInfo.duration} mins</Text>}
         {exerciseInfo.weight && <Text style={styles.ingredientText}>Weight: {exerciseInfo.weight} kg</Text>}
         {exerciseInfo.sets && <Text style={styles.ingredientText}>Sets: {exerciseInfo.sets}</Text>}
         {exerciseInfo.repetitions && <Text style={styles.ingredientText}>Reps: {exerciseInfo.repetitions}</Text>}
       </View>
 
-      <View style={styles.section}>
+      {exerciseInfo.description && <View style={styles.section}>
         <Text style={styles.sectionTitle}>Description</Text>
         <Text style={styles.description}>
           {exerciseInfo.description}
         </Text>
+      </View>}
+      
+      { exerciseInfo.instructions && 
+        <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Instructions</Text>
+        {exerciseInfo.instructions.map((instruction, index) => (
+          <Text key={index} style={styles.description}>
+            -&gt; {instruction}
+          </Text>
+        ))}
+        
+          <Text style={styles.description}>
+            {exerciseInfo.description}
+          </Text>
       </View>
+      }
 
-      <TouchableOpacity style={styles.saveButton} onPress={()=>handleEdit(exerciseInfo)}>
+      {/* <TouchableOpacity style={styles.saveButton} onPress={()=>handleEdit(exerciseInfo)}>
         <Text style={styles.saveButtonText}>Edit Exercise</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </ScrollView>
   );
 };
@@ -70,12 +93,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFD20A',
     padding: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
     borderBottomRightRadius: 25,
     borderBottomLeftRadius: 25  ,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    padding: 10,
   },
   detailsContainer: {
     flexDirection: 'row',
@@ -126,5 +152,9 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  backButton: {
+    padding: 10,
+    // position: 'absolute',
   },
 });

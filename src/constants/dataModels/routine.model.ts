@@ -9,7 +9,7 @@
 import { ExerciseDetails } from "./exercise.model";
 
 export interface Routine {
-  routineId?: string; // Unique identifier for the routine
+  id?: string; // Unique identifier for the routine
   name: string; // Name of the routine
   description: string; // Description of the routine
   exercises: ExerciseDetails[]; // Array of exercises with details
