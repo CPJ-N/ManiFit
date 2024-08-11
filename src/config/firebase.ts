@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage"
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 // const firebaseConfig = {
@@ -32,8 +33,9 @@ const firebaseApp = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(firebaseApp);
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
 // initializeAuth(auth, {
 //   persistence: getReactNativePersistence(AsyncStorage),
 // });
 
-export {auth, db}
+export {auth, db, storage}

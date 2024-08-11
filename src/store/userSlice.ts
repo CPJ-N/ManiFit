@@ -1,9 +1,9 @@
 // src/features/user/userSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User } from '../constants/dataModels/userInfo.model';
+import { UserDetails } from '../constants/dataModels/userDetails.model';
 
 interface UserState {
-  userInfo: User | null;
+  userInfo: UserDetails | null;
   status: 'idle' | 'loading' | 'failed';
 }
 
@@ -16,7 +16,7 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<User>) => {
+    setUser: (state, action: PayloadAction<UserDetails>) => {
       state.userInfo = action.payload;
     },
     clearUser: (state) => {

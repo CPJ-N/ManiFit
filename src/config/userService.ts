@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { User } from '../constants/dataModels/userInfo.model';
+import { User } from '../constants/dataModels/userDetails.model';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 // Function to save user data

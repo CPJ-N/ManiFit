@@ -2,32 +2,34 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useDispatch, useSelector } from 'react-redux';
+import { UserDetails } from '../constants/dataModels/userDetails.model';
+import { setUser } from '../store/userSlice';
+import { RootState } from '../store/reduxStore';
 
-interface ProfileData {
-  fullName: string;
-  email: string;
-  mobileNumber: string;
-  dateOfBirth: string;
-  weight: string;
-  height: string;
-}
 
-const EditProfileScreen = () => {
-  const navigation = useNavigation();
-  const [profile, setProfile] = useState<ProfileData>({
-    fullName: 'Madison Smith',
-    email: 'madisons@example.com',
-    mobileNumber: '+123 567 89000',
-    dateOfBirth: '01 / 04 / 199X',
-    weight: '75 Kg',
-    height: '1.65 CM',
+const EditProfileScreen = ({navigation}) => {
+
+  const dispatch = useDispatch(); // Initialize useDispatch
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const [profile, setProfile] = useState<UserDetails>({
+    fullName: userInfo?.fullName,
+    email: userInfo?.email,
+    mobileNumber: userInfo?.mobileNumber,
+    dateOfBirth: userInfo?.dateOfBirth,
+    weight: userInfo?.weight,
+    height: userInfo?.height,
+    isTrainer: userInfo?.isTrainer,
   });
 
   const handleUpdate = () => {
+    console.log('userDetails updated:', profile);
+    // Dispatch setUser action with userDetails
+    dispatch(setUser(profile));
     console.log('Profile updated:', profile);
   };
 
-  const handleChange = (value: string, field: keyof ProfileData) => {
+  const handleChange = (value: string, field: keyof UserDetails) => {
     setProfile({ ...profile, [field]: value });
   };
 
@@ -55,8 +57,8 @@ const EditProfileScreen = () => {
           <TextInput
             key={key}
             style={styles.input}
-            onChangeText={(text) => handleChange(text, key as keyof ProfileData)}
-            value={profile[key as keyof ProfileData]}
+            onChangeText={(text) => handleChange(text, key as keyof UserDetails)}
+            value={(profile[key as keyof UserDetails] ?? '').toString()}
           />
         ))}
       </View>
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 70,
     backgroundColor: '#FFD20A',
     alignItems: 'center',
     flexDirection: 'row',

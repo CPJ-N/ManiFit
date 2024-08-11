@@ -4,15 +4,17 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Assuming
 import CheckBox from '@react-native-community/checkbox';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
-import { useNavigation } from '@react-navigation/native';
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../store/userSlice';
+import { getUser } from '../../config/userService';
 
-export default function Login() {
+export default function Login({navigation}) {
   const [isSelected, setSelection] = useState(false);
   const [showPassword, setShowPassword] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [userPassword, setUserPassword] = useState('')
-  const navigation = useNavigation()
+  const dispatch = useDispatch()
 
   useEffect(() =>{
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -26,11 +28,14 @@ export default function Login() {
 
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, userEmail, userPassword)
-    .then((userCredential) => {
+    .then(async (userCredential) => {
       // Signed in
       const user = userCredential.user;
-      console.log(user.email)
-      console.log(user)
+
+      const userInfo = await getUser(user.uid)
+
+      dispatch(setUser(userInfo));
+
       navigation.navigate(BOTTOM_TABS, {screen: {HOME}})
       // ...
     })

@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from 'react-native-elements';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { Exercise } from '../constants/dataModels/excercise.model'; // Import the Exercise interface
-import { getAllExercises } from '../utils/exerciseController'; // Import the API function to get all exercises
-import { EXERCISE_FORM } from '../constants/screenNames';
-import ExerciseItem from './ExerciseItem';
+import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
+import { EXERCISE_DETAILS, EXERCISE_EDIT, EXERCISE_FORM } from '../constants/screenNames';
+import ExerciseItem from '../components/ExerciseItem';
+import ExerciseCard from '../components/ExerciseCard';
+import { useRoute } from '@react-navigation/native';
+import { deleteExercise, getAllExercises } from '../utils/controllers/exerciseController';
 
-function ExerciseList({navigation}) {
+
+export default function CompleteExerciseList({navigation}) {
+
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         const fetchExercises = async () => {
             const fetchedExercises = await getAllExercises();
-            console.log(fetchedExercises);
+            // console.log(fetchedExercises);
             setExercises(fetchedExercises);
         };
         fetchExercises();
@@ -24,18 +28,25 @@ function ExerciseList({navigation}) {
         // Add functionality to filter exercises based on search term
     };
 
-    const handleEdit = (id: string) => {
-        console.log('Edit:', id);
+
+    const handleEdit = (exerciseInfo: Exercise) => {
+        navigation.navigate(EXERCISE_EDIT, { exerciseInfo });
+        console.log(`Edit Exercise: ${exerciseInfo.id}`);
     };
 
-    const handleDelete = (id: string) => {
-        console.log('Delete:', id);
+    const handleDelete = (exerciseId: string) => {
+        deleteExercise(exerciseId);
+        console.log(`Delete Exercise: ${exerciseId}`);
     };
+
+    const viewDetails = (exerciseInfo: Exercise) => {
+        navigation.navigate(EXERCISE_DETAILS, { exerciseInfo });
+        console.log(`View Exercise Details: ${exerciseInfo.id}`);
+    }
 
     return (
         <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          {/* <Text style={styles.greeting}>Hi, Madison</Text> */}
           <TextInput
                 placeholder="Search exercises..."
                 style={styles.searchInput}
@@ -52,11 +63,15 @@ function ExerciseList({navigation}) {
             renderItem={({ item }) => (
                 <ExerciseItem
                     exercise={item}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
+                    onEdit={() => handleEdit(item)}
+                    onDelete={() => handleDelete(item.id)}
                 />
+                // <ExerciseItem
+                //     exercise={item}
+                // />
                 )}
         />
+
         </SafeAreaView>
     );
 };
@@ -85,5 +100,3 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     }
 });
-
-export default ExerciseList;

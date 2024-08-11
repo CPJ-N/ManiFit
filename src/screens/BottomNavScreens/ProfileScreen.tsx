@@ -3,14 +3,16 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'rea
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth } from '../../config/firebase'
 import { signOut } from 'firebase/auth'
-import { AUTH_TABS, EDIT_PROFILE, FAVORITE, LOGIN } from '../../constants/screenNames';
+import { AUTH_TABS, COMPLETE_EXERCISE_LIST, EDIT_PROFILE, EXERCISE_TABS, FAVORITE, LOGIN } from '../../constants/screenNames';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/reduxStore';
 
-// TODO: Add redux toolkit for state management
 // TODO: Add functionality to update user profile
 // TODO: Add functionality to go to all menu options
 // TODO: Add functionality to create user DOC for sign up
 
 export default function ProfileScreen({navigation}) {
+    const userInfo = useSelector((state: RootState) => state.user.userInfo);
     const menuItems = [
         { name: 'Profile', icon: 'person-circle-outline' },
         { name: 'Favorite', icon: 'heart-outline' },
@@ -28,6 +30,13 @@ export default function ProfileScreen({navigation}) {
                 break;
             case "Favorite":
                 navigation.navigate(FAVORITE);
+                break;
+            case "Privacy Policy":
+                console.log(auth.currentUser?.uid);
+                break;
+            case "Help":
+                navigation.navigate(EXERCISE_TABS)
+                console.log('Help');
                 break;
             case "Logout":
                 handleLogOut();
@@ -62,12 +71,14 @@ export default function ProfileScreen({navigation}) {
                     source={{ uri: 'https://images.pexels.com/photos/3806244/pexels-photo-3806244.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }}
                     style={styles.profileImage} 
                 />
-                <Text style={styles.name}>Madison Smith</Text>
-                <Text style={styles.email}>{auth.currentUser?.email}</Text>
+                <Text style={styles.name}>{userInfo?.fullName}</Text>
+                {/* <Text style={styles.email}>{auth.currentUser?.email}</Text> */}
+                <Text style={styles.email}>{userInfo?.email}</Text>
+
                 <Text style={styles.birthday}>Birthday: April 1st</Text>
                 <View style={styles.statsContainer}>
                     <View style={styles.stat}>
-                        <Text style={styles.statValue}>75 Kg</Text>
+                        <Text style={styles.statValue}>{userInfo?.weight}</Text>
                         <Text style={styles.statLabel}>Weight</Text>
                     </View>
                     <View style={styles.stat}>
@@ -75,7 +86,7 @@ export default function ProfileScreen({navigation}) {
                         <Text style={styles.statLabel}>Years Old</Text>
                     </View>
                     <View style={styles.stat}>
-                        <Text style={styles.statValue}>1.65 CM</Text>
+                        <Text style={styles.statValue}>{userInfo?.height}</Text>
                         <Text style={styles.statLabel}>Height</Text>
                     </View>
                 </View>
@@ -120,9 +131,10 @@ const styles = StyleSheet.create({
 
     },
     profileImage: {
-        width: 135,
-        height: 135,
-        borderRadius: 50,
+        width: 130,
+        height: 130,
+        padding: 10,
+        borderRadius: 65,
         marginBottom: 10,
     },
     name: {

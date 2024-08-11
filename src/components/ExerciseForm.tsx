@@ -1,26 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { Exercise } from '../constants/dataModels/excercise.model';
-import { addExercise } from '../utils/exerciseController';
+import { Exercise } from '../constants/dataModels/exercise.model';
+import { ROUTINE_LIST } from '../constants/screenNames';
+import { auth } from '../config/firebase';
+import { addExercise } from '../utils/controllers/exerciseController';
 
-// export interface Exercise {
-//   id: string;
-//   name: string;
-//   description: string;
-//   duration?: number;
-//   repetitions?: number;
-//   sets?: number;
-//   weight?: number;
-//   image?: string;
-//   video?: string;
-//   trainerId: string;
-//   category: string;
-// }
-
-export default function ExerciseForm() {
+export default function ExerciseForm({ navigation }) {
   const [exercise, setExercise] = useState<Exercise>({
-    id: '',
     name: '',
     description: '',
     duration: undefined,
@@ -29,7 +16,7 @@ export default function ExerciseForm() {
     weight: undefined,
     image: '',
     video: '',
-    trainerId: '',  // Assume trainerId is passed or set contextually
+    trainerId: auth.currentUser?.uid,
     category: ''
   });
 
@@ -44,19 +31,21 @@ export default function ExerciseForm() {
     }
     
     await addExercise(exercise);
-    Alert.alert('Success', 'Exercise added successfully.');
+    navigation.navigate(ROUTINE_LIST);
+    console.log('Success', 'Exercise added successfully.');
+    // Alert.alert('Success', 'Exercise added successfully.');
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: '#000',}}>
+    <SafeAreaView style={{backgroundColor: '#000', flex: 1}}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.label}>Name</Text>
+        <Text style={styles.label}>Name *</Text>
         <TextInput
           style={styles.input}
           value={exercise.name}
           onChangeText={(text) => handleChange('name', text)}
         />
-        <Text style={styles.label}>Description</Text>
+        <Text style={styles.label}>Description *</Text>
         <TextInput
           style={styles.input}
           value={exercise.description}

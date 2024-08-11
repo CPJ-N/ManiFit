@@ -15,7 +15,6 @@ export const exerciseCategories = [
       name: 'cardio',
       image: require('../assets/images/cardio.png'),
     },
-    
     {
       name: 'lower arms',
       image: require('../assets/images/lowerArms.png'),
