@@ -1,39 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from 'react-native-elements';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
+import { Exercise, ExerciseDetails } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
 import { EXERCISE_DETAILS, EXERCISE_EDIT, EXERCISE_FORM } from '../constants/screenNames';
 import ExerciseCard from './ExerciseCard';
 import { useRoute } from '@react-navigation/native';
-import { deleteExercise } from '../utils/controllers/exerciseController';
+import { deleteExercise, getExercise } from '../utils/controllers/exerciseController';
+import { Routine } from '../constants/dataModels/routine.model';
 
 
 function ExerciseList({navigation}) {
     const route = useRoute();
 
-    // Assuming the data you want is passed as a parameter named 'exerciseData'
-    const routineExerciseIds = (route.params as { exercises: string[] }).exercises;
-
-    const [exerciseIds, setExerciseIds] = useState<string[]>();
+    const { routine } = (route.params as { routine: Routine }) || { routine: { name: '', description: '', exercises: [], createdBy: '' } };
+    const [exerciseDetails, setExerciseDetails] = useState<ExerciseDetails[]>();
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // useEffect(() => {
-    //     const fetchExercises = async () => {
-    //         const fetchedExercises = await getAllExercises();
-    //         // console.log(fetchedExercises);
-    //         setExercises(fetchedExercises);
-    //     };
-    //     fetchExercises();
-    // }, []);
-
     useEffect(() => {
-        routineExerciseIds ? setExerciseIds(routineExerciseIds) : [];
-    }, [routineExerciseIds]);
+        console.log(routine);
+        if (routine) {
+            setExerciseDetails(routine.exercises);
+        }
+    }, [routine]);
+
 
     const handleSearch = (text: string) => {
         setSearchTerm(text);
-        // Add functionality to filter exercises based on search term
     };
 
 
@@ -46,6 +39,10 @@ function ExerciseList({navigation}) {
         deleteExercise(exerciseId);
         console.log(`Delete Exercise: ${exerciseId}`);
     };
+
+    // const findExerciseById = (exerciseId: string) => {
+    //     return exercises?.find(exercise => exercise.id === exerciseId);
+    // };
 
     const viewDetails = (exerciseInfo: Exercise) => {
         navigation.navigate(EXERCISE_DETAILS, { exerciseInfo });
@@ -65,28 +62,14 @@ function ExerciseList({navigation}) {
             <Icon name="plus" type="feather" color="#fff" size={25} onPress={() => navigation.navigate(EXERCISE_FORM)}/>
           </View>
         </View>
-        {/* <FlatList
-            data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-                <ExerciseItem
-                    exercise={item}
-                    onEdit={() => handleEdit(item)}
-                    onDelete={() => handleDelete(item.id)}
-                />
-                // <ExerciseItem
-                //     exercise={item}
-                // />
-                )}
-        /> */}
         <FlatList
             // data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
-            data={exerciseIds}
-            keyExtractor={item => item}
+            data={exerciseDetails}
+            keyExtractor={(item) => item.exerciseId}
             renderItem={({ item }) => (
                 <ExerciseCard
-                    exerciseId={item}
                     viewDetails={viewDetails}
+                    exerciseDetails={item}
                 />
                 )}
         />
@@ -97,7 +80,8 @@ function ExerciseList({navigation}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 10,
+        paddingTop: 20,
+        padding: 5,
         backgroundColor: '#000',
     },
     header: {

@@ -1,7 +1,7 @@
 
 // Session.ts
 export interface Session {
-    sessionId?: string;
+    id?: string;
     name: string;
     routines: string[]; // Array of routine IDs included in the session
     createdBy: string; // Trainer ID

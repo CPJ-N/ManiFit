@@ -1,26 +1,22 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Exercise } from '../constants/dataModels/exercise.model'
+import { Exercise, ExerciseDetails } from '../constants/dataModels/exercise.model'
 import { Icon } from 'react-native-elements';
 import { getExercise } from '../utils/controllers/exerciseController';
-
-interface ExerciseProps {
-  exerciseId: string;
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
-  viewDetails: (exercise: Exercise) => void;
-}
+import { exerciseImageUrlPrefix } from '../constants/serverConstant';
 
 
-
-const ExerciseCard = ({ exerciseId, viewDetails }: { exerciseId: string, viewDetails: (exercise: Exercise) => void}) => {
+const ExerciseCard = ({viewDetails, exerciseDetails }: {  
+  viewDetails: (exercise: Exercise) => void,
+  exerciseDetails: ExerciseDetails}) => {
 
   const [exercise, setExercise] = useState<Exercise>(null);
 
     useEffect(() => {
+      console.log('exerciseId in card:', exerciseDetails.exerciseId);  
         const fetchExercises = async () => {
-            const fetchedExercise = await getExercise(exerciseId);
-            console.log(fetchedExercise);
+            const fetchedExercise = await getExercise(exerciseDetails.exerciseId);
+            console.log('exercise fetched in card:', fetchedExercise);
             setExercise(fetchedExercise);
         };
         fetchExercises();
@@ -29,13 +25,18 @@ const ExerciseCard = ({ exerciseId, viewDetails }: { exerciseId: string, viewDet
   return (
     <TouchableOpacity style={styles.card} onPress={()=>viewDetails(exercise)}>
       {exercise?.image && <Image source={{ uri: exercise.image }} style={styles.image} />}
+      {exercise?.images && <Image source={{ uri: `${exerciseImageUrlPrefix}/${exercise.images[0]}`}} style={styles.image} />}
       <View style={styles.info}>
       {/* <View style={styles.icons}>
             <Icon name="edit" type="feather" color="#000" size={20} style={{padding: 5}}/>
             <Icon name="trash-2" type="feather" color="#000" size={20} style={{padding: 5}}/>
           </View> */}
         <Text style={styles.title}>{exercise?.name}</Text>
-        <Text style={styles.details}>{`${exercise?.duration} Minutes · ${exercise?.sets} Kcal · ${exercise?.repetitions} Exercises`}</Text>
+        {exerciseDetails.duration && <Text style={styles.details}>Duration: {exerciseDetails.duration} mins</Text>}
+        {exerciseDetails.weight && <Text style={styles.details}>Weight: {exerciseDetails.weight} kg</Text>}
+        {exerciseDetails.sets && <Text style={styles.details}>Sets: {exerciseDetails.sets}</Text>}
+        {exerciseDetails.repetitions && <Text style={styles.details}>Reps: {exerciseDetails.repetitions}</Text>}
+        {exerciseDetails.specialInstructions && <Text style={styles.details}>Note: {exerciseDetails.specialInstructions}</Text>}
       </View>
     </TouchableOpacity>
   )

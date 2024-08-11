@@ -25,9 +25,9 @@ export default function RoutineList ({navigation}) {
   const [routines, setRoutines] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  function handleRoutinePress(exercises:string[]) {
-    navigation.navigate(EXERCISE_LIST, { exercises });
-    console.log('Routine selected:', exercises);
+  function handleRoutinePress(routine) {
+    navigation.navigate(EXERCISE_LIST, { routine });
+    console.log('Routine selected:', routine.id);
   }
 
   useEffect(() => {
@@ -45,8 +45,8 @@ export default function RoutineList ({navigation}) {
   }
 
   return (
-    <SafeAreaView>
-      <Text>Select a Routine</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.label}>Select a Routine</Text>
       <FlatList
         data={routines}
         keyExtractor={(item) => item.routineId}
@@ -63,6 +63,16 @@ export default function RoutineList ({navigation}) {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 50,
+    backgroundColor: '#fff',
+  },
+  label: {
+    padding: 20,
+    fontSize: 16,
+    color: '#000'
+  },
   button: {
     backgroundColor: '#FFD20A',
     marginHorizontal: 20,

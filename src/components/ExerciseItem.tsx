@@ -3,6 +3,8 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Exercise } from '../constants/dataModels/exercise.model';
 import { Icon } from 'react-native-elements';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import { getImageUrl } from '../utils/imageHelpers/getImageUrl';
+import { bucketName } from '../constants/serverConstant';
 
 interface ExerciseProps {
   exercise: Exercise;
@@ -12,22 +14,16 @@ interface ExerciseProps {
 
 
 
-// TODO: update the design of exercise details display
+// TODO: update the design of exercise details display according to new and old routine & exercise models
 
 export default function ExerciseItem({ exercise, onEdit, onDelete }: ExerciseProps) {
 // export default function ExerciseItem({ exercise }: { exercise: Exercise }) {
-  // console.log(exercise);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const getImageUrl = async (imageName: string) => {
-    const storage = getStorage();
-    const storageRef = ref(storage, `exercise-images/${imageName}`);
-    return await getDownloadURL(storageRef);
-  };
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (exercise.images) {
-      getImageUrl(exercise.images[0])
+      getImageUrl(bucketName.exerciseImages, exercise.images[0])
         .then((url) => {
           setImageUrl(url);
         }
@@ -35,9 +31,6 @@ export default function ExerciseItem({ exercise, onEdit, onDelete }: ExercisePro
     }
   }
   , [exercise]);
-
-  
-
 
   return (
     <View style={styles.container}>
@@ -51,10 +44,6 @@ export default function ExerciseItem({ exercise, onEdit, onDelete }: ExercisePro
           </View> */}
         </View>
       {/* <Text style={styles.detail}>{exercise.description}</Text> */}
-      {exercise.duration && <Text style={styles.detail}>Duration: {exercise.duration} mins</Text>}
-      {exercise.weight && <Text style={styles.detail}>Weight: {exercise.weight} kg</Text>}
-      {exercise.sets && <Text style={styles.detail}>Sets: {exercise.sets}</Text>}
-      {exercise.repetitions && <Text style={styles.detail}>Reps: {exercise.repetitions}</Text>}
     </View>
   );
 }
