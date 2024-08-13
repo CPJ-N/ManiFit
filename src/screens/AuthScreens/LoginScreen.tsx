@@ -14,6 +14,7 @@ export default function Login({navigation}) {
   const [showPassword, setShowPassword] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [userPassword, setUserPassword] = useState('')
+  const [error, setError] = useState('')
   const dispatch = useDispatch()
 
   useEffect(() =>{
@@ -42,6 +43,7 @@ export default function Login({navigation}) {
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
+      setError(errorCode);
       // ...
       console.log(errorCode, errorMessage)
     });
@@ -87,6 +89,8 @@ export default function Login({navigation}) {
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
       </View>
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <TouchableOpacity
        style={styles.loginButton}
@@ -208,5 +212,10 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    margin: 10,
+    textAlign: 'center',
   },
 });

@@ -12,6 +12,7 @@ export default function SignUp({navigation}) {
   const [showPassword, setShowPassword] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [userPassword, setUserPassword] = useState('')
+  const [error, setError] = useState('')
   const dispatch = useDispatch();
 
   const handleSignUp = () => {
@@ -36,6 +37,7 @@ export default function SignUp({navigation}) {
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
+      setError(errorCode);
 
       console.log(errorCode, errorMessage)
     });
@@ -71,6 +73,8 @@ export default function SignUp({navigation}) {
        onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign up</Text>
       </TouchableOpacity>
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <Text 
         style={styles.loginText} 
@@ -178,5 +182,10 @@ const styles = StyleSheet.create({
   socialButtonText: {
     color: '#fff',
     marginLeft: 10,
+  },
+  error: {
+    color: 'red',
+    margin: 10,
+    textAlign: 'center',
   },
 });
