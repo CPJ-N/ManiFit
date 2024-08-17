@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc, query, where } from "firebase/firestore";
 import { Exercise } from "../../constants/dataModels/exercise.model";
 import { EXERCISES } from "../../constants/firebaseCollections";
 import { db } from "../../config/firebase";
@@ -76,3 +76,29 @@ export const deleteExercise = async (exerciseId: string) => {
     throw new Error("Failed to delete exercise");
   }
 }
+
+
+export const getExercisesByCategory = async (category: string) => {
+  try {
+    // Query for products that have "red" in the colors array
+    const querySnapshot = query(collection(db, EXERCISES), where("primaryMuscles", "array-contains", category));
+    const getExercisesByCategory: Exercise[] = [];
+    getDocs(querySnapshot)
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id, " => ", doc.data());
+          const exercise = {
+            ...doc.data(),
+            id: doc.id,
+          } as Exercise;
+          getExercisesByCategory.push(exercise);
+        });
+      })
+      .catch((error) => {
+        console.error("Error getting documents:", error);
+      });
+  }
+  catch (error) {
+    console.error("Error getting documents:", error);
+  }
+};

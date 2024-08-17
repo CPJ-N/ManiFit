@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, View, Text, ActivityIndicator, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
-import RoutineItem from '../components/RoutineItem';
-import { CONFIGURE_EXERCISES, CREATE_ROUTINE, EXERCISE_LIST } from '../constants/screenNames';
-import { Routine } from '../constants/dataModels/routine.model';
-import { Exercise } from '../constants/dataModels/exercise.model';
-import { getAllRoutines } from '../utils/controllers/routineController';
+import RoutineItem from '../../components/RoutineItem';
+import { CONFIGURE_EXERCISES, CREATE_ROUTINE, EXERCISE_LIST } from '../../constants/screenNames';
+import { Routine } from '../../constants/dataModels/routine.model';
+import { Exercise } from '../../constants/dataModels/exercise.model';
+import { getAllRoutines } from '../../utils/controllers/routineController';
 
 /*
 	1.	Create a New Routine or Select an Existing One:
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 50,
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
   },
   label: {
     padding: 20,

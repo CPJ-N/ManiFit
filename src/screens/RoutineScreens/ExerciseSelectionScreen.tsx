@@ -1,11 +1,10 @@
 // ExerciseSelectionScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Button, TextInput, SafeAreaView, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { CONFIGURE_EXERCISES } from '../constants/screenNames';
+import { CONFIGURE_EXERCISES } from '../../constants/screenNames';
 // import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
-import { getImageUrl } from '../utils/imageHelpers/getImageUrl';
-import { getAllExercises } from '../utils/controllers/exerciseController';
-import { exerciseImageUrlPrefix } from '../constants/serverConstant';
+import { getAllExercises } from '../../utils/controllers/exerciseController';
+import { exerciseImageUrlPrefix } from '../../constants/serverConstant';
 
 export default function ExerciseSelectionScreen ({ route, navigation }) {
   const { routineId } = route.params || {};
@@ -128,7 +127,7 @@ const styles = StyleSheet.create({
   container: {
       flex: 1,
       padding: 10,
-      backgroundColor: '#fff',
+      backgroundColor: '#1E1E1E',
   },
   header: {
     flexDirection: 'row',

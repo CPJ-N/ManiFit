@@ -1,11 +1,11 @@
 // ConfigureExercisesScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, SafeAreaView, StyleSheet, Image, TouchableOpacity} from 'react-native';
-import { ROUTINE_LIST } from '../constants/screenNames';
-import { addRoutine } from '../utils/controllers/routineController';
-import { auth } from '../config/firebase';
-import { exerciseImageUrlPrefix } from '../constants/serverConstant';
-import { ExerciseDetails } from '../constants/dataModels/exercise.model';
+import { ROUTINE_LIST } from '../../constants/screenNames';
+import { addRoutine } from '../../utils/controllers/routineController';
+import { auth } from '../../config/firebase';
+import { exerciseImageUrlPrefix } from '../../constants/serverConstant';
+import { ExerciseDetails } from '../../constants/dataModels/exercise.model';
 
 export default function ConfigureExercisesScreen({ route, navigation }){
   const { selectedExercises, name, description } = route.params;
@@ -55,6 +55,7 @@ export default function ConfigureExercisesScreen({ route, navigation }){
       weight: exercise.weight,
       specialInstructions: exercise.specialInstructions,
     }));
+
     addRoutine({
       name: name,
       description: description,
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
   container: {
       flex: 1,
       padding: 10,
-      backgroundColor: '#fff',
+      backgroundColor: '#1E1E1E',
   },
   subcontainer: {
     backgroundColor: '#fff',

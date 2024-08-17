@@ -9,7 +9,7 @@ import FavoriteScreen from '../screens/BottomNavScreens/FavoriteScreen';
 import ProfileNavigation from './ProfileNavigation';
 import ExerciseNavigation from './ExerciseNavigation';
 import {ImageUploadScreen} from '../components/ImageUpload';
-import RoutineList from '../screens/RoutineList';
+import RoutineList from '../screens/RoutineScreens/RoutineList';
 
 
 const BottomTabs = createBottomTabNavigator();

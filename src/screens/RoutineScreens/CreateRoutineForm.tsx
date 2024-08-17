@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
-import { CONFIGURE_EXERCISES, ROUTINE_LIST, SELECT_ROUTINE_EXERCISES } from '../constants/screenNames';
-import { auth } from '../config/firebase';
-import { Routine } from '../constants/dataModels/routine.model';
-import ExerciseSelectionScreen from './ExerciseSelectionScreen';
+import { CONFIGURE_EXERCISES, ROUTINE_LIST, SELECT_ROUTINE_EXERCISES } from '../../constants/screenNames';
+import { auth } from '../../config/firebase';
+import { Routine } from '../../constants/dataModels/routine.model';
 
 export default function CreateRoutineForm({ navigation }) {
   const [routine, setRoutine] = useState({
@@ -61,6 +60,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingBottom: 60,
+    backgroundColor: '#1E1E1E',
   },
   input: {
     borderWidth: 1,

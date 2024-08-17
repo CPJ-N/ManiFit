@@ -4,13 +4,13 @@ import ExerciseList from "../components/ExerciseList";
 import ExerciseForm from "../components/ExerciseForm";
 import EditExercise from "../screens/EditExcercise";
 import ExcerciseDetails from "../screens/ExerciseDetails";
-import RoutineList from "../screens/RoutineList";
-import SessionsList from "../screens/SessionList";
-import SessionCreationForm from "../screens/SessionCreationForm";
-import CompleteExerciseList from "../screens/CompleteExerciseList";
-import ConfigureExercisesScreen from "../screens/ConfigureExercisesScreen";
-import ExerciseSelectionScreen from "../screens/ExerciseSelectionScreen";
-import CreateRoutineForm from "../screens/CreateRoutineForm";
+import RoutineList from "../screens/RoutineScreens/RoutineList";
+import SessionsList from "../screens/SessionScreens/SessionList";
+import SessionCreationForm from "../screens/SessionScreens/SessionCreationForm";
+import CompleteExerciseList from "../screens/RoutineScreens/CompleteExerciseList";
+import ConfigureExercisesScreen from "../screens/RoutineScreens/ConfigureExercisesScreen";
+import ExerciseSelectionScreen from "../screens/RoutineScreens/ExerciseSelectionScreen";
+import CreateRoutineForm from "../screens/RoutineScreens/CreateRoutineForm";
 
 
 const ExerciseTabs = createNativeStackNavigator();

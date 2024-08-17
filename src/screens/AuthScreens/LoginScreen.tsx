@@ -7,7 +7,7 @@ import { auth } from '../../config/firebase';
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
-import { getUser } from '../../config/userService';
+import { getUser } from '../../utils/controllers/userController';
 
 export default function Login({navigation}) {
   const [isSelected, setSelection] = useState(false);
@@ -121,28 +121,28 @@ export default function Login({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignContent: 'center',
-    backgroundColor: '#000',
+    backgroundColor: '#1E1E1E',
     padding: 20,
   },
   welcomeBack: {
-    fontSize: 30,
-    color: '#fff',
+    fontSize: 26,
+    color: '#FFD20A',
     fontWeight: 'bold',
-    marginTop: 50,
+    textAlign: 'center',
+    marginTop: 100,
     marginBottom: 10,
   },
   subtext: {
     color: '#aaa',
     fontSize: 16,
     marginBottom: 20,
+    textAlign: 'center',
   },
   inputField: {
     flexDirection: 'row',
     borderBottomColor: '#444',
     borderBottomWidth: 1,
-    paddingBottom: 5,
+    padding: 10,
     marginBottom: 15,
     alignItems: 'center',
   },
@@ -204,13 +204,14 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   loginButton: {
-    backgroundColor: '#1e90ff',
+    backgroundColor: '#FFD20A',
     padding: 15,
     borderRadius: 25,
     alignItems: 'center',
+    margin: 10,
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
   },
   error: {
