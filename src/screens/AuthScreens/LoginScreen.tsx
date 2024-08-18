@@ -8,6 +8,7 @@ import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 import { getUser } from '../../utils/controllers/userController';
+import { StatusBar } from 'expo-status-bar';
 
 export default function Login({navigation}) {
   const [isSelected, setSelection] = useState(false);
@@ -51,6 +52,7 @@ export default function Login({navigation}) {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
+      <StatusBar style="light" />
       <Text style={styles.welcomeBack}>Welcome Back! </Text>
       <Text style={styles.subtext}>Sign in to access your personalized workouts and track your progress.</Text>
 

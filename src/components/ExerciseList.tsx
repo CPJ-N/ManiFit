@@ -7,6 +7,8 @@ import ExerciseCard from './ExerciseCard';
 import { useRoute } from '@react-navigation/native';
 import { deleteExercise, getExercise } from '../utils/controllers/exerciseController';
 import { Routine } from '../constants/dataModels/routine.model';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/reduxStore';
 
 
 function ExerciseList({navigation}) {
@@ -14,6 +16,7 @@ function ExerciseList({navigation}) {
 
     const { routine } = (route.params as { routine: Routine }) || { routine: { name: '', description: '', exercises: [], createdBy: '' } };
     const [exerciseDetails, setExerciseDetails] = useState<ExerciseDetails[]>();
+    const userInfo = useSelector((state: RootState) => state.user.userInfo);
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -52,15 +55,18 @@ function ExerciseList({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
         <View style={styles.header}>
+            <View style={styles.icons}>
+                <Icon name="arrow-left" type="feather" color="#fff" size={25} onPress={() => navigation.goBack()} style={{marginRight: 20}}/>
+            </View>
           <TextInput
                 placeholder="Search exercises..."
                 style={styles.searchInput}
                 value={searchTerm}
                 onChangeText={handleSearch}
             />
-          <View style={styles.icons}>
+          {userInfo?.isTrainer && <View style={styles.icons}>
             <Icon name="plus" type="feather" color="#fff" size={25} onPress={() => navigation.navigate(EXERCISE_FORM)}/>
-          </View>
+          </View>}
         </View>
         <FlatList
             // data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
@@ -82,7 +88,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 20,
         padding: 5,
-        backgroundColor: '#000',
+        backgroundColor: '#1E1E1E',
     },
     header: {
         flexDirection: 'row',

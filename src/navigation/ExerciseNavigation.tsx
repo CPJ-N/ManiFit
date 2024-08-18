@@ -17,7 +17,7 @@ const ExerciseTabs = createNativeStackNavigator();
 
 export default function ExerciseNavigation() {
     return (
-        <ExerciseTabs.Navigator screenOptions={{headerShown: false}} initialRouteName={ROUTINE_LIST}>
+        <ExerciseTabs.Navigator screenOptions={{headerShown: false}} initialRouteName={SESSION_LIST}>
             <ExerciseTabs.Screen name={EXERCISE_LIST} component={ExerciseList} />
             <ExerciseTabs.Screen name={EXERCISE_FORM} component={ExerciseForm}  />
             <ExerciseTabs.Screen name={EXERCISE_EDIT} component={EditExercise} />

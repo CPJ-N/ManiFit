@@ -6,6 +6,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM, WELCOME } from '../../constants/screenNames';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
+import { StatusBar } from 'expo-status-bar';
 // import { AppDispatch } from '../store/reduxStore';
 
 export default function SignUp({navigation}) {
@@ -45,6 +46,7 @@ export default function SignUp({navigation}) {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
+      <StatusBar style="light" />
       <Text style={styles.header}>Create Your Account </Text>
       {/* 💪 */}
       <Text style={styles.subheader}>Sign up now to get access to personalized workouts and achieve your fitness goals.</Text>

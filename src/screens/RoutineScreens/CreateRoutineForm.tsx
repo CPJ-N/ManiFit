@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, Alert, ScrollView, SafeAreaView, Tou
 import { CONFIGURE_EXERCISES, ROUTINE_LIST, SELECT_ROUTINE_EXERCISES } from '../../constants/screenNames';
 import { auth } from '../../config/firebase';
 import { Routine } from '../../constants/dataModels/routine.model';
+import ScreenHeader from '../../components/ScreenHeader';
 
 export default function CreateRoutineForm({ navigation }) {
   const [routine, setRoutine] = useState({
@@ -13,6 +14,10 @@ export default function CreateRoutineForm({ navigation }) {
   const handleChange = (name: keyof Routine, value: string | number) => {
     setRoutine(prev => ({ ...prev, [name]: value }));
   };
+
+  const goBack = () => {
+    navigation.navigate(ROUTINE_LIST);
+  }
 
   const handleSubmit = async () => {
     if (!routine.name || !routine.description) {
@@ -32,19 +37,22 @@ export default function CreateRoutineForm({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: '#fff', flex: 1}}>
+    <SafeAreaView style={{backgroundColor: '#1E1E1E', flex: 1}}>
+      <ScreenHeader screenName='Create Routine' back={goBack} />
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.label}>Name *</Text>
         <TextInput
           style={styles.input}
           value={routine.name}
           onChangeText={(text) => handleChange('name', text)}
+          placeholder='Enter routine name'
         />
         <Text style={styles.label}>Description *</Text>
         <TextInput
           style={styles.input}
           value={routine.description}
           onChangeText={(text) => handleChange('description', text)}
+          placeholder='Enter routine description'
         />
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
@@ -73,7 +81,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
-    color: '#000'
+    color: '#FFD20A'
   },
   picker: {
     marginBottom: 20,

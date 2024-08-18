@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   View,
   Text,
@@ -11,61 +10,22 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { exerciseCategories } from '../../constants/categories';
 import { StatusBar } from 'expo-status-bar';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/reduxStore';
+import { auth } from '../../config/firebase';
 
-interface WorkoutVideo {
-  title: string;
-  image: any;
-  duration: string;
-  exercises: number;
-}
+
 const workoutVideos = exerciseCategories
-// const workoutVideos: WorkoutVideo[] = [
-//   {
-//     title: 'Loop Band Exercises',
-//     image: require('../../assets/images/slide5.png'),
-//     duration: '45 Minutes',
-//     exercises: 5,
-//   },
-//   {
-//     title: 'Workouts For Beginners',
-//     image: require('../../assets/images/slide5.png'),
-//     duration: '45 Minutes',
-//     exercises: 5,
-//   },
-//   {
-//     title: 'Full Body Stretch',
-//     image: require('../../assets/images/slide5.png'),
-//     duration: '45 Minutes',
-//     exercises: 5,
-//   },
-//   {
-//     title: 'Low Impact Workouts',
-//     image: require('../../assets/images/slide5.png'),
-//     duration: '45 Minutes',
-//     exercises: 5,
-//   },
-//   {
-//     title: 'Strength Training',
-//     image: require('../../assets/images/slide5.png'),
-//     duration: '45 Minutes',
-//     exercises: 5,
-//   },
-//   {
-//     title: 'Split Squats Vs Lunges',
-//     image: require('../../assets/images/slide5.png'),
-//     duration: '45 Minutes',
-//     exercises: 5,
-//   },
-// ];
 
-const Home: React.FC = () => {
+export default function Home() {
+
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
-      {/* <StatusBar barStyle="light-content" /> */}
       <View style={styles.header}>
+      <StatusBar style="light" />
         <View>
-          <Text style={styles.greeting}>Hi, Madison</Text>
+          <Text style={styles.greeting}>Hi, {userInfo ? userInfo.fullName : auth.currentUser.email}</Text>
           <Text style={styles.subGreeting}>It's Time To Challenge Your Limits.</Text>
         </View>
         <View style={styles.headerIcons}>
@@ -233,5 +193,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   }
 });
-
-export default Home;
