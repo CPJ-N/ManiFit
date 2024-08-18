@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, SafeAreaView } from 'react-native';
-import { Routine } from '../constants/dataModels/routine.model';
-import { createSession } from '../utils/controllers/sessionController';
+import { Routine } from '../../constants/dataModels/routine.model';
+import { createSession } from '../../utils/controllers/sessionController';
 
 interface SessionFormState {
   name: string;

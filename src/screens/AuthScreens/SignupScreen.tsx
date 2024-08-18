@@ -6,6 +6,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM, WELCOME } from '../../constants/screenNames';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
+import { StatusBar } from 'expo-status-bar';
 // import { AppDispatch } from '../store/reduxStore';
 
 export default function SignUp({navigation}) {
@@ -45,7 +46,9 @@ export default function SignUp({navigation}) {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
-      <Text style={styles.header}>Create Your Account 💪</Text>
+      <StatusBar style="light" />
+      <Text style={styles.header}>Create Your Account </Text>
+      {/* 💪 */}
       <Text style={styles.subheader}>Sign up now to get access to personalized workouts and achieve your fitness goals.</Text>
 
       <View style={styles.inputContainer}>
@@ -54,7 +57,8 @@ export default function SignUp({navigation}) {
           placeholder="Email" 
           value={userEmail}
           onChangeText={text => setUserEmail(text)}
-          style={styles.input} />
+          style={styles.input} 
+          placeholderTextColor="grey" />
       </View>
 
       <View style={styles.inputContainer}>
@@ -64,7 +68,8 @@ export default function SignUp({navigation}) {
           value={userPassword}
           onChangeText={text => setUserPassword(text)}
           secureTextEntry={!showPassword} 
-          style={styles.input} />
+          style={styles.input} 
+          placeholderTextColor="grey"/>
         <Icon name="eye-outline" onPress={() => setShowPassword(!showPassword)} size={20} color="#666" style={styles.inputIcon} />
       </View>
 
@@ -105,18 +110,20 @@ export default function SignUp({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#1E1E1E',
     padding: 20,
   },
   header: {
     fontSize: 26,
-    color: '#fff',
+    color: '#FFD20A',
     fontWeight: 'bold',
+    textAlign: 'center',
     marginTop: 100,
     marginBottom: 10,
   },
   subheader: {
     fontSize: 16,
+    textAlign: 'center',
     color: '#aaa',
     marginBottom: 20,
   },
@@ -124,7 +131,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#444',
+    paddingBottom: 5,
     marginBottom: 20,
   },
   input: {
@@ -136,14 +144,14 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   button: {
-    backgroundColor: '#1e90ff',
+    backgroundColor: '#FFD20A',
     padding: 15,
     borderRadius: 25,
     alignItems: 'center',
     marginBottom: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
   },
   loginText: {
@@ -159,6 +167,7 @@ const styles = StyleSheet.create({
   socialButtonGoogle: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#dd4b39',
     padding: 10,
     borderRadius: 25,
@@ -167,6 +176,7 @@ const styles = StyleSheet.create({
   socialButtonApple: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#555',
     padding: 10,
     borderRadius: 25,
@@ -175,6 +185,7 @@ const styles = StyleSheet.create({
   socialButtonFacebook: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#3b5998',
     padding: 10,
     borderRadius: 25,

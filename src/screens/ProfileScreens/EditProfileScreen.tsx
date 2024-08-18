@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
-import { UserDetails } from '../constants/dataModels/userDetails.model';
-import { setUser } from '../store/userSlice';
-import { RootState } from '../store/reduxStore';
+import { UserDetails } from '../../constants/dataModels/userDetails.model';
+import { setUser } from '../../store/userSlice';
+import { RootState } from '../../store/reduxStore';
 
 
 const EditProfileScreen = ({navigation}) => {
@@ -71,7 +71,7 @@ const EditProfileScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
   },
   header: {
     padding: 20,

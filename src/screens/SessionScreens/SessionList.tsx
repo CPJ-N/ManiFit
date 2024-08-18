@@ -1,9 +1,9 @@
 // SessionList.tsx
 import React, { useState } from 'react';
 import { View, FlatList, Text, StyleSheet, TextInput, SafeAreaView } from 'react-native';
-import SessionItem from '../components/SessionItem';
+import SessionItem from '../../components/SessionItem';
 import { Icon } from 'react-native-elements';
-import { SESSION_FORM } from '../constants/screenNames';
+import { SESSION_FORM } from '../../constants/screenNames';
 
 interface Session {
   sessionId: string;

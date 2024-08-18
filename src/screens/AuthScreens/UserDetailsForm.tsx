@@ -151,7 +151,7 @@ export default function UserDetailsForm({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
   },
   header: {
     padding: 20,

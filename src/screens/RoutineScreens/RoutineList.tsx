@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlatList, View, Text, ActivityIndicator, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
-import RoutineItem from '../components/RoutineItem';
-import { CONFIGURE_EXERCISES, CREATE_ROUTINE, EXERCISE_LIST } from '../constants/screenNames';
-import { Routine } from '../constants/dataModels/routine.model';
-import { Exercise } from '../constants/dataModels/exercise.model';
-import { getAllRoutines } from '../utils/controllers/routineController';
+import RoutineItem from '../../components/RoutineItem';
+import { CONFIGURE_EXERCISES, CREATE_ROUTINE, EXERCISE_LIST } from '../../constants/screenNames';
+import { Routine } from '../../constants/dataModels/routine.model';
+import { Exercise } from '../../constants/dataModels/exercise.model';
+import { getAllRoutines } from '../../utils/controllers/routineController';
+import ScreenHeader from '../../components/ScreenHeader';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/reduxStore';
 
 /*
 	1.	Create a New Routine or Select an Existing One:
@@ -24,10 +27,15 @@ import { getAllRoutines } from '../utils/controllers/routineController';
 export default function RoutineList ({navigation}) {
   const [routines, setRoutines] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
 
   function handleRoutinePress(routine) {
     navigation.navigate(EXERCISE_LIST, { routine });
     console.log('Routine selected:', routine.id);
+  }
+
+  const goBack = () => {
+    navigation.goBack();
   }
 
   useEffect(() => {
@@ -46,18 +54,21 @@ export default function RoutineList ({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.label}>Select a Routine</Text>
+      {/* <Text style={styles.label}>Select a Routine</Text> */}
+      <ScreenHeader screenName="Routines" back={goBack} />
       <FlatList
         data={routines}
         keyExtractor={(item) => item.routineId}
         renderItem={({ item }) => <RoutineItem routine={item} onPress={handleRoutinePress} />}
       />
-      <TouchableOpacity
-        style={styles.button} 
-        onPress={() => navigation.navigate(CREATE_ROUTINE)}
-      >
-        <Text style={styles.buttonText}>Create New Routine</Text>
-      </TouchableOpacity>
+      {userInfo?.isTrainer &&
+        <TouchableOpacity
+          style={styles.button} 
+          onPress={() => navigation.navigate(CREATE_ROUTINE)}
+          >
+          <Text style={styles.buttonText}>Create New Routine</Text>
+        </TouchableOpacity>
+      }
     </SafeAreaView>
   );
 };
@@ -66,12 +77,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 50,
-    backgroundColor: '#fff',
+    backgroundColor: '#1E1E1E',
   },
   label: {
     padding: 20,
     fontSize: 16,
-    color: '#000'
+    color: '#f4f4f4',
   },
   button: {
     backgroundColor: '#FFD20A',

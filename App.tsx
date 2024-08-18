@@ -6,11 +6,9 @@ import { Provider } from 'react-redux';
 import { store } from './src/store/reduxStore';
 
 //App Screens & Componets
-import Login from './src/screens/AuthScreens/LoginScreen';
-import SignUp from './src/screens/AuthScreens/SignupScreen';
 import { AUTH_TABS, BOTTOM_TABS, LOGIN, REGISTER } from './src/constants/screenNames';
 import BottomNavigation from './src/navigation/BottomNavigation';
-import LoadingScreen from './src/screens/LoadingScreen';
+import LoadingScreen from './src/screens/AuthScreens/LoadingScreen';
 import AuthNavigation from './src/navigation/AuthNavigation';
 
 const Stack = createNativeStackNavigator();

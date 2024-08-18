@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth } from '../../config/firebase'
 import { signOut } from 'firebase/auth'
@@ -62,7 +62,7 @@ export default function ProfileScreen({navigation}) {
       }
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView  style={{backgroundColor: '#1E1E1E', flex: 1}}>
             <StatusBar style="dark" />
             {/* <View style={styles.header}>
                 <Text style={styles.headerText}>My Profile</Text>
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     },
     userInfoSection: {
         backgroundColor: '#ffd20a',
-        paddingTop: 40,
+        paddingTop: 50,
         paddingVertical: 40,
         alignItems: 'center',
         borderBottomRightRadius: 50,
