@@ -46,7 +46,7 @@ export default function RoutineList ({navigation}) {
     };
   
     fetchRoutines();
-  }, [routines]);
+  }, []);
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;

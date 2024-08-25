@@ -10,4 +10,6 @@ export interface UserDetails {
     weight?: number; // Weight of the user in kilograms
     height?: number; // Height of the user in centimeters
     fitnessGoals?: string[]; // Fitness goals of the user
-}
+    linkedTrainees?: string[]; // Array of trainee IDs (applicable only for trainers)
+    linkedTrainer?: string; // Trainer ID (applicable only for trainees)
+}   
