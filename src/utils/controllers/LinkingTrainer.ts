@@ -17,6 +17,9 @@ export const assignTraineeToTrainer = async (traineeUid: string, trainerUid: str
         await updateDoc(traineeRef, {
             linkedTrainer: trainerUid
         });
+
+        console.log(`Trainee linked successfully! Trainer: ${trainerUid}, Trainee: ${traineeUid}`);
+
     } else {
         console.error('Trainee is already linked to another trainer or does not exist.');
     }
@@ -38,6 +41,8 @@ export const unlinkTraineeFromTrainer = async (traineeUid: string, trainerUid: s
     await updateDoc(traineeRef, {
         linkedTrainer: null
     });
+
+    console.log(`Trainee unlinked successfully! Trainer: ${trainerUid}, Trainee: ${traineeUid}`);
 };
 
 // Get all unlinked trainees
@@ -45,8 +50,19 @@ export const getAllUnlinkedTrainees = async () => {
     const q = query(
         collection(db, firebaseCollection.userDetails),
         where("isTrainer", "==", false),
-        where("linkedTrainer", "==", null)
+        // where("linkedTrainer", "==", null)
     );
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+};
+
+
+//get all user with isTrainer = true
+export const getAllTrainers = async () => {
+    const q = query(
+        collection(db, firebaseCollection.userDetails),
+        where("isTrainer", "==", true)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id }));
 };

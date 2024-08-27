@@ -30,7 +30,7 @@ export default function ProfileScreen({navigation}) {
                 navigation.navigate(EDIT_PROFILE);
                 break;
             case "Favorite":
-                navigation.navigate(LINK_TRAINEE);
+                userInfo?.isTrainer ? navigation.navigate(LINK_TRAINEE) : navigation.navigate(LINK_TRAINER);
                 break;
             case "Privacy Policy":
                 console.log(auth.currentUser?.uid);
