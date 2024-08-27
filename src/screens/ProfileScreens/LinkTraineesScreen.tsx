@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Button, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { assignTraineeToTrainer, getAllUnlinkedTrainees } from '../../utils/controllers/linkingTrainer';
 
+/* This screen will show the trainer a list of available trainees 
+  who are not yet linked to any trainer, with the ability to select and link them.*/
 export default function LinkTraineesScreen({navigation}) {
   const [trainees, setTrainees] = useState([]);
   const trainerUid = 'trainer-uid'; // Replace with actual trainer UID

@@ -2,15 +2,22 @@ import { useEffect, useState } from 'react';
 import { View, Text, Button, SafeAreaView, StyleSheet } from 'react-native';
 import { unlinkTraineeFromTrainer } from '../../utils/controllers/linkingTrainer';
 import { getUser } from '../../utils/controllers/userController';
-  // Assume you have a function to get and unlink trainer
+import { auth } from '../../config/firebase';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/reduxStore';
 
+
+/* This screen will allow trainees to view their linked trainer 
+  and provide options to unlink or request a change. */
 export default function LinkedTrainerScreen({navigation}) {
   const [trainer, setTrainer] = useState(null);
-  const traineeUid = 'trainee-uid'; // Replace with actual trainee UID
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const traineeUid = auth.currentUser?.uid;
 
   useEffect(() => {
     const fetchTrainer = async () => {
-      const linkedTrainer = await getUser(traineeUid);
+      // const linkedTrainer = await getUser(traineeUid);
+      const linkedTrainer = await getUser(userInfo.linkedTrainer);
       setTrainer(linkedTrainer);
     };
     fetchTrainer();
