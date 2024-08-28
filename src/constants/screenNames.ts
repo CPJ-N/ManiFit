@@ -7,6 +7,7 @@ export const PROFILE = 'PROFILE';
 export const USER_DETAILS_FORM = 'USER_DETAILS_FORM';
 export const EDIT_PROFILE = 'EDIT_PROFILE';
 export const SETTINGS = 'SETTINGS';
+export const PRIVACY_POLICY = 'PRIVACY_POLICY';
 export const LINK_TRAINER = 'LINK_TRAINER';
 export const LINK_TRAINEE = 'LINK_TRAINEE';
 export const EXERCISE_FORM = 'EXERCISE_FORM';
