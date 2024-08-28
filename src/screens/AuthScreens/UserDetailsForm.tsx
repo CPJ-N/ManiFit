@@ -101,38 +101,40 @@ export default function UserDetailsForm({ navigation }) {
           </View>
         ))}
       </View> */}
-      <Text style={styles.label}>Full Name</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => handleChange(text, 'fullName')}
-        value={userDetails['fullName'].toString()}
-      />
-      <Text style={styles.label}>Phone Number</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => handleChange(text, 'mobileNumber')}
-        value={userDetails['mobileNumber'].toString()}
-      />
-      <Text style={styles.label}>Date Of Birth</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => handleChange(text, 'dateOfBirth')}
-        value={userDetails['dateOfBirth'].toString()}
-      />
-      <Text style={styles.label}>Weight</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => handleChange(text, 'weight')}
-        value={userDetails['weight'].toString()}
-      />
-      <Text style={styles.label}>Height</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => handleChange(text, 'height')}
-        value={userDetails['height'].toString()}
-      />
-      
-      <Text style={styles.label}>Are you a Trainer?</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Full Name</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => handleChange(text, 'fullName')}
+          value={userDetails['fullName'].toString()}
+          placeholderTextColor='grey'
+        />
+        <Text style={styles.label}>Phone Number</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => handleChange(text, 'mobileNumber')}
+          value={userDetails['mobileNumber'].toString()}
+        />
+        <Text style={styles.label}>Date Of Birth</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => handleChange(text, 'dateOfBirth')}
+          value={userDetails['dateOfBirth'].toString()}
+        />
+        <Text style={styles.label}>Weight</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => handleChange(text, 'weight')}
+          value={userDetails['weight'].toString()}
+        />
+        <Text style={styles.label}>Height</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => handleChange(text, 'height')}
+          value={userDetails['height'].toString()}
+        />
+        
+        <Text style={styles.label}>Are you a Trainer?</Text>
         <Picker
           selectedValue={userDetails.isTrainer}
           onValueChange={(itemValue, itemIndex) => handleChange(itemValue, 'isTrainer')}
@@ -141,6 +143,7 @@ export default function UserDetailsForm({ navigation }) {
           <Picker.Item label="Yes" value={true} />
           <Picker.Item label="No" value={false} />
         </Picker>
+      </View>
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit Profile</Text>
       </TouchableOpacity>
@@ -177,7 +180,7 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 30,
   },
   profileImage: {
     width: 150,
@@ -195,8 +198,9 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    marginTop: 5,
-    color: '#000'
+    marginTop: 10,
+    paddingBottom: 5,
+    color: '#FFD20A',
   },
   picker: {
     marginBottom: 20,
@@ -214,6 +218,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
+    color: '#fff',
     padding: 10,
     marginVertical: 10,
     borderRadius: 10,
