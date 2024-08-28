@@ -1,23 +1,31 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { COMPLETE_EXERCISE_LIST, CONFIGURE_EXERCISES, CREATE_ROUTINE, EXERCISE_DETAILS, EXERCISE_EDIT, EXERCISE_FORM, EXERCISE_LIST, ROUTINE_LIST, SELECT_ROUTINE_EXERCISES, SESSION_FORM, SESSION_LIST } from "../constants/screenNames";
 import ExerciseList from "../components/ExerciseList";
 import ExerciseForm from "../components/ExerciseForm";
 import EditExercise from "../screens/EditExcercise";
 import ExcerciseDetails from "../screens/ExerciseDetails";
 import RoutineList from "../screens/RoutineScreens/RoutineList";
-import SessionsList from "../screens/SessionScreens/SessionList";
-import SessionCreationForm from "../screens/SessionScreens/SessionCreationForm";
 import CompleteExerciseList from "../screens/RoutineScreens/CompleteExerciseList";
 import ConfigureExercisesScreen from "../screens/RoutineScreens/ConfigureExercisesScreen";
 import ExerciseSelectionScreen from "../screens/RoutineScreens/ExerciseSelectionScreen";
 import CreateRoutineForm from "../screens/RoutineScreens/CreateRoutineForm";
+import { 
+    COMPLETE_EXERCISE_LIST, 
+    CONFIGURE_EXERCISES, 
+    CREATE_ROUTINE, 
+    EXERCISE_DETAILS, 
+    EXERCISE_EDIT, 
+    EXERCISE_FORM, 
+    EXERCISE_LIST, 
+    ROUTINE_LIST, 
+    SELECT_ROUTINE_EXERCISES 
+} from "../constants/screenNames";
 
 
 const ExerciseTabs = createNativeStackNavigator();
 
 export default function ExerciseNavigation() {
     return (
-        <ExerciseTabs.Navigator screenOptions={{headerShown: false}} initialRouteName={SESSION_LIST}>
+        <ExerciseTabs.Navigator screenOptions={{headerShown: false}} initialRouteName={ROUTINE_LIST}>
             <ExerciseTabs.Screen name={EXERCISE_LIST} component={ExerciseList} />
             <ExerciseTabs.Screen name={EXERCISE_FORM} component={ExerciseForm}  />
             <ExerciseTabs.Screen name={EXERCISE_EDIT} component={EditExercise} />
@@ -27,8 +35,6 @@ export default function ExerciseNavigation() {
             <ExerciseTabs.Screen name={CONFIGURE_EXERCISES} component={ConfigureExercisesScreen} />
             <ExerciseTabs.Screen name={SELECT_ROUTINE_EXERCISES} component={ExerciseSelectionScreen} />
             <ExerciseTabs.Screen name={ROUTINE_LIST} component={RoutineList} />
-            <ExerciseTabs.Screen name={SESSION_LIST} component={SessionsList} />
-            <ExerciseTabs.Screen name={SESSION_FORM} component={SessionCreationForm} />
         </ExerciseTabs.Navigator>
     );
 }
