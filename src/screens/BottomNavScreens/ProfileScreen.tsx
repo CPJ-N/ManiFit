@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, SafeAreaVi
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth } from '../../config/firebase'
 import { signOut } from 'firebase/auth'
-import { AUTH_TABS, COMPLETE_EXERCISE_LIST, EDIT_PROFILE, EXERCISE_TABS, FAVORITE, LINK_TRAINEE, LINK_TRAINER, LOGIN, SETTINGS } from '../../constants/screenNames';
+import { AUTH_TABS, COMPLETE_EXERCISE_LIST, EDIT_PROFILE, EXERCISE_TABS, FAVORITE, LINK_TRAINEE, LINK_TRAINER, LOGIN, PRIVACY_POLICY, SETTINGS } from '../../constants/screenNames';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { StatusBar } from 'expo-status-bar';
@@ -34,6 +34,8 @@ export default function ProfileScreen({navigation}) {
                 break;
             case "Privacy Policy":
                 console.log(auth.currentUser?.uid);
+                console.log('Privacy Policy')
+                navigation.navigate(PRIVACY_POLICY)
                 break;
             case "Settings":
                 navigation.navigate(SETTINGS)
