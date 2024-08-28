@@ -70,7 +70,7 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (          
           <TouchableOpacity 
-            style={[styles.card, item.isSelected ? { backgroundColor: 'ffd202' } : { backgroundColor: 'F0F0F0' }]} 
+            style={[styles.card, item.isSelected ? { backgroundColor: '#ffd20a' } : { backgroundColor: '#F0F0F0' }]} 
             onPress={() =>
               item.isSelected ? removeExercise(item) : addExercise(item)
             }>

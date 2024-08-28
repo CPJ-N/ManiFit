@@ -16,11 +16,9 @@ export const firebaseBucketName = {
 export const firebaseCollection = {
     exercises: 'Exercises',
     routines: 'Routines',
-    sessions: 'Sessions',
     userDetails: 'UsersDetails',
 }
 //firebase Collections
 export const EXERCISES = 'Exercises';
 export const ROUTINES = 'Routines';
-export const SESSIONS = 'Sessions'
 export const USER_DETAILS = 'UsersDetails';
