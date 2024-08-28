@@ -7,8 +7,8 @@ export default function ScreenHeader({screenName, back}: {screenName: string, ba
   return (
     <View style={styles.header}>
       <StatusBar style="light" />
-        <View style={{flexDirection: 'row'}}>
-            <Ionicons name="caret-back" size={24} color="white" style={styles.icon} onPress={back} />
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Ionicons name="chevron-back" size={24} color="white" style={styles.icon} onPress={back} />
           <Text style={styles.greeting}>
             {screenName}
           </Text>

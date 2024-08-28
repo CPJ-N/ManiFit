@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons'; 
 
 import { EXERCISE_TABS, FAVORITE, HOME, PROFILE_TABS } from '../constants/screenNames';
 
@@ -15,7 +15,12 @@ const BottomTabs = createBottomTabNavigator();
 
 export default function BottomNavigation() {
     return (
-            <BottomTabs.Navigator screenOptions={{headerShown: false, tabBarShowLabel: false}}>
+            <BottomTabs.Navigator screenOptions={{
+                headerShown: false, tabBarShowLabel: false,
+                tabBarStyle: { backgroundColor: '#2A2A2A' },
+                tabBarActiveTintColor: '#ffd20a', // Active icon color
+                tabBarInactiveTintColor: '#FFFFFF', // Inactive icon color
+                }}>
                 <BottomTabs.Screen name={HOME} component={Home} 
                     options={{
                         tabBarIcon: ({color, size}) => (
