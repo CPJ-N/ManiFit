@@ -17,7 +17,6 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
   useEffect(() => {
       const fetchExercises = async () => {
           const fetchedExercises = await getAllExercises();
-          // console.log(fetchedExercises);
           
           const exercisesWithSelection = fetchedExercises.map(exercise => ({
             ...exercise,
@@ -25,32 +24,10 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
           }));
           
           setExercises(exercisesWithSelection);
-          // const urls = await Promise.all(
-          //   fetchedExercises.map(async (exercise) => {
-          //     if (exercise.images && exercise.images.length > 0) {
-          //       const url = await getImageUrl(exercise.images[0]);
-          //       return { [exercise.id]: url };
-          //     }
-          //     return {};
-          //   })
-          // );
-    
-          // setImageUrls(Object.assign({}, ...urls));
+
       };
       fetchExercises();
   }, []);
-
-  // const addExercise = (exercise) => {
-  //   setSelectedExercises((prev) => [...prev, exercise]);
-  //   // remove the exercise from the list of exercises
-  //   // setExercises((prev) => prev.filter((ex) => ex.id !== exercise && ex.id));
-
-  //   console.log(exercise.name);
-  // };
-
-  // const removeExercise = (exercise) => {
-  //   setSelectedExercises((prev) => prev.filter((ex) => ex.id !== exercise.id));
-  // };
 
   const addExercise = (exercise) => {
     setSelectedExercises((prev) => [...prev, exercise]);
@@ -91,9 +68,9 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
       <FlatList
         data={filteredExercises}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
+        renderItem={({ item }) => (          
           <TouchableOpacity 
-            style={styles.card} 
+            style={[styles.card, item.isSelected ? { backgroundColor: 'ffd202' } : { backgroundColor: 'F0F0F0' }]} 
             onPress={() =>
               item.isSelected ? removeExercise(item) : addExercise(item)
             }>
@@ -147,7 +124,6 @@ const styles = StyleSheet.create({
       padding: 5,
       marginHorizontal: 10,
       marginBottom: 10,
-      backgroundColor: '#F0F0F0',
       borderRadius: 10,
       elevation: 3,
       shadowOpacity: 0.1,

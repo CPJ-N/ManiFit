@@ -34,10 +34,6 @@ export default function RoutineList ({navigation}) {
     console.log('Routine selected:', routine.id);
   }
 
-  const goBack = () => {
-    navigation.goBack();
-  }
-
   useEffect(() => {
     const fetchRoutines = async () => {
       const routines = await getAllRoutines();
@@ -55,20 +51,21 @@ export default function RoutineList ({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       {/* <Text style={styles.label}>Select a Routine</Text> */}
-      <ScreenHeader screenName="Routines" back={goBack} />
+      <ScreenHeader screenName="Routines" back={() => navigation.goBack()} />
       <FlatList
         data={routines}
         keyExtractor={(item) => item.routineId}
         renderItem={({ item }) => <RoutineItem routine={item} onPress={handleRoutinePress} />}
       />
-      {userInfo?.isTrainer &&
+      {/* {userInfo?.isTrainer && */}
         <TouchableOpacity
           style={styles.button} 
           onPress={() => navigation.navigate(CREATE_ROUTINE)}
           >
           <Text style={styles.buttonText}>Create New Routine</Text>
         </TouchableOpacity>
-      }
+      {/* } */}
+      
     </SafeAreaView>
   );
 };
