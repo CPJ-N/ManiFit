@@ -9,7 +9,6 @@ import FavoriteScreen from '../screens/BottomNavScreens/FavoriteScreen';
 import ProfileNavigation from './ProfileNavigation';
 import ExerciseNavigation from './ExerciseNavigation';
 import {ImageUploadScreen} from '../components/ImageUpload';
-import RoutineList from '../screens/RoutineScreens/RoutineList';
 
 
 const BottomTabs = createBottomTabNavigator();
@@ -29,7 +28,7 @@ export default function BottomNavigation() {
                         <Ionicons name="albums-outline" size={size} color={color} />
                     ),
                 }}/>
-                <BottomTabs.Screen name={FAVORITE} component={RoutineList}
+                <BottomTabs.Screen name={FAVORITE} component={FavoriteScreen}
                     options={{
                         tabBarIcon: ({color, size}) => (
                         <Ionicons name="bookmarks-outline" size={size} color={color} />
