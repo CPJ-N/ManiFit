@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { DELETE_ACCOUNT, LINK_TRAINEE, LINK_TRAINER, PASSWORD_SETTINGS } from '../../constants/screenNames';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/reduxStore';
+import { updateUser } from '../../utils/controllers/userController';
 
 const SettingItem = ({ icon, title, onPress }) => (
   <TouchableOpacity style={styles.settingItem} onPress={onPress}>
@@ -10,11 +14,17 @@ const SettingItem = ({ icon, title, onPress }) => (
       </View>
       <Text style={styles.settingItemText}>{title}</Text>
     </View>
-    <Ionicons name="chevron-down" size={24} color="#FFD20A" />
+    <Ionicons name="chevron-forward" size={24} color="#FFD20A" />
   </TouchableOpacity>
 );
 
 export default function SettingsScreen({navigation}) {
+    const userInfo = useSelector((state: RootState) => state.user.userInfo);
+
+    useEffect(() => {
+        console.log(userInfo);
+    }, [userInfo])
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -33,13 +43,33 @@ export default function SettingsScreen({navigation}) {
         <SettingItem
           icon="key"
           title="Password Setting"
-          onPress={() => {/* Handle press */}}
+          onPress={() => {navigation.navigate(PASSWORD_SETTINGS)}}
         />
         <SettingItem
           icon="trash"
           title="Delete Account"
-          onPress={() => {/* Handle press */}}
+          onPress={() => {navigation.navigate(DELETE_ACCOUNT)}}
         />
+        {userInfo?.isTrainer === true? (
+            <SettingItem
+              icon="person-add"
+              title="Link Trainee"
+              onPress={() => {navigation.navigate(LINK_TRAINEE)}}
+            />
+            ) : (
+            <SettingItem
+              icon="person-add"
+              title="Link Trainer"
+              onPress={() => {navigation.navigate(LINK_TRAINER)}}
+            />
+        )}
+        {!userInfo?.isTrainer === false && ( 
+          <SettingItem
+            icon="barbell"
+            title="Register as Trainer"
+            onPress={() => {updateUser(userInfo.uid, {isTrainer: true})}}
+            />
+        )}
       </View>
     </SafeAreaView>
   );

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Button, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
 import { assignTraineeToTrainer, getAllUnlinkedTrainees } from '../../utils/controllers/linkingTrainer';
 import { auth } from '../../config/firebase';
+import { Ionicons } from '@expo/vector-icons';
 
 /* This screen will show the trainer a list of available trainees 
   who are not yet linked to any trainer, with the ability to select and link them.*/
@@ -27,7 +28,10 @@ export default function LinkTraineesScreen({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Get New Trainees</Text>
+      <View style={styles.header}>
+        <Ionicons name="chevron-back" size={24} color="#ffd20a" onPress={()=>navigation.goBack()}/>
+        <Text style={styles.headerTitle}>Get New Trainees</Text>
+      </View>
       <FlatList
         data={trainees}
         keyExtractor={(item) => item.uid}
@@ -49,10 +53,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E1E1E',
   },
   header: {
-    fontSize: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  headerTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    margin: 16,
-    color: '#FFD20A',
+    color: '#ffd20a',
+    marginLeft: 16,
   },
   trainerName: {
     fontSize: 18,
