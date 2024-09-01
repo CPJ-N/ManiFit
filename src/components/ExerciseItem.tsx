@@ -4,7 +4,7 @@ import { Exercise } from '../constants/dataModels/exercise.model';
 import { Icon } from 'react-native-elements';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { getImageUrl } from '../utils/imageHelpers/getImageUrl';
-import { bucketName } from '../constants/serverConstant';
+import { firebaseBucketName } from '../constants/firebaseContant';
 
 interface ExerciseProps {
   exercise: Exercise;
@@ -23,7 +23,7 @@ export default function ExerciseItem({ exercise, onEdit, onDelete }: ExercisePro
 
   useEffect(() => {
     if (exercise.images) {
-      getImageUrl(bucketName.exerciseImages, exercise.images[0])
+      getImageUrl(firebaseBucketName.exerciseImages, exercise.images[0])
         .then((url) => {
           setImageUrl(url);
         }

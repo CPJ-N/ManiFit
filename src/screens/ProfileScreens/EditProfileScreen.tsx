@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, SafeAreaView } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
 import { setUser } from '../../store/userSlice';
@@ -49,10 +49,15 @@ export default function EditProfileScreen({navigation}) {
     </View>
     <ScrollView style={styles.container}>
       <View style={styles.profileSection}>
-        <Image
-          source={{ uri: 'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
-          style={styles.profileImage}
-        />
+        <View style={{ position: 'relative', flex: 0 }}>
+          <Image
+            source={{ uri: 'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
+            style={styles.profileImage}
+          />
+          <TouchableOpacity style={styles.editIcon} >
+            <Ionicons name="camera" size={24} color="#ffd20a"/>
+          </TouchableOpacity>
+        </View> 
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{profile.fullName}</Text>
           <Text style={styles.detailsText}>{auth.currentUser?.email}</Text>
@@ -120,6 +125,14 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     padding: 10,
     marginBottom: 10,
+  },
+  editIcon: {
+    position: 'absolute', 
+    bottom: 10, 
+    right: 10, 
+    padding: 5, 
+    backgroundColor: '#1e1e1e',
+    borderRadius: 30,
   },
   infoContainer: {
     marginLeft: 20,

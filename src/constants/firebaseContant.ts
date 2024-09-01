@@ -18,7 +18,3 @@ export const firebaseCollection = {
     routines: 'Routines',
     userDetails: 'UsersDetails',
 }
-//firebase Collections
-export const EXERCISES = 'Exercises';
-export const ROUTINES = 'Routines';
-export const USER_DETAILS = 'UsersDetails';

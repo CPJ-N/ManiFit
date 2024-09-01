@@ -1,11 +1,11 @@
 import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc, query, where } from "firebase/firestore";
 import { Exercise } from "../../constants/dataModels/exercise.model";
-import { EXERCISES } from "../../constants/firebaseCollections";
+import { firebaseCollection } from "../../constants/firebaseContant";
 import { db } from "../../config/firebase";
 
 export const addExercise = async (exercise: Exercise) => {
   try {
-    const docRef = await addDoc(collection(db, EXERCISES), exercise);
+    const docRef = await addDoc(collection(db, firebaseCollection.exercises), exercise);
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
@@ -14,7 +14,7 @@ export const addExercise = async (exercise: Exercise) => {
 
 export const updateExercise = async (exerciseId: string, updatedData: Partial<Exercise>): Promise<void> => {
   try {
-    const excerciseRef = doc(db, EXERCISES, exerciseId);
+    const excerciseRef = doc(db, firebaseCollection.exercises, exerciseId);
     await updateDoc(excerciseRef, updatedData);
     console.log("Exercise updated successfully");
   } catch (error) {
@@ -25,7 +25,7 @@ export const updateExercise = async (exerciseId: string, updatedData: Partial<Ex
 
 export const getAllExercises = async (): Promise<Exercise[]> => {
   try {
-    const querySnapshot = await getDocs(collection(db, EXERCISES));
+    const querySnapshot = await getDocs(collection(db, firebaseCollection.exercises));
     const exercises: Exercise[] = [];
     querySnapshot.forEach((doc) => {
       // Include the document ID in the object
@@ -44,7 +44,7 @@ export const getAllExercises = async (): Promise<Exercise[]> => {
 
 export const getExercise = async (exerciseId: string): Promise<Exercise> => {
   try {
-    const docRef = doc(db, EXERCISES, exerciseId);
+    const docRef = doc(db, firebaseCollection.exercises, exerciseId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -67,7 +67,7 @@ export const getExercise = async (exerciseId: string): Promise<Exercise> => {
 export const deleteExercise = async (exerciseId: string) => {
   try {
     console.log("Deleting exercise...", exerciseId);
-    const docRef = doc(db, `${EXERCISES}/${exerciseId}`);
+    const docRef = doc(db, `${firebaseCollection.exercises}/${exerciseId}`);
     console.log(docRef);
     await deleteDoc(docRef);
     console.log("Exercise deleted successfully");
@@ -81,7 +81,7 @@ export const deleteExercise = async (exerciseId: string) => {
 export const getExercisesByCategory = async (category: string) => {
   try {
     // Query for products that have "red" in the colors array
-    const querySnapshot = query(collection(db, EXERCISES), where("primaryMuscles", "array-contains", category));
+    const querySnapshot = query(collection(db, firebaseCollection.exercises), where("primaryMuscles", "array-contains", category));
     const getExercisesByCategory: Exercise[] = [];
     getDocs(querySnapshot)
       .then((querySnapshot) => {

@@ -1,12 +1,12 @@
 import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import { ROUTINES } from "../../constants/firebaseCollections";
+import { firebaseCollection } from "../../constants/firebaseContant";
 import { Routine } from "../../constants/dataModels/routine.model";
 
 
 export const addRoutine = async (routine: Routine) => {
     try {
-      const docRef = await addDoc(collection(db, ROUTINES), routine);
+      const docRef = await addDoc(collection(db, firebaseCollection.routines), routine);
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -15,7 +15,7 @@ export const addRoutine = async (routine: Routine) => {
 
 export const getRoutine = async (routineId: string) => {
     try {
-      const docRef = doc(db, ROUTINES, routineId);
+      const docRef = doc(db, firebaseCollection.routines, routineId);
       const docSnap = await getDoc(docRef);
   
       if (docSnap.exists()) {
@@ -31,7 +31,7 @@ export const getRoutine = async (routineId: string) => {
 
 export const getAllRoutines = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, ROUTINES));
+      const querySnapshot = await getDocs(collection(db, firebaseCollection.routines));
       const routines: any[] = [];
       querySnapshot.forEach((doc) => {
         routines.push({ id: doc.id, ...doc.data() });
@@ -44,7 +44,7 @@ export const getAllRoutines = async () => {
 };
 
 export const addExerciseToRoutine = (routineId: string, exerciseId: string) => {
-    const routineRef = doc(db, ROUTINES, routineId);
+    const routineRef = doc(db, firebaseCollection.routines, routineId);
   
     // Atomically add a new exercise to the "exercises" array field.
     updateDoc(routineRef, {
@@ -54,7 +54,7 @@ export const addExerciseToRoutine = (routineId: string, exerciseId: string) => {
 
 export const deleteRoutine = async (routineId: string) => {
     try {
-      await deleteDoc(doc(db, ROUTINES, routineId));
+      await deleteDoc(doc(db, firebaseCollection.routines, routineId));
       console.log("Document deleted successfully");
     } catch (error) {
       console.error("Error deleting document: ", error);

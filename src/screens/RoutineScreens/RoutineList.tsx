@@ -56,15 +56,14 @@ export default function RoutineList ({navigation}) {
         keyExtractor={(item) => item.routineId}
         renderItem={({ item }) => <RoutineItem routine={item} onPress={handleRoutinePress} />}
       />
-      {/* {userInfo?.isTrainer && */}
+      {userInfo?.isTrainer &&
         <TouchableOpacity
           style={styles.button} 
           onPress={() => navigation.navigate(CREATE_ROUTINE)}
           >
           <Text style={styles.buttonText}>Create New Routine</Text>
         </TouchableOpacity>
-      {/* } */}
-      
+      }
     </SafeAreaView>
   );
 };
