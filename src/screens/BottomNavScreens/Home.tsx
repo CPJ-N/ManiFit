@@ -13,25 +13,26 @@ import { StatusBar } from 'expo-status-bar';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { auth } from '../../config/firebase';
+import { COMPLETE_EXERCISE_LIST, EXERCISE_TABS, PROFILE_TABS } from '../../constants/screenNames';
 
 
 const workoutVideos = exerciseCategories
 
-export default function Home() {
+export default function Home({navigation}) {
 
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
       <StatusBar style="light" />
+      <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>Hi, {userInfo ? userInfo.fullName : auth.currentUser.email}</Text>
           <Text style={styles.subGreeting}>It's Time To Challenge Your Limits.</Text>
         </View>
         <View style={styles.headerIcons}>
-          <Ionicons name="search" size={24} color="white" style={styles.icon} />
+          <Ionicons name="search" size={24} color="white" style={styles.icon} onPress={navigation.navigate(EXERCISE_TABS, {COMPLETE_EXERCISE_LIST})}/>
           <Ionicons name="notifications" size={24} color="white" style={styles.icon} />
-          <Ionicons name="person" size={24} color="white" style={styles.icon} />
+          <Ionicons name="person" size={24} color="white" style={styles.icon} onPress={()=>navigation.navigate(PROFILE_TABS)} />
         </View>
       </View>
       <View style={styles.quickActions}>

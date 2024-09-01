@@ -10,7 +10,6 @@ import { StatusBar } from 'expo-status-bar';
 
 // TODO: Add functionality to update user profile
 // TODO: Add functionality to go to all menu options
-// TODO: Add functionality to create user DOC for sign up
 
 export default function ProfileScreen({navigation}) {
     const userInfo = useSelector((state: RootState) => state.user.userInfo);
@@ -68,23 +67,21 @@ export default function ProfileScreen({navigation}) {
       }
 
     return (
-        <ScrollView  style={{backgroundColor: '#1E1E1E', flex: 1}}>
+        <SafeAreaView style={styles.container}>
             <StatusBar style="dark" />
-            {/* <View style={styles.header}>
-                <Text style={styles.headerText}>My Profile</Text>
-            </View> */}
-
+        <ScrollView  style={{backgroundColor: '#1E1E1E', flex: 1}}>
             <View style={styles.userInfoSection}>
                 <Image 
                     source={{ uri: 'https://images.pexels.com/photos/3806244/pexels-photo-3806244.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }}
                     style={styles.profileImage} 
                 />
-                <Text style={styles.name}>{userInfo?.fullName}</Text>
-                {/* <Text style={styles.email}>{auth.currentUser?.email}</Text> */}
-                <Text style={styles.email}>{userInfo?.email}</Text>
-
-                <Text style={styles.birthday}>Birthday: April 1st</Text>
-                <View style={styles.statsContainer}>
+                <View style={styles.subInfoSection}>
+                    <Text style={styles.name}>{userInfo?.fullName}</Text>
+                    <Text style={styles.email}>{userInfo?.email}</Text>
+                    <Text style={styles.birthday}>Birthday: {userInfo?.dateOfBirth}</Text>
+                </View>
+            </View>
+            <View style={styles.statsContainer}>
                     <View style={styles.stat}>
                         <Text style={styles.statValue}>{userInfo?.weight}</Text>
                         <Text style={styles.statLabel}>Weight</Text>
@@ -98,7 +95,6 @@ export default function ProfileScreen({navigation}) {
                         <Text style={styles.statLabel}>Height</Text>
                     </View>
                 </View>
-            </View>
 
             <View style={styles.menu}>
                 {menuItems.map((item, index) => (
@@ -113,55 +109,55 @@ export default function ProfileScreen({navigation}) {
                 ))}
             </View>
         </ScrollView>
+    </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1E1E1E',
-    },
-    header: {
         backgroundColor: '#ffd20a',
-        padding: 12,
-    },
-    headerText: {
-        color: '#1f1f1f',
-        fontSize: 20,
-        fontWeight: 'bold',
     },
     userInfoSection: {
         backgroundColor: '#ffd20a',
-        paddingTop: 50,
-        paddingVertical: 40,
+        padding: 20,
         alignItems: 'center',
-        borderBottomRightRadius: 50,
-        borderBottomLeftRadius: 50,
-
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    subInfoSection: {
+        marginLeft: 20,
     },
     profileImage: {
         width: 130,
         height: 130,
-        padding: 10,
+        paddingBottom: 15,
         borderRadius: 65,
         marginBottom: 10,
     },
     name: {
         color: '#1f1f1f',
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
+        paddingBottom: 5,
     },
     email: {
         color: '#3f381a',
+        fontSize: 16,
+        padding: 3,
     },
     birthday: {
         color: '#3f381a',
         marginBottom: 20,
     },
     statsContainer: {
+        backgroundColor: '#ffd20a',
         flexDirection: 'row',
         justifyContent: 'space-around',
         width: '100%',
+        borderBottomRightRadius: 50,
+        borderBottomLeftRadius: 50,
+        paddingBottom: 30,
     },
     stat: {
         alignItems: 'center',

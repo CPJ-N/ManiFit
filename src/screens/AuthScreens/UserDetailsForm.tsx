@@ -135,14 +135,14 @@ export default function UserDetailsForm({ navigation }) {
         />
         
         <Text style={styles.label}>Are you a Trainer?</Text>
-        <Picker
+        {/* <Picker
           selectedValue={userDetails.isTrainer}
           onValueChange={(itemValue, itemIndex) => handleChange(itemValue, 'isTrainer')}
           style={styles.picker}
         >
           <Picker.Item label="Yes" value={true} />
           <Picker.Item label="No" value={false} />
-        </Picker>
+        </Picker> */}
       </View>
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit Profile</Text>

@@ -50,8 +50,7 @@ export default function RoutineList ({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <Text style={styles.label}>Select a Routine</Text> */}
-      <ScreenHeader screenName="Routines" back={() => navigation.goBack()} />
+      <ScreenHeader screenName="Routines" navigation={navigation} />
       <FlatList
         data={routines}
         keyExtractor={(item) => item.routineId}

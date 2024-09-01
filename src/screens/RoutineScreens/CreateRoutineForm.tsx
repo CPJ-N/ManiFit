@@ -38,7 +38,7 @@ export default function CreateRoutineForm({ navigation }) {
 
   return (
     <SafeAreaView style={{backgroundColor: '#1E1E1E', flex: 1}}>
-      <ScreenHeader screenName='Create Routine' back={goBack} />
+      <ScreenHeader screenName='Create Routine' navigation={navigation}/>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.label}>Name *</Text>
         <TextInput

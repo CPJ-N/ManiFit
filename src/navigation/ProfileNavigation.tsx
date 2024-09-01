@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { DELETE_ACCOUNT, EDIT_PROFILE, LINK_TRAINEE, LINK_TRAINER, PASSWORD_SETTINGS, PRIVACY_POLICY, PROFILE, SETTINGS } from "../constants/screenNames";
+import { DELETE_ACCOUNT, EDIT_PROFILE, LINK_TRAINEE, LINK_TRAINER, PASSWORD_SETTINGS, PRIVACY_POLICY, PROFILE, REGISTER_TRAINER, SETTINGS } from "../constants/screenNames";
 import ProfileScreen from "../screens/BottomNavScreens/ProfileScreen";
 import EditProfileScreen from "../screens/ProfileScreens/EditProfileScreen";
 import LinkTraineesScreen from "../screens/ProfileScreens/LinkTraineesScreen";
@@ -8,6 +8,8 @@ import SettingsScreen from "../screens/ProfileScreens/SettingsScreen";
 import PrivacyPolicyScreen from "../screens/ProfileScreens/PrivacyPolicyScreen";
 import DeleteAccountScreen from "../screens/ProfileScreens/DeleteAccountScreen";
 import PasswordSettingsScreen from "../screens/ProfileScreens/PasswordSettingsScreen";
+import TrainerRegistrationScreen from "../screens/ProfileScreens/TrainerRegistrationScreen";
+
 
 const ProfileScreens = createNativeStackNavigator();
 
@@ -22,6 +24,7 @@ export default function ProfileNavigation() {
             <ProfileScreens.Screen name={SETTINGS} component={SettingsScreen} />
             <ProfileScreens.Screen name={DELETE_ACCOUNT} component={DeleteAccountScreen} />
             <ProfileScreens.Screen name={PASSWORD_SETTINGS} component={PasswordSettingsScreen} />
+            <ProfileScreens.Screen name={REGISTER_TRAINER} component={TrainerRegistrationScreen} />
         </ProfileScreens.Navigator>
     );
 }

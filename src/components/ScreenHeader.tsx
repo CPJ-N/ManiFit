@@ -2,19 +2,20 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { Ionicons } from '@expo/vector-icons';
+import { PROFILE_TABS } from '../constants/screenNames';
 
-export default function ScreenHeader({screenName, back}: {screenName: string, back: any}) {
+export default function ScreenHeader({screenName, navigation}: {screenName: string, navigation: any}) {
   return (
     <View style={styles.header}>
       <StatusBar style="light" />
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Ionicons name="chevron-back" size={24} color="#ffd20a" style={styles.icon} onPress={back} />
+          <Ionicons name="chevron-back" size={24} color="#ffd20a" style={styles.icon} onPress={navigation.goBack()} />
           <Text style={styles.greeting}>
             {screenName}
           </Text>
         </View>
         <View style={styles.headerIcons}>
-          <Ionicons name="search" size={24} color="white" style={styles.icon} />
+          <Ionicons name="search" size={24} color="white" style={styles.icon} onPress={() => navigation.navigate(PROFILE_TABS)}/>
           <Ionicons name="notifications" size={24} color="white" style={styles.icon} />
           <Ionicons name="person" size={24} color="white" style={styles.icon} />
         </View>

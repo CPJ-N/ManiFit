@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { DELETE_ACCOUNT, LINK_TRAINEE, LINK_TRAINER, PASSWORD_SETTINGS } from '../../constants/screenNames';
+import { DELETE_ACCOUNT, LINK_TRAINEE, LINK_TRAINER, PASSWORD_SETTINGS, REGISTER_TRAINER } from '../../constants/screenNames';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { updateUser } from '../../utils/controllers/userController';
@@ -63,11 +63,11 @@ export default function SettingsScreen({navigation}) {
               onPress={() => {navigation.navigate(LINK_TRAINER)}}
             />
         )}
-        {!userInfo?.isTrainer === false && ( 
+        {userInfo?.isTrainer === false && ( 
           <SettingItem
             icon="barbell"
             title="Register as Trainer"
-            onPress={() => {updateUser(userInfo.uid, {isTrainer: true})}}
+            onPress={() => {navigation.navigate(REGISTER_TRAINER)}}
             />
         )}
       </View>

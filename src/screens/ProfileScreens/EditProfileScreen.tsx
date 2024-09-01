@@ -1,31 +1,37 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, SafeAreaView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
 import { setUser } from '../../store/userSlice';
 import { RootState } from '../../store/reduxStore';
+import { updateUser } from '../../utils/controllers/userController';
+import { StatusBar } from 'expo-status-bar';
+import { auth } from '../../config/firebase';
 
 
-const EditProfileScreen = ({navigation}) => {
+export default function EditProfileScreen({navigation}) {
 
   const dispatch = useDispatch(); // Initialize useDispatch
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
-  const [profile, setProfile] = useState<UserDetails>({
+  const [profile, setProfile] = useState<Partial<UserDetails>>({
     fullName: userInfo?.fullName,
-    email: userInfo?.email,
     mobileNumber: userInfo?.mobileNumber,
     dateOfBirth: userInfo?.dateOfBirth,
     weight: userInfo?.weight,
     height: userInfo?.height,
-    isTrainer: userInfo?.isTrainer,
   });
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     console.log('userDetails updated:', profile);
     // Dispatch setUser action with userDetails
-    dispatch(setUser(profile));
-    console.log('Profile updated:', profile);
+    const updateProffileInfo: UserDetails = {...userInfo, ...profile} as UserDetails;
+    await updateUser(auth.currentUser?.uid, updateProffileInfo).then(() => {
+      dispatch(setUser(updateProffileInfo));
+      console.log('Profile updated:', updateProffileInfo);
+    }).catch((error) => {
+      console.log('Error updating profile:', error);
+    });
   };
 
   const handleChange = (value: string, field: keyof UserDetails) => {
@@ -33,13 +39,15 @@ const EditProfileScreen = ({navigation}) => {
   };
 
   return (
+    <SafeAreaView style={styles.container}>
+    <StatusBar style="light" />
+    <View style={styles.header}>
+      <TouchableOpacity onPress={()=>navigation.goBack()}>
+        <Ionicons name="chevron-back" size={24} color="#FFD20A" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle}>Settings</Text>
+    </View>
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>My Profile</Text>
-      </View>
       <View style={styles.profileSection}>
         <Image
           source={{ uri: 'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
@@ -47,7 +55,7 @@ const EditProfileScreen = ({navigation}) => {
         />
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{profile.fullName}</Text>
-          <Text style={styles.detailsText}>{profile.email}</Text>
+          <Text style={styles.detailsText}>{auth.currentUser?.email}</Text>
           <Text style={styles.detailsText}>Birthday: {profile.dateOfBirth}</Text>
         </View>
       </View>
@@ -65,6 +73,7 @@ const EditProfileScreen = ({navigation}) => {
         <Text style={styles.buttonText}>Update Profile</Text>
       </TouchableOpacity>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -74,14 +83,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E1E1E',
   },
   header: {
-    padding: 20,
-    paddingTop: 70,
-    backgroundColor: '#FFD20A',
-    alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'center',
-    borderBottomRightRadius: 15,
-    borderBottomLeftRadius: 15,
+    alignItems: 'center',
+    padding: 16,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFD20A',
+    marginLeft: 16,
   },
   backButton: {
     paddingTop: 30,
@@ -98,24 +108,32 @@ const styles = StyleSheet.create({
   profileSection: {
     alignItems: 'center',
     marginVertical: 20,
+    backgroundColor: '#FFD20A',
+    borderRadius: 15,
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
+    padding: 10,
+    marginBottom: 10,
   },
   infoContainer: {
-    alignItems: 'center',
+    marginLeft: 20,
   },
   name: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
+    paddingBottom: 5,
   },
   detailsText: {
-    fontSize: 16,
-    color: '#666',
-    marginVertical: 5,
+    fontSize: 14,
+    color: '#333',
+    padding: 3,
   },
   inputContainer: {
     paddingHorizontal: 20,
@@ -126,6 +144,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 10,
     borderRadius: 10,
+    color: '#ddd',
   },
   button: {
     backgroundColor: '#FFD20A',
@@ -142,5 +161,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-export default EditProfileScreen;
