@@ -9,7 +9,7 @@ export default function ScreenHeader({screenName, navigation}: {screenName: stri
     <View style={styles.header}>
       <StatusBar style="light" />
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Ionicons name="chevron-back" size={24} color="#ffd20a" style={styles.icon} onPress={navigation.goBack()} />
+          <Ionicons name="chevron-back" size={24} color="#ffd20a" style={styles.icon} onPress={() => navigation.goBack()} />
           <Text style={styles.greeting}>
             {screenName}
           </Text>

@@ -10,10 +10,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { exerciseCategories } from '../../constants/categories';
 import { StatusBar } from 'expo-status-bar';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { auth } from '../../config/firebase';
 import { COMPLETE_EXERCISE_LIST, EXERCISE_TABS, PROFILE_TABS } from '../../constants/screenNames';
+import { useEffect } from 'react';
+import { setUser } from '../../store/userSlice';
+import { getUser } from '../../utils/controllers/userController';
+import { UserDetails } from '../../constants/dataModels/userDetails.model';
 
 
 const workoutVideos = exerciseCategories
@@ -21,6 +25,21 @@ const workoutVideos = exerciseCategories
 export default function Home({navigation}) {
 
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    // Perform side effects here, such as fetching data or updating state
+    if (userInfo == null) {
+      getUser(auth.currentUser.uid)
+        .then((result) => {
+          dispatch(setUser(result as UserDetails));
+        })
+        .catch((error) => {
+          console.error('Error fetching user:', error);
+        });
+    }
+
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
@@ -147,6 +166,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2A2A2A',
     borderRadius: 8,
     overflow: 'hidden',
+    padding: 5,
   },
   videoImage: {
     width: '100%',
