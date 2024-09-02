@@ -53,7 +53,7 @@ export default function RoutineList ({navigation}) {
       <ScreenHeader screenName="Routines" navigation={navigation} />
       <FlatList
         data={routines}
-        keyExtractor={(item) => item.routineId}
+        keyExtractor={(item) => item.routineId ? item.routineId : item.id}
         renderItem={({ item }) => <RoutineItem routine={item} onPress={handleRoutinePress} />}
       />
       {userInfo?.isTrainer &&

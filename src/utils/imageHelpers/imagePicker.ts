@@ -1,6 +1,6 @@
 // useImagePicker.ts
 import * as ImagePicker from 'expo-image-picker';
-import { requestMediaLibraryPermissions } from '../config/permissions';
+import { requestMediaLibraryPermissions } from '../../config/permissions';
 
 export const pickImage = async (): Promise<string | null> => {
   const hasPermission = await requestMediaLibraryPermissions();
@@ -13,12 +13,7 @@ export const pickImage = async (): Promise<string | null> => {
     quality: 1,
   });
 
-  console.log(result);
-
+  console.log('image picker:', result);
 
   return result.canceled ? null : result.assets[0].uri;
-
-  // if (result.canceled) return null;
-  // if ('uri' in result) return result.uri as string;
-  return null;
 };

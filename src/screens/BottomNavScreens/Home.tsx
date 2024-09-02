@@ -15,31 +15,39 @@ import { RootState } from '../../store/reduxStore';
 import { auth } from '../../config/firebase';
 import { COMPLETE_EXERCISE_LIST, EXERCISE_TABS, PROFILE_TABS } from '../../constants/screenNames';
 import { useEffect } from 'react';
-import { setUser } from '../../store/userSlice';
+import { setUser, setUserImageUrl } from '../../store/userSlice';
 import { getUser } from '../../utils/controllers/userController';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
+import { getImageUrl } from '../../utils/controllers/imageController';
+import { firebaseBucketName } from '../../constants/firebaseContant';
 
 
 const workoutVideos = exerciseCategories
 
 export default function Home({navigation}) {
 
-  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const {userInfo, userImageUrl} = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch()
 
   useEffect(() => {
-    // Perform side effects here, such as fetching data or updating state
-    if (userInfo == null) {
-      getUser(auth.currentUser.uid)
+    if (!userInfo) {
+      getUser(auth.currentUser?.uid)
         .then((result) => {
           dispatch(setUser(result as UserDetails));
+          if (result.profilePhotoName){
+            getImageUrl(firebaseBucketName.userImages, result.profilePhotoName).then((url) => {
+              dispatch(setUserImageUrl(url));
+            }).catch((error) => {
+              console.error('Error fetching user image:', error);
+            });
+          }
         })
         .catch((error) => {
           console.error('Error fetching user:', error);
         });
     }
-
   }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
@@ -49,9 +57,9 @@ export default function Home({navigation}) {
           <Text style={styles.subGreeting}>It's Time To Challenge Your Limits.</Text>
         </View>
         <View style={styles.headerIcons}>
-          <Ionicons name="search" size={24} color="white" style={styles.icon} onPress={navigation.navigate(EXERCISE_TABS, {COMPLETE_EXERCISE_LIST})}/>
+          <Ionicons name="search" size={24} color="white" style={styles.icon} onPress={() => navigation.navigate(EXERCISE_TABS, {COMPLETE_EXERCISE_LIST})}/>
           <Ionicons name="notifications" size={24} color="white" style={styles.icon} />
-          <Ionicons name="person" size={24} color="white" style={styles.icon} onPress={()=>navigation.navigate(PROFILE_TABS)} />
+          <Ionicons name="person" size={24} color="white" style={styles.icon} onPress={() =>navigation.navigate(PROFILE_TABS)} />
         </View>
       </View>
       <View style={styles.quickActions}>

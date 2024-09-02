@@ -6,6 +6,7 @@ import { addRoutine } from '../../utils/controllers/routineController';
 import { auth } from '../../config/firebase';
 import { exerciseImageUrlPrefix } from '../../constants/serverConstant';
 import { ExerciseDetails } from '../../constants/dataModels/exercise.model';
+import { Routine } from '../../constants/dataModels/routine.model';
 
 export default function ConfigureExercisesScreen({ route, navigation }){
   const { selectedExercises, name, description } = route.params;
@@ -61,7 +62,7 @@ export default function ConfigureExercisesScreen({ route, navigation }){
       description: description,
       exercises: exerciseDetailsConcise,
       createdBy: auth.currentUser?.uid,
-    })
+    } as Routine)
     console.log('Routine saved', exerciseDetailsConcise);
     navigation.navigate(ROUTINE_LIST);
   };

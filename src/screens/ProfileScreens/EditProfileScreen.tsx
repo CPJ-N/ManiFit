@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
-import { setUser } from '../../store/userSlice';
+import { setUser, setUserImageUrl } from '../../store/userSlice';
 import { RootState } from '../../store/reduxStore';
 import { updateUser } from '../../utils/controllers/userController';
 import { StatusBar } from 'expo-status-bar';
 import { auth } from '../../config/firebase';
+import { getImageUrl, uploadImage } from '../../utils/controllers/imageController';
+import { firebaseBucketName } from '../../constants/firebaseContant';
+import { pickImage } from '../../utils/imageHelpers/imagePicker';
+import { isValidImageUrl } from '../../utils/imageHelpers/isValidImageUrl';
 
 
 export default function EditProfileScreen({navigation}) {
 
   const dispatch = useDispatch(); // Initialize useDispatch
-  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const {userInfo, userImageUrl} = useSelector((state: RootState) => state.user);
   const [profile, setProfile] = useState<Partial<UserDetails>>({
     fullName: userInfo?.fullName,
     mobileNumber: userInfo?.mobileNumber,
@@ -21,14 +25,48 @@ export default function EditProfileScreen({navigation}) {
     weight: userInfo?.weight,
     height: userInfo?.height,
   });
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<string>('');
+
+  const handleImageUpload = async () => {
+    setIsUploading(true);
+    const imageUri = await pickImage();
+    if (imageUri) {
+      setSelectedImage(imageUri);
+      await uploadImage(imageUri).then(async (result) => {
+        const updateProfileInfo: UserDetails = { ...userInfo, profilePhotoName: result.metadata.name };
+        await updateUser(auth.currentUser?.uid, updateProfileInfo)
+        dispatch(setUser(updateProfileInfo))
+        const uploadedImageUrl = await getImageUrl(firebaseBucketName.userImages, updateProfileInfo.profilePhotoName);
+        dispatch(setUserImageUrl(uploadedImageUrl));
+        setSelectedImage('')
+        console.log('Image URL:', uploadedImageUrl);
+      }).catch((error) => {
+        console.log('Error uploading image:', error);
+      })
+    } else {
+      console.log("No image picked");
+    }
+
+    setIsUploading(false);
+    setUploadSuccess(true); // Assuming the upload is always successful
+  };
+  
+  const handleSelectImage = async () => {
+    const imageUri = await pickImage();
+    if (imageUri) {
+      setSelectedImage(imageUri);
+    } else {
+      console.log("No image picked");
+    }
+  }
 
   const handleUpdate = async () => {
-    console.log('userDetails updated:', profile);
-    // Dispatch setUser action with userDetails
-    const updateProffileInfo: UserDetails = {...userInfo, ...profile} as UserDetails;
-    await updateUser(auth.currentUser?.uid, updateProffileInfo).then(() => {
-      dispatch(setUser(updateProffileInfo));
-      console.log('Profile updated:', updateProffileInfo);
+    const updateProfileInfo: UserDetails = {...userInfo, ...profile} as UserDetails;
+    await updateUser(auth.currentUser?.uid, updateProfileInfo).then(() => {
+      dispatch(setUser(updateProfileInfo));
+      console.log('Profile updated:', updateProfileInfo);
     }).catch((error) => {
       console.log('Error updating profile:', error);
     });
@@ -37,6 +75,16 @@ export default function EditProfileScreen({navigation}) {
   const handleChange = (value: string, field: keyof UserDetails) => {
     setProfile({ ...profile, [field]: value });
   };
+
+  useEffect(() => {
+    if (userInfo.profilePhotoName) {
+      getImageUrl(firebaseBucketName.userImages, userInfo.profilePhotoName).then((url) => {
+        console.log(`Image name: ${userInfo.profilePhotoName} \n Image URL: ${url}`);
+        dispatch(setUserImageUrl(url));
+      }).catch((error) => {
+        console.error('Error fetching user image:', error)});
+    }
+  }, [])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -50,12 +98,24 @@ export default function EditProfileScreen({navigation}) {
     <ScrollView style={styles.container}>
       <View style={styles.profileSection}>
         <View style={{ position: 'relative', flex: 0 }}>
+          {userImageUrl ? 
           <Image
-            source={{ uri: 'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
+            source={{ uri: userImageUrl }}
             style={styles.profileImage}
-          />
-          <TouchableOpacity style={styles.editIcon} >
-            <Ionicons name="camera" size={24} color="#ffd20a"/>
+          /> :
+          <Image
+            source={{ 
+              uri: selectedImage ? 
+              selectedImage : 
+              'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+            }} 
+            style={styles.profileImage}
+          />}
+          <TouchableOpacity style={styles.editIcon} onPress={handleImageUpload} >
+            {isUploading ? 
+              (<ActivityIndicator size="small" color="#ffd20a" />) : 
+              (<Ionicons name="camera" size={24} color="#ffd20a"/>)
+            }
           </TouchableOpacity>
         </View> 
         <View style={styles.infoContainer}>
@@ -66,12 +126,13 @@ export default function EditProfileScreen({navigation}) {
       </View>
       <View style={styles.inputContainer}>
         {Object.keys(profile).map((key) => (
-          <TextInput
+          key !== 'profilePhotoUrl' && (
+            <TextInput
             key={key}
             style={styles.input}
             onChangeText={(text) => handleChange(text, key as keyof UserDetails)}
             value={(profile[key as keyof UserDetails] ?? '').toString()}
-          />
+          />)
         ))}
       </View>
       <TouchableOpacity style={styles.button} onPress={handleUpdate}>
