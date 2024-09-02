@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 // TODO: Add functionality to go to all menu options
 
 export default function ProfileScreen({navigation}) {
-    const userInfo = useSelector((state: RootState) => state.user.userInfo);
+    const {userInfo, userImageUrl} = useSelector((state: RootState) => state.user);
     const menuItems = [
         { name: 'Profile', icon: 'person-circle-outline' },
         { name: 'Favorite', icon: 'heart-outline' },
@@ -72,7 +72,10 @@ export default function ProfileScreen({navigation}) {
         <ScrollView  style={{backgroundColor: '#1E1E1E', flex: 1}}>
             <View style={styles.userInfoSection}>
                 <Image 
-                    source={{ uri: 'https://images.pexels.com/photos/3806244/pexels-photo-3806244.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }}
+                    source={{ uri: userImageUrl ?
+                        userImageUrl :
+                        'https://images.pexels.com/photos/3806244/pexels-photo-3806244.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' 
+                    }}
                     style={styles.profileImage} 
                 />
                 <View style={styles.subInfoSection}>

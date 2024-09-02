@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Exercise } from '../constants/dataModels/exercise.model';
 import { Icon } from 'react-native-elements';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
-import { getImageUrl } from '../utils/imageHelpers/getImageUrl';
+import { getImageUrl } from '../utils/controllers/imageController';
 import { firebaseBucketName } from '../constants/firebaseContant';
 
 interface ExerciseProps {

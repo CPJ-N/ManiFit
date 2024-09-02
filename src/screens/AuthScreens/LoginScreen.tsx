@@ -9,6 +9,8 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 import { getUser } from '../../utils/controllers/userController';
 import { StatusBar } from 'expo-status-bar';
+import { getImageUrl } from '../../utils/controllers/imageController';
+import { firebaseBucketName } from '../../constants/firebaseContant';
 
 export default function Login({navigation}) {
   const [isSelected, setSelection] = useState(false);
@@ -33,10 +35,16 @@ export default function Login({navigation}) {
     .then(async (userCredential) => {
       // Signed in
       const user = userCredential.user;
-
       const userInfo = await getUser(user.uid)
 
       dispatch(setUser(userInfo));
+
+      if(!userInfo.profilePhotoName) {
+        const imageUrl = await getImageUrl(firebaseBucketName.userImages, userInfo.profilePhotoName)
+        console.log('Image URL:', imageUrl);
+        console.log('UserImage:', userInfo.profilePhotoName);
+        dispatch(setUserImageUrl(imageUrl))
+      }
 
       navigation.navigate(BOTTOM_TABS, {screen: {HOME}})
       // ...
@@ -222,3 +230,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+function setUserImageUrl(arg0: string): any {
+  throw new Error('Function not implemented.');
+}
+

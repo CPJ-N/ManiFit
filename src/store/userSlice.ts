@@ -5,11 +5,13 @@ import { UserDetails } from '../constants/dataModels/userDetails.model';
 interface UserState {
   userInfo: UserDetails | null;
   status: 'idle' | 'loading' | 'failed';
+  userImageUrl: string;
 }
 
 const initialState: UserState = {
   userInfo: null,
   status: 'idle',
+  userImageUrl: '',
 };
 
 export const userSlice = createSlice({
@@ -22,9 +24,12 @@ export const userSlice = createSlice({
     clearUser: (state) => {
       state.userInfo = null;
     },
+    setUserImageUrl: (state, action: PayloadAction<string>) => {
+      state.userImageUrl = action.payload;
+    },
   },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, setUserImageUrl } = userSlice.actions;
 
 export default userSlice.reducer;
