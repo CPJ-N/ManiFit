@@ -59,7 +59,8 @@ export default function ProfileScreen({navigation}) {
         signOut(auth)
         .then((res) => {
           console.log(res)
-          dispatch(clearUser(), clearUserImageUrl())
+          dispatch(clearUser())
+          dispatch(clearUserImageUrl())
           navigation.navigate(AUTH_TABS, {screen: {LOGIN}})
           console.log('signed out')
         })
