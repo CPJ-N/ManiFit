@@ -27,9 +27,12 @@ export const userSlice = createSlice({
     setUserImageUrl: (state, action: PayloadAction<string>) => {
       state.userImageUrl = action.payload;
     },
+    clearUserImageUrl: (state) => {
+      state.userImageUrl = '';
+    }
   },
 });
 
-export const { setUser, clearUser, setUserImageUrl } = userSlice.actions;
+export const { setUser, clearUser, setUserImageUrl, clearUserImageUrl } = userSlice.actions;
 
 export default userSlice.reducer;
