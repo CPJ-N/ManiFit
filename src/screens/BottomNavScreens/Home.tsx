@@ -56,10 +56,11 @@ export default function Home({navigation}) {
           <Text style={styles.greeting}>Hi, {userInfo ? userInfo.fullName : auth.currentUser.email}</Text>
           <Text style={styles.subGreeting}>It's Time To Challenge Your Limits.</Text>
         </View>
-        <View style={styles.headerIcons}>
-          <Ionicons name="search" size={24} color="white" style={styles.icon} onPress={() => navigation.navigate(EXERCISE_TABS, {COMPLETE_EXERCISE_LIST})}/>
-          <Ionicons name="notifications" size={24} color="white" style={styles.icon} />
-          <Ionicons name="person" size={24} color="white" style={styles.icon} onPress={() =>navigation.navigate(PROFILE_TABS)} />
+        <View style={{ position: 'relative', flex: 0 }}>
+          <Image
+              source={{ uri: userImageUrl ? userImageUrl : 'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
+              style={styles.profileImage}
+            />
         </View>
       </View>
       <View style={styles.quickActions}>
@@ -125,17 +126,18 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#FFD20A',
+    padding: 5,
+    marginBottom: 5,
   },
   subGreeting: {
     fontSize: 14,
     color: '#f4f4f4',
   },
-  headerIcons: {
-    flexDirection: 'row',
-  },
-  icon: {
-    marginLeft: 16,
-  },
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+},
   quickActions: {
     flexDirection: 'row',
     justifyContent: 'space-around',

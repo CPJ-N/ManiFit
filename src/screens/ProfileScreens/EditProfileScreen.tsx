@@ -52,15 +52,6 @@ export default function EditProfileScreen({navigation}) {
     setIsUploading(false);
     setUploadSuccess(true); // Assuming the upload is always successful
   };
-  
-  const handleSelectImage = async () => {
-    const imageUri = await pickImage();
-    if (imageUri) {
-      setSelectedImage(imageUri);
-    } else {
-      console.log("No image picked");
-    }
-  }
 
   const handleUpdate = async () => {
     const updateProfileInfo: UserDetails = {...userInfo, ...profile} as UserDetails;
@@ -165,11 +156,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     top: 15,
-  },
-  headerText: {
-    fontSize: 24,
-    color: '#333',
-    fontWeight: 'bold',
   },
   profileSection: {
     alignItems: 'center',

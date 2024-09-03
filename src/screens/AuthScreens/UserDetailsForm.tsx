@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, SafeAreaView, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
 import { auth } from '../../config/firebase'
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
 import { Picker } from '@react-native-picker/picker';
-import { setUser } from '../../store/userSlice';
+import { setUser, setUserImageUrl } from '../../store/userSlice';
 import { useDispatch } from 'react-redux';
-import { createUser } from '../../utils/controllers/userController';
+import { createUser, updateUser } from '../../utils/controllers/userController';
+import { getImageUrl, uploadImage } from '../../utils/controllers/imageController';
+import { firebaseBucketName } from '../../constants/firebaseContant';
+import { pickImage } from '../../utils/imageHelpers/imagePicker';
 
-// Define the interface for the item
-interface ListItem {
-  id: string;
-  name: string;
-}
-
-const FitnessGoals: ListItem[] = [
+const FitnessGoals = [
   { id: '1', name: 'Lose Wight' },
   { id: '2', name: 'Gain Wight' },
   { id: '3', name: 'Muscle Mass Gail' },
@@ -26,33 +23,40 @@ const FitnessGoals: ListItem[] = [
 export default function UserDetailsForm({ navigation }) {
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
-    fullName: 'Madison Smith',
+    fullName: '',
     email: auth.currentUser?.email,
-    mobileNumber: '+123 567 89000',
-    dateOfBirth: '01 / 04 / 199X',
-    weight: 75,
-    height: 1.65,
+    mobileNumber: '',
+    dateOfBirth: '',
+    weight: 0,
+    height: 0,
     isTrainer: false,
+    profilePhotoName: '',
   });
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<string>('');
+
   const dispatch = useDispatch();
 
-  const renderOptionsItem = ({ item } : { item: ListItem }) => (
-    <TouchableOpacity
-      style={styles.item}
-      onPress={() => handleSelectItem(item.id)}
-    >
-      <Text style={styles.text}>{item.name}</Text>
-      <Text style={styles.text}>{selectedIds.includes(item.id) ? '✓' : ''}</Text>
-    </TouchableOpacity>
-  );
-
-  const handleSelectItem = (id: string) => {
-    if (selectedIds.includes(id)) {
-      setSelectedIds(selectedIds.filter(item => item !== id));
+  const handleImageUpload = async () => {
+    setIsUploading(true);
+    const imageUri = await pickImage();
+    if (imageUri) {
+      setSelectedImage(imageUri);
+      await uploadImage(imageUri).then(async (result) => {
+        userDetails.profilePhotoName = result.metadata.name;
+        const uploadedImageUrl = await getImageUrl(firebaseBucketName.userImages, userDetails.profilePhotoName);
+        setSelectedImage(uploadedImageUrl)
+        // console.log('Image URL:', uploadedImageUrl);
+      }).catch((error) => {
+        console.log('Error uploading image:', error);
+      })
     } else {
-      setSelectedIds([...selectedIds, id]);
+      console.log("No image picked");
     }
+
+    setIsUploading(false);
+    setUploadSuccess(true); // Assuming the upload is always successful
   };
 
   const handleSubmit = async () => {
@@ -67,20 +71,27 @@ export default function UserDetailsForm({ navigation }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
+          <Ionicons name="chevron-back" size={24} color="#FFD20A" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Setup Your Profile</Text>
+        <Text style={styles.headerTitle}>Setup Your Profile</Text>
       </View>
+    <ScrollView style={styles.container}>
       <View style={styles.profileSection}>
-        <View style={{ position: 'relative' }}>
+        <View style={{ position: 'relative', flex: 0 }}>
           <Image
-            source={{ uri: 'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
+            source={{ uri: selectedImage ? selectedImage :
+              'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
             style={styles.profileImage}
           />
-          <Ionicons name="pencil" size={20} color="#fff" style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor:'grey', padding:5, borderRadius:20 }} />
+          <TouchableOpacity style={styles.editIcon} onPress={handleImageUpload}>
+            {isUploading ? 
+              (<ActivityIndicator size="small" color="#ffd20a" />) : 
+              (<Ionicons name="camera" size={24} color="#ffd20a" style={{padding:3}}/>)
+            }
+          </TouchableOpacity>
         </View> 
         <View style={styles.infoContainer}>
           {/* <Text style={styles.name}>{userDetails.fullName}</Text> */}
@@ -88,19 +99,6 @@ export default function UserDetailsForm({ navigation }) {
           {/* <Text style={styles.detailsText}>Birthday: {userDetails.dateOfBirth}</Text> */}
         </View>
       </View>
-      {/* <View style={styles.inputContainer}>
-        {Object.keys(userDetails).map((key) => (
-          <View key={key}>
-            <Text style={styles.label}>{key}</Text>
-            <TextInput
-              key={key}
-              style={styles.input}
-              onChangeText={(text) => handleChange(text, key as keyof UserDetails)}
-              value={userDetails[key as keyof UserDetails].toString()}
-            />
-          </View>
-        ))}
-      </View> */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Full Name</Text>
         <TextInput
@@ -121,20 +119,20 @@ export default function UserDetailsForm({ navigation }) {
           onChangeText={(text) => handleChange(text, 'dateOfBirth')}
           value={userDetails['dateOfBirth'].toString()}
         />
-        <Text style={styles.label}>Weight</Text>
+        <Text style={styles.label}>Weight (kg)</Text>
         <TextInput
           style={styles.input}
           onChangeText={(text) => handleChange(text, 'weight')}
           value={userDetails['weight'].toString()}
         />
-        <Text style={styles.label}>Height</Text>
+        <Text style={styles.label}>Height (cm)</Text>
         <TextInput
           style={styles.input}
           onChangeText={(text) => handleChange(text, 'height')}
           value={userDetails['height'].toString()}
         />
         
-        <Text style={styles.label}>Are you a Trainer?</Text>
+        {/* <Text style={styles.label}>Are you a Trainer?</Text> */}
         {/* <Picker
           selectedValue={userDetails.isTrainer}
           onValueChange={(itemValue, itemIndex) => handleChange(itemValue, 'isTrainer')}
@@ -148,6 +146,7 @@ export default function UserDetailsForm({ navigation }) {
         <Text style={styles.buttonText}>Submit Profile</Text>
       </TouchableOpacity>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -156,15 +155,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1E1E1E',
   },
+  // header: {
+  //   padding: 20,
+  //   paddingTop: 70,
+  //   backgroundColor: '#FFD20A',
+  //   alignItems: 'center',
+  //   flexDirection: 'row',
+  //   justifyContent: 'center',
+  //   borderBottomRightRadius: 15,
+  //   borderBottomLeftRadius: 15,
+  // },
   header: {
-    padding: 20,
-    paddingTop: 70,
-    backgroundColor: '#FFD20A',
-    alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'center',
-    borderBottomRightRadius: 15,
-    borderBottomLeftRadius: 15,
+    alignItems: 'center',
+    padding: 16,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFD20A',
+    marginLeft: 16,
   },
   backButton: {
     paddingTop: 30,
@@ -173,14 +183,18 @@ const styles = StyleSheet.create({
     left: 10,
     top: 15,
   },
-  headerText: {
-    fontSize: 24,
-    color: '#333',
-    fontWeight: 'bold',
-  },
+  // headerText: {
+  //   fontSize: 24,
+  //   color: '#333',
+  //   fontWeight: 'bold',
+  // },
   profileSection: {
     alignItems: 'center',
-    marginVertical: 30,
+    marginVertical: 20,
+    backgroundColor: '#FFD20A',
+    borderRadius: 15,
+    padding: 20,
+    justifyContent: 'center',
   },
   profileImage: {
     width: 150,
@@ -190,6 +204,14 @@ const styles = StyleSheet.create({
   infoContainer: {
     paddingTop: 5,
     alignItems: 'center',
+  },
+  editIcon: {
+    position: 'absolute', 
+    bottom: 0, 
+    right: 0, 
+    padding: 5, 
+    backgroundColor: '#1e1e1e',
+    borderRadius: 30,
   },
   name: {
     fontSize: 22,
@@ -208,8 +230,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   detailsText: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 18,
+    color: '#333',
+    fontWeight: 'semibold',
     marginVertical: 5,
   },
   inputContainer: {

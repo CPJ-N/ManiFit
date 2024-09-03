@@ -4,9 +4,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth } from '../../config/firebase'
 import { signOut } from 'firebase/auth'
 import { AUTH_TABS, COMPLETE_EXERCISE_LIST, EDIT_PROFILE, EXERCISE_TABS, FAVORITE, LINK_TRAINEE, LINK_TRAINER, LOGIN, PRIVACY_POLICY, SETTINGS } from '../../constants/screenNames';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { StatusBar } from 'expo-status-bar';
+import { clearUser, clearUserImageUrl } from '../../store/userSlice';
 
 // TODO: Add functionality to update user profile
 // TODO: Add functionality to go to all menu options
@@ -14,13 +15,14 @@ import { StatusBar } from 'expo-status-bar';
 export default function ProfileScreen({navigation}) {
     const {userInfo, userImageUrl} = useSelector((state: RootState) => state.user);
     const menuItems = [
-        { name: 'Profile', icon: 'person-circle-outline' },
+        { name: 'Edit Profile', icon: 'person-circle-outline' },
         { name: 'Favorite', icon: 'heart-outline' },
         { name: 'Privacy Policy', icon: 'shield-checkmark-outline' },
         { name: 'Settings', icon: 'settings-outline' },
         { name: 'Help', icon: 'help-circle-outline' },
         { name: 'Logout', icon: 'log-out-outline' },
     ];
+    const dispatch = useDispatch();
 
     const handlePress = (name: string) => {
 
@@ -57,6 +59,7 @@ export default function ProfileScreen({navigation}) {
         signOut(auth)
         .then((res) => {
           console.log(res)
+          dispatch(clearUser(), clearUserImageUrl())
           navigation.navigate(AUTH_TABS, {screen: {LOGIN}})
           console.log('signed out')
         })
