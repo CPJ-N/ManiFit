@@ -11,12 +11,41 @@ import BottomNavigation from './src/navigation/BottomNavigation';
 import LoadingScreen from './src/screens/AuthScreens/LoadingScreen';
 import AuthNavigation from './src/navigation/AuthNavigation';
 import ProfileNavigation from './src/navigation/ProfileNavigation';
+import { useEffect, useState } from 'react';
 
 const Stack = createNativeStackNavigator();
 
 // TODO: configure redux toolkit state management for loading screen
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Set an initial delay (e.g., 2 seconds) before changing the loading state
+    const delay = 2000; // 2000 ms = 2 seconds
+
+    const timeoutId = setTimeout(() => {
+      if (store.getState()) {
+        setIsLoading(false);
+      }
+    }, delay);
+
+    // Subscribe to store updates
+    const unsubscribe = store.subscribe(() => {
+      setIsLoading(false);
+    });
+
+    // Clean up the timeout and subscription when the component unmounts
+    return () => {
+      clearTimeout(timeoutId);
+      unsubscribe();
+    };
+  }, []); // Empty dependency array ensures this runs only on mount
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <Provider store={store}>
       <NavigationContainer>
