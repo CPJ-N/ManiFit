@@ -2,6 +2,7 @@ import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, get
 import { Exercise } from "../../constants/dataModels/exercise.model";
 import { firebaseCollection } from "../../constants/firebaseContant";
 import { db } from "../../config/firebase";
+import { exercisesUrl } from "../../constants/serverConstant";
 
 export const addExercise = async (exercise: Exercise) => {
   try {
@@ -86,7 +87,7 @@ export const getExercisesByCategory = async (category: string) => {
     getDocs(querySnapshot)
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
+          // console.log(doc.id, " => ", doc.data());
           const exercise = {
             ...doc.data(),
             id: doc.id,
@@ -94,11 +95,34 @@ export const getExercisesByCategory = async (category: string) => {
           getExercisesByCategory.push(exercise);
         });
       })
+      .then(() => {
+        return getExercisesByCategory;
+      })
       .catch((error) => {
         console.error("Error getting documents:", error);
       });
   }
   catch (error) {
     console.error("Error getting documents:", error);
+  }
+};
+
+
+//get all exercise using exercisesUrl
+export const getAllExercisesFromUrl = async (): Promise<Exercise[]> => {
+  try {
+    const requestOptions: RequestInit = {
+      method: "GET",
+      redirect: "follow"
+    };
+    
+    const response = await fetch(
+      "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json", requestOptions);
+   
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error getting exercises: ", error);
+    throw new Error("Failed to get exercises");
   }
 };

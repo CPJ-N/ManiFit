@@ -13,13 +13,15 @@ import { StatusBar } from 'expo-status-bar';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { auth } from '../../config/firebase';
-import { COMPLETE_EXERCISE_LIST, EXERCISE_TABS, PROFILE_TABS } from '../../constants/screenNames';
+import { COMPLETE_EXERCISE_LIST, EXERCISE_CATALOG, EXERCISE_TABS, PROFILE_TABS } from '../../constants/screenNames';
 import { useEffect } from 'react';
 import { setUser, setUserImageUrl } from '../../store/userSlice';
 import { getUser } from '../../utils/controllers/userController';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
 import { getImageUrl } from '../../utils/controllers/imageController';
 import { firebaseBucketName } from '../../constants/firebaseContant';
+import { getAllExercisesFromUrl } from '../../utils/controllers/exerciseController';
+import { setExercises } from '../../store/exerciseSlice';
 
 
 const workoutVideos = exerciseCategories
@@ -46,6 +48,15 @@ export default function Home({navigation}) {
           console.error('Error fetching user:', error);
         });
     }
+    const fetchAllExercises = async () => {
+      try {
+        const exercises = await getAllExercisesFromUrl();
+        dispatch(setExercises(exercises));
+        } catch (error) {
+          console.error('Error fetching exercises:', error);
+        }
+    }
+    fetchAllExercises();
   }, []);
 
   return (
@@ -85,7 +96,7 @@ export default function Home({navigation}) {
       <Text style={styles.sectionTitle}>Quick & Easy Workout Videos</Text>
       <Text style={styles.sectionSubtitle}>Discover Fresh Workouts: Elevate Your Training</Text>
         {workoutVideos.map((video, index) => (
-          <TouchableOpacity key={index} style={styles.videoCard}>
+          <TouchableOpacity key={index} style={styles.videoCard} onPress={() => navigation.navigate(EXERCISE_TABS, {screen: EXERCISE_CATALOG, params:{category: video.name}})}>
             <Image source={video.image} style={styles.videoImage} />
             <View style={styles.videoInfo}>
               <Text style={styles.videoTitle}>{video.name}</Text>

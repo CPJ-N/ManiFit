@@ -8,7 +8,7 @@ export const sliderImages = [
 
 export const exerciseCategories = [
     {
-      name: 'back',
+      name: 'middle back',
       image: require('../assets/images/back.png'),
     },
     {
@@ -16,7 +16,7 @@ export const exerciseCategories = [
       image: require('../assets/images/cardio.png'),
     },
     {
-      name: 'lower arms',
+      name: 'triceps',
       image: require('../assets/images/lowerArms.png'),
     },
     {
@@ -36,7 +36,7 @@ export const exerciseCategories = [
       image: require('../assets/images/shoulders.png'),
     },
     {
-      name: 'upper arms',
+      name: 'biceps',
       image: require('../assets/images/upperArms.png'),
     },
     {
@@ -44,7 +44,7 @@ export const exerciseCategories = [
       image: require('../assets/images/upperLegs.png'),
     },
     {
-      name: 'waist',
+      name: 'abdominals',
       image: require('../assets/images/waist.png'),
     }
 ]

@@ -13,10 +13,10 @@ const ExerciseCard = ({viewDetails, exerciseDetails }: {
   const [exercise, setExercise] = useState<Exercise>(null);
 
     useEffect(() => {
-      console.log('exerciseId in card:', exerciseDetails.exerciseId);  
+      // console.log('exerciseId in card:', exerciseDetails.exerciseId);  
         const fetchExercises = async () => {
             const fetchedExercise = await getExercise(exerciseDetails.exerciseId);
-            console.log('exercise fetched in card:', fetchedExercise);
+            // console.log('exercise fetched in card:', fetchedExercise);
             setExercise(fetchedExercise);
         };
         fetchExercises();
