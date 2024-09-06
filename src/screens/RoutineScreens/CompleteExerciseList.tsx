@@ -1,42 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Icon } from 'react-native-elements';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Image, ScrollView } from 'react-native';
 import { Exercise } from '../../constants/dataModels/exercise.model'; // Import the Exercise interface
 import { EXERCISE_DETAILS, EXERCISE_EDIT, EXERCISE_FORM } from '../../constants/screenNames';
-import ExerciseItem from '../../components/ExerciseItem';
-import ExerciseCard from '../../components/ExerciseCard';
-import { useRoute } from '@react-navigation/native';
 import { deleteExercise, getAllExercises } from '../../utils/controllers/exerciseController';
-
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/reduxStore';
+import ExerciseItem from '../../components/ExerciseItem';
+import { Ionicons } from '@expo/vector-icons'; 
 
 export default function CompleteExerciseList({navigation}) {
 
-    const [exercises, setExercises] = useState<Exercise[]>([]);
+    const allExercises = useSelector((state: RootState) => state.exercises.allExercises);
     const [searchTerm, setSearchTerm] = useState('');
-
-    useEffect(() => {
-        const fetchExercises = async () => {
-            const fetchedExercises = await getAllExercises();
-            // console.log(fetchedExercises);
-            setExercises(fetchedExercises);
-        };
-        fetchExercises();
-    }, []);
 
     const handleSearch = (text: string) => {
         setSearchTerm(text);
         // Add functionality to filter exercises based on search term
-    };
-
-
-    const handleEdit = (exerciseInfo: Exercise) => {
-        navigation.navigate(EXERCISE_EDIT, { exerciseInfo });
-        console.log(`Edit Exercise: ${exerciseInfo.id}`);
-    };
-
-    const handleDelete = (exerciseId: string) => {
-        deleteExercise(exerciseId);
-        console.log(`Delete Exercise: ${exerciseId}`);
     };
 
     const viewDetails = (exerciseInfo: Exercise) => {
@@ -47,28 +26,31 @@ export default function CompleteExerciseList({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
         <View style={styles.header}>
+            <TouchableOpacity onPress={()=>navigation.goBack()}>
+                <Ionicons name="chevron-back" size={24} color="#FFD20A" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>All Exercises</Text>
+        </View>
+        <View style={styles.searchBar}>
           <TextInput
                 placeholder="Search exercises..."
                 style={styles.searchInput}
                 value={searchTerm}
                 onChangeText={handleSearch}
             />
-          <View style={styles.icons}>
-            <Icon name="plus" type="feather" color="#fff" size={25} onPress={() => navigation.navigate(EXERCISE_FORM)}/>
-          </View>
+          {/* <View style={styles.icons}>
+            <Ionicons name="add" type="feather" color="#fff" size={25} onPress={() => navigation.navigate(EXERCISE_FORM)}/>
+          </View> */}
         </View>
-        <FlatList
-            data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-                <ExerciseItem
-                    exercise={item}
-                    onEdit={() => handleEdit(item)}
-                    onDelete={() => handleDelete(item.id)}
-                />
-                )}
-        />
-
+        <ScrollView contentContainerStyle={styles.videoGrid}>
+        {allExercises.map((exercise, index) => (
+            <ExerciseItem
+                key={index}
+                exercise={exercise}
+                viewDetails={() => viewDetails(exercise)}
+            />
+        ))}
+        </ScrollView>
         </SafeAreaView>
     );
 };
@@ -77,9 +59,20 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
-        backgroundColor: '#000',
+        backgroundColor: '#1e1e1e',
     },
     header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+      },
+      headerTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#FFD20A',
+        marginLeft: 16,
+      },
+    searchBar: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -92,6 +85,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f0f0',
         borderRadius: 10,
     },
+    videoGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-around',
+        padding: 8,
+      },
     icons: {
         flexDirection: 'row',
         marginLeft: 10,

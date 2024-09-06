@@ -8,10 +8,12 @@ import CompleteExerciseList from "../screens/RoutineScreens/CompleteExerciseList
 import ConfigureExercisesScreen from "../screens/RoutineScreens/ConfigureExercisesScreen";
 import ExerciseSelectionScreen from "../screens/RoutineScreens/ExerciseSelectionScreen";
 import CreateRoutineForm from "../screens/RoutineScreens/CreateRoutineForm";
+import ExerciseCatalog from "../screens/ExerciseScreens/ExerciseCatalog";
 import { 
     COMPLETE_EXERCISE_LIST, 
     CONFIGURE_EXERCISES, 
     CREATE_ROUTINE, 
+    EXERCISE_CATALOG, 
     EXERCISE_DETAILS, 
     EXERCISE_EDIT, 
     EXERCISE_FORM, 
@@ -30,6 +32,7 @@ export default function ExerciseNavigation() {
             <ExerciseTabs.Screen name={EXERCISE_FORM} component={ExerciseForm}  />
             <ExerciseTabs.Screen name={EXERCISE_EDIT} component={EditExercise} />
             <ExerciseTabs.Screen name={EXERCISE_DETAILS} component={ExcerciseDetails} />
+            <ExerciseTabs.Screen name={EXERCISE_CATALOG} component={ExerciseCatalog} />
             <ExerciseTabs.Screen name={COMPLETE_EXERCISE_LIST} component={CompleteExerciseList} />
             <ExerciseTabs.Screen name={CREATE_ROUTINE} component={CreateRoutineForm} />
             <ExerciseTabs.Screen name={CONFIGURE_EXERCISES} component={ConfigureExercisesScreen} />
