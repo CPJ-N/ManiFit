@@ -11,7 +11,6 @@ import { auth } from '../../config/firebase';
 import { getImageUrl, uploadImage } from '../../utils/controllers/imageController';
 import { firebaseBucketName } from '../../constants/firebaseContant';
 import { pickImage } from '../../utils/imageHelpers/imagePicker';
-import { isValidImageUrl } from '../../utils/imageHelpers/isValidImageUrl';
 
 
 export default function EditProfileScreen({navigation}) {

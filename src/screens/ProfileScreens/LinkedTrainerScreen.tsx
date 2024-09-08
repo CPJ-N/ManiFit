@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, Button, SafeAreaView, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { assignTraineeToTrainer, getAllTrainers, unlinkTraineeFromTrainer } from '../../utils/controllers/linkingTrainer';
+import { assignTraineeToTrainer, getAllTrainers, unlinkTraineeFromTrainer } from '../../utils/controllers/linkingTrainerTrainee';
 import { getUser, updateUser } from '../../utils/controllers/userController';
 import { auth } from '../../config/firebase';
 import { useDispatch, useSelector } from 'react-redux';

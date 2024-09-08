@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Button, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
-import { assignTraineeToTrainer, getAllUnlinkedTrainees } from '../../utils/controllers/linkingTrainer';
+import { assignTraineeToTrainer, getAllUnlinkedTrainees } from '../../utils/controllers/linkingTrainerTrainee';
 import { auth } from '../../config/firebase';
 import { Ionicons } from '@expo/vector-icons';
 
