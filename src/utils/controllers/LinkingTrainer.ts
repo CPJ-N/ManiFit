@@ -50,10 +50,10 @@ export const getAllUnlinkedTrainees = async () => {
     const q = query(
         collection(db, firebaseCollection.userDetails),
         where("isTrainer", "==", false),
-        // where("linkedTrainer", "==", null)
+        where("linkedTrainer", "==", '')
     );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id }));
 };
 
 

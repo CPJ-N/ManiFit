@@ -76,10 +76,7 @@ export default function ProfileScreen({navigation}) {
         <ScrollView  style={{backgroundColor: '#1E1E1E', flex: 1}}>
             <View style={styles.userInfoSection}>
                 <Image 
-                    source={{ uri: userImageUrl ?
-                        userImageUrl :
-                        'https://images.pexels.com/photos/3806244/pexels-photo-3806244.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' 
-                    }}
+                    source={ userImageUrl ? { uri: userImageUrl } : require('../../assets/placeholder-user-image.jpg')}
                     style={styles.profileImage} 
                 />
                 <View style={styles.subInfoSection}>
