@@ -12,6 +12,7 @@ export const store = configureStore({
           serializableCheck: {
             warnAfter: 128, // Increase the warning threshold to 128ms
           },
+          // serializableCheck: false, // if the warning threshold is too much
         }),
 });
 

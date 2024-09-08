@@ -1,29 +1,10 @@
-import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { Exercise } from '../constants/dataModels/exercise.model';
-import { Icon } from 'react-native-elements';
-import { getStorage, ref, getDownloadURL } from 'firebase/storage';
-import { getImageUrl } from '../utils/controllers/imageController';
-import { firebaseBucketName } from '../constants/firebaseContant';
 import { exerciseImageUrlPrefix } from '../constants/serverConstant';
 
 
 export default function ExerciseItem({ exercise, viewDetails }) {
 
   return (
-    // <TouchableOpacity style={styles.container} onPress={() => viewDetails(exercise)}>
-    //   {/* {exercise.image && <Image source={{ uri: exercise.image }} style={styles.image} />}
-    //   {imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} />} */}
-    //   {exercise?.images && <Image source={{ uri: `${exerciseImageUrlPrefix}/${exercise.images[0]}`}} style={styles.image} />}
-    //   <View style={styles.header}>
-    //     <Text style={styles.title}>{exercise.name}</Text>
-    //       {/* <View style={styles.icons}>
-    //         <Icon name="edit" type="feather" color="#000" size={20} style={{padding: 10}} onPress={() => onEdit(exercise.id)}/>
-    //         <Icon name="trash-2" type="feather" color="#000" size={20} style={{padding: 10}} onPress={() => onDelete(exercise.id)}/>
-    //       </View> */}
-    //     </View>
-    //   {/* <Text style={styles.detail}>{exercise.description}</Text> */}
-    // </TouchableOpacity>
     <TouchableOpacity style={styles.videoCard} onPress={() => viewDetails(exercise)}>
     <Image source={{ uri: `${exerciseImageUrlPrefix}/${exercise.images[0]}`}} style={styles.videoImage} />
     
@@ -52,7 +33,7 @@ const styles = StyleSheet.create({
       width: '48%',
       marginBottom: 16,
       backgroundColor: '#2A2A2A',
-      borderRadius: 8,
+      borderRadius: 10,
       overflow: 'hidden',
       padding: 5,
   },
@@ -60,6 +41,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 120,
     resizeMode: 'cover',
+    borderRadius: 10,
   },
   title: {
     color: 'white',

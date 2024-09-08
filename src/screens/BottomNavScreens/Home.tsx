@@ -61,15 +61,15 @@ export default function Home({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
       <View style={styles.header}>
+      <StatusBar style="light" />
         <View>
           <Text style={styles.greeting}>Hi, {userInfo ? userInfo.fullName : auth.currentUser.email}</Text>
           <Text style={styles.subGreeting}>It's Time To Challenge Your Limits.</Text>
         </View>
         <View style={{ position: 'relative', flex: 0 }}>
           <Image
-              source={{ uri: userImageUrl ? userImageUrl : 'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
+              source={userImageUrl ? { uri: userImageUrl } : require('../../assets/placeholder-user-image.jpg')} // Replace with your image URL
               style={styles.profileImage}
             />
         </View>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     width: '48%',
     marginBottom: 16,
     backgroundColor: '#2A2A2A',
-    borderRadius: 8,
+    borderRadius: 10,
     overflow: 'hidden',
     padding: 5,
   },
@@ -193,6 +193,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 120,
     resizeMode: 'cover',
+    borderRadius: 10,
+    padding: 2,
   },
   videoInfo: {
     padding: 8,
