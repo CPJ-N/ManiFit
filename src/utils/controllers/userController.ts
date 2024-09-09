@@ -33,7 +33,7 @@ export const deleteUserDocument = async (userId: string) => {
         await deleteDoc(userDocRef);
         console.log('Successfully deleted user document with id:', userId);
     } catch (error) {
-        console.error('Error deleting user: ', error);
+        console.error('Error deleting user document: ', error);
     }
 };
 

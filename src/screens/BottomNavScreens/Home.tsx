@@ -36,7 +36,7 @@ export default function Home({navigation}) {
       getUser(auth.currentUser?.uid)
         .then((result) => {
           dispatch(setUser(result as UserDetails));
-          if (result.profilePhotoName){
+          if (result?.profilePhotoName !== '' || result?.profilePhotoName !== undefined) {
             getImageUrl(firebaseBucketName.userImages, result.profilePhotoName).then((url) => {
               dispatch(setUserImageUrl(url));
             }).catch((error) => {

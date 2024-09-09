@@ -39,7 +39,7 @@ export default function Login({navigation}) {
 
       dispatch(setUser(userInfo));
 
-      if(!userInfo.profilePhotoName) {
+      if(userInfo?.profilePhotoName) {
         const imageUrl = await getImageUrl(firebaseBucketName.userImages, userInfo.profilePhotoName)
         console.log('Image URL:', imageUrl);
         console.log('UserImage:', userInfo.profilePhotoName);
@@ -47,13 +47,11 @@ export default function Login({navigation}) {
       }
 
       navigation.navigate(BOTTOM_TABS, {screen: {HOME}})
-      // ...
     })
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
       setError(errorCode);
-      // ...
       console.log(errorCode, errorMessage)
     });
   }
