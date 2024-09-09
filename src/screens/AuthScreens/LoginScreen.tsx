@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, KeyboardAvoidingView } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Assuming you're using this library
+import { Ionicons } from '@expo/vector-icons';
 import CheckBox from '@react-native-community/checkbox';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
@@ -63,7 +63,7 @@ export default function Login({navigation}) {
       <Text style={styles.subtext}>Sign in to access your personalized workouts and track your progress.</Text>
 
       <View style={styles.inputField}>
-        <Icon name="email-outline" size={24} color="grey" />
+        <Ionicons name="mail-outline" size={24} color="grey" />
         <TextInput 
           placeholder="Email" 
           value={userEmail}
@@ -74,7 +74,7 @@ export default function Login({navigation}) {
       </View>
 
       <View style={styles.inputField}>
-        <Icon name="lock-outline" size={24} color="grey" />
+        <Ionicons name="book-outline" size={24} color="grey" />
         <TextInput 
           placeholder="Password" 
           value={userPassword}
@@ -83,7 +83,7 @@ export default function Login({navigation}) {
           style={styles.input} 
           placeholderTextColor="grey"
         />
-        <Icon onPress={() => setShowPassword(!showPassword)} name={showPassword ? "eye-off-outline" : "eye-outline"} size={24} color="grey" />
+        <Ionicons onPress={() => setShowPassword(!showPassword)} name={showPassword ? "eye-off-outline" : "eye-outline"} size={24} color="grey" />
       </View>
 
       <View style={styles.rememberMeContainer}>
@@ -109,17 +109,17 @@ export default function Login({navigation}) {
       <Text style={styles.or}>or</Text>
 
       <TouchableOpacity style={styles.googleButton}>
-        <Icon name="google" size={20} color="#fff" />
+        <Ionicons name="logo-google" size={20} color="#fff" />
         <Text style={styles.buttonText}>Continue with Google</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.appleButton}>
-        <Icon name="apple" size={20} color="#fff" />
+        <Ionicons name="logo-apple" size={20} color="#fff" />
         <Text style={styles.buttonText}>Continue with Apple</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.facebookButton}>
-        <Icon name="facebook" size={20} color="#fff" />
+        <Ionicons name="logo-facebook" size={20} color="#fff" />
         <Text style={styles.buttonText}>Continue with Facebook</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Icon } from 'react-native-elements';
+import { Ionicons } from '@expo/vector-icons';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { Exercise, ExerciseDetails } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
 import { EXERCISE_DETAILS, EXERCISE_EDIT, EXERCISE_FORM } from '../constants/screenNames';
@@ -9,6 +9,8 @@ import { deleteExercise, getExercise } from '../utils/controllers/exerciseContro
 import { Routine } from '../constants/dataModels/routine.model';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/reduxStore';
+import { StatusBar } from 'expo-status-bar';
+
 
 
 function ExerciseList({navigation}) {
@@ -54,19 +56,24 @@ function ExerciseList({navigation}) {
 
     return (
         <SafeAreaView style={styles.container}>
+        <StatusBar style="light" />
         <View style={styles.header}>
-            <View style={styles.icons}>
-                <Icon name="arrow-left" type="feather" color="#fff" size={25} onPress={() => navigation.goBack()} style={{marginRight: 20}}/>
-            </View>
+            <TouchableOpacity onPress={()=>navigation.goBack()}>
+            <Ionicons name="chevron-back" size={24} color="#FFD20A" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>{routine.name}</Text>
+        </View>
+        <View style={styles.header}>
+
           <TextInput
                 placeholder="Search exercises..."
                 style={styles.searchInput}
                 value={searchTerm}
                 onChangeText={handleSearch}
             />
-          {userInfo?.isTrainer && <View style={styles.icons}>
+          {/* {userInfo?.isTrainer && <View style={styles.icons}>
             <Icon name="plus" type="feather" color="#fff" size={25} onPress={() => navigation.navigate(EXERCISE_FORM)}/>
-          </View>}
+          </View>} */}
         </View>
         <FlatList
             // data={exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()))}
@@ -92,9 +99,14 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 20,
+        padding: 16,
+      },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#FFD20A',
+        marginLeft: 16,
       },
     searchInput: {
         flex: 1,

@@ -1,6 +1,6 @@
 import React, { useState }  from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // or any other icon library
+import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM, WELCOME } from '../../constants/screenNames';
@@ -32,7 +32,7 @@ export default function SignUp({navigation}) {
       // createUser(newUser);
       // dispatch(setUser(newUser));
 
-      navigation.navigate(USER_DETAILS_FORM);
+      navigation.navigate(USER_DETAILS_FORM, {user: newUser});
       // navigation.navigate(BOTTOM_TABS, {screen: {HOME}});
     })
     .catch((error) => {
@@ -52,7 +52,7 @@ export default function SignUp({navigation}) {
       <Text style={styles.subheader}>Sign up now to get access to personalized workouts and achieve your fitness goals.</Text>
 
       <View style={styles.inputContainer}>
-        <Icon name="email-outline" size={20} color="#666" style={styles.inputIcon} />
+        <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
         <TextInput 
           placeholder="Email" 
           value={userEmail}
@@ -62,7 +62,7 @@ export default function SignUp({navigation}) {
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="lock-outline" size={20} color="#666" style={styles.inputIcon} />
+        <Ionicons name="lock-closed" size={20} color="#666" style={styles.inputIcon} />
         <TextInput 
           placeholder="Password" 
           value={userPassword}
@@ -70,7 +70,7 @@ export default function SignUp({navigation}) {
           secureTextEntry={!showPassword} 
           style={styles.input} 
           placeholderTextColor="grey"/>
-        <Icon name="eye-outline" onPress={() => setShowPassword(!showPassword)} size={20} color="#666" style={styles.inputIcon} />
+        <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} onPress={() => setShowPassword(!showPassword)} size={20} color="#666" style={styles.inputIcon} />
       </View>
 
       <TouchableOpacity
@@ -90,17 +90,17 @@ export default function SignUp({navigation}) {
       <Text style={styles.orText}>or</Text>
 
       <TouchableOpacity style={styles.socialButtonGoogle}>
-        <Icon name="google" size={20} color="#fff" />
+        <Ionicons name="logo-google" size={20} color="#fff" />
         <Text style={styles.socialButtonText}>Continue with Google</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.socialButtonApple}>
-        <Icon name="apple" size={20} color="#fff" />
+        <Ionicons name="logo-apple" size={20} color="#fff" />
         <Text style={styles.socialButtonText}>Continue with Apple</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.socialButtonFacebook}>
-        <Icon name="facebook" size={20} color="#fff" />
+        <Ionicons name="logo-facebook" size={20} color="#fff" />
         <Text style={styles.socialButtonText}>Continue with Facebook</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>

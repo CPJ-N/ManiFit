@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, SafeAreaView, ActivityIndicator } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
 import { auth } from '../../config/firebase'
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
