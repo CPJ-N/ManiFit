@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function CompleteExerciseList({navigation}) {
 
-    const allExercises = useSelector((state: RootState) => state.exercises.allExercises);
+    const allExercises = useSelector((state: RootState) => state.workout.allExercises);
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearch = (text: string) => {

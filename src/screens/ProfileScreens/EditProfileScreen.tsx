@@ -68,7 +68,7 @@ export default function EditProfileScreen({navigation}) {
   };
 
   useEffect(() => {
-    if (userInfo.profilePhotoName) {
+    if (userInfo?.profilePhotoName) {
       getImageUrl(firebaseBucketName.userImages, userInfo.profilePhotoName).then((url) => {
         console.log(`Image name: ${userInfo.profilePhotoName} \n Image URL: ${url}`);
         dispatch(setUserImageUrl(url));
@@ -110,7 +110,7 @@ export default function EditProfileScreen({navigation}) {
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{profile.fullName}</Text>
           <Text style={styles.detailsText}>{auth.currentUser?.email}</Text>
-          <Text style={styles.detailsText}>Birthday: {profile.dateOfBirth}</Text>
+          { profile.dateOfBirth && <Text style={styles.detailsText}>Birthday: {profile.dateOfBirth}</Text>}
         </View>
       </View>
       <View style={styles.inputContainer}>
@@ -121,6 +121,8 @@ export default function EditProfileScreen({navigation}) {
             style={styles.input}
             onChangeText={(text) => handleChange(text, key as keyof UserDetails)}
             value={(profile[key as keyof UserDetails] ?? '').toString()}
+            placeholder={key}
+            placeholderTextColor={'grey'}
           />)
         ))}
       </View>
