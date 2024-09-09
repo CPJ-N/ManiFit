@@ -61,8 +61,8 @@ export default function Home({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
       <StatusBar style="light" />
+      <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>Hi, {userInfo ? userInfo.fullName : auth.currentUser?.email}</Text>
           <Text style={styles.subGreeting}>It's Time To Challenge Your Limits.</Text>

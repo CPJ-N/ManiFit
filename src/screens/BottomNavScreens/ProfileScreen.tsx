@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../../config/firebase'
 import { signOut } from 'firebase/auth'
 import { AUTH_TABS, COMPLETE_EXERCISE_LIST, EDIT_PROFILE, EXERCISE_TABS, FAVORITE, LINK_TRAINEE, LINK_TRAINER, LOGIN, PRIVACY_POLICY, SETTINGS } from '../../constants/screenNames';
@@ -106,7 +106,7 @@ export default function ProfileScreen({navigation}) {
                         key={index} 
                         style={styles.menuItem} 
                         onPress={() => handlePress(item.name)}>
-                        <Ionicons name={item.icon} size={24} color="#f4f4f4" />
+                        <Ionicons name={item.icon as any} size={24} color="#f4f4f4" />
                         <Text style={styles.menuItemText}>{item.name}</Text>
                         <Ionicons name="chevron-forward-outline" size={24} color="#f4f4f4" />
                     </TouchableOpacity>

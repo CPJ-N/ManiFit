@@ -44,7 +44,22 @@ export default function RoutineList ({navigation}) {
         await getRoutinesByTrainer(auth.currentUser?.uid) :
         await getRoutinesByTrainee(auth.currentUser?.uid);
         // dispatch(setUserRoutine());
-      setRoutines(routines);
+        //order routines by assigne date
+        // Assuming you have the routines array
+      const sortedRoutines = routines
+      .filter(routine => routine.assignees && routine.assignees.length > 0) // Filter out routines without assignees
+      .map(routine => ({
+        ...routine,
+        assignees: routine.assignees.filter(assignee => assignee.date) // Filter out assignees without a date
+      }))
+      .sort((a, b) => {
+        // Find the most recent date in each routine's assignees
+        const latestA = Math.max(...a.assignees.map(assignee => new Date(assignee.date).getTime()));
+        const latestB = Math.max(...b.assignees.map(assignee => new Date(assignee.date).getTime()));
+        return latestB - latestA; // Sort by date, newer first
+      });
+      
+      setRoutines(sortedRoutines);
       setLoading(false);
     };
     
