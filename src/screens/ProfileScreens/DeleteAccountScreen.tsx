@@ -3,38 +3,46 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, SafeAreaView } from 'r
 import { Ionicons } from '@expo/vector-icons';
 import { deleteUser } from 'firebase/auth';
 import { RootState } from '../../store/reduxStore';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { auth } from '../../config/firebase';
 import { deleteUserDocument } from '../../utils/controllers/userController';
 import { AUTH_TABS, LOGIN } from '../../constants/screenNames';
+import { clearUser, clearUserImageUrl } from '../../store/userSlice';
 
 export default function DeleteAccountScreen ({navigation}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const dispatch = useDispatch();
 
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
-    // Simulating an API call
-    setTimeout(async () => {
+    setTimeout( async () => {
       setIsDeleting(false);
-
       await deleteUserDocument(auth.currentUser.uid)
+        .then(() => {
+          
+        })
+        .catch( e => console.log(e))
 
       await deleteUser(auth.currentUser)
         .then(() => {
-            console.log(`Successfully deleted user with id:${auth.currentUser.uid} & email:${auth.currentUser.email}`);
+            console.log(`Successfully deleted user with id:${userInfo?.uid} & email:${userInfo?.email}`);
+            dispatch(clearUser());
+            dispatch(clearUserImageUrl());
             navigation.navigate(AUTH_TABS, {LOGIN});
         })
         .catch((error) => {
-            console.error('Error deleting user:', error);
+            console.error('Error deleting user auth:', error);
         });
 
       Alert.alert(
         "Account Deleted",
         "Your account has been successfully deleted. We're sorry to see you go!",
-        [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+        [{ text: "OK", onPress: () => console.log("OK Pressed")}]
       );
     }, 2000);
+    
+    navigation.navigate(AUTH_TABS, {LOGIN});
   };
 
   const confirmDeletion = () => {

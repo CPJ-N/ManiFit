@@ -81,7 +81,7 @@ export default function ProfileScreen({navigation}) {
                 />
                 <View style={styles.subInfoSection}>
                     <Text style={styles.name}>{userInfo?.fullName}</Text>
-                    <Text style={styles.email}>{userInfo?.email}</Text>
+                    <Text style={styles.email}>{auth.currentUser?.email}</Text>
                     <Text style={styles.birthday}>Birthday: {userInfo?.dateOfBirth}</Text>
                 </View>
             </View>

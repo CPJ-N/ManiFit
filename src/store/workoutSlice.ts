@@ -21,7 +21,13 @@ export const workoutSlice = createSlice({
     },
     clearExercises: (state) => {
       state.allExercises = [];
-    }
+    },
+    setUserRoutine: (state, action: PayloadAction<Routine[]>) => {
+      state.userRoutines = action.payload;
+    },
+    clearUserRoutine: (state) => {
+      state.userRoutines = [];
+    },
   },
 });
 

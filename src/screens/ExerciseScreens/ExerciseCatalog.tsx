@@ -21,7 +21,7 @@ import { RootState } from '../../store/reduxStore';
 export default function ExerciseCatalog({route, navigation}) {
   const { category } = route.params || {};
   const [ exercises, setExercises] = useState<any[]>([]);
-  const allExercises = useSelector((state: RootState) => state.exercises.allExercises);
+  const allExercises = useSelector((state: RootState) => state.workout.allExercises);
 
   useEffect(() => {
     const filterByCategory = () => {

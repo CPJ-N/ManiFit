@@ -6,7 +6,7 @@ import { Routine } from '../../constants/dataModels/routine.model';
 import { Exercise } from '../../constants/dataModels/exercise.model';
 import { getAllRoutines, getRoutinesByTrainee, getRoutinesByTrainer } from '../../utils/controllers/routineController';
 import ScreenHeader from '../../components/ScreenHeader';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { auth } from '../../config/firebase';
 
@@ -29,6 +29,8 @@ export default function RoutineList ({navigation}) {
   const [routines, setRoutines] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const userRoutines = useSelector((state: RootState) => state.workout.userRoutines);
+  const dispatch = useDispatch();
 
   function handleRoutinePress(routine) {
     navigation.navigate(EXERCISE_LIST, { routine });
@@ -41,6 +43,7 @@ export default function RoutineList ({navigation}) {
       const routines = userInfo?.isTrainer ? 
         await getRoutinesByTrainer(auth.currentUser?.uid) :
         await getRoutinesByTrainee(auth.currentUser?.uid);
+        // dispatch(setUserRoutine());
       setRoutines(routines);
       setLoading(false);
     };

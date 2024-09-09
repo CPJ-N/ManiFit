@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './userSlice';
-import exerciseReducer from './workoutSlice';
+import workoutReducer from './workoutSlice';
 
 export const store = configureStore({
     reducer: {
         user: userReducer,
-        exercises: exerciseReducer,
+        workout: workoutReducer,
       },
       middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
