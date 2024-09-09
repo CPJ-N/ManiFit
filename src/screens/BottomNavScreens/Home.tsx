@@ -21,7 +21,7 @@ import { UserDetails } from '../../constants/dataModels/userDetails.model';
 import { getImageUrl } from '../../utils/controllers/imageController';
 import { firebaseBucketName } from '../../constants/firebaseContant';
 import { getAllExercisesFromUrl } from '../../utils/controllers/exerciseController';
-import { setExercises } from '../../store/exerciseSlice';
+import { setExercises } from '../../store/workoutSlice';
 
 
 const workoutVideos = exerciseCategories
@@ -64,7 +64,7 @@ export default function Home({navigation}) {
       <View style={styles.header}>
       <StatusBar style="light" />
         <View>
-          <Text style={styles.greeting}>Hi, {userInfo ? userInfo.fullName : auth.currentUser.email}</Text>
+          <Text style={styles.greeting}>Hi, {userInfo ? userInfo.fullName : auth.currentUser?.email}</Text>
           <Text style={styles.subGreeting}>It's Time To Challenge Your Limits.</Text>
         </View>
         <View style={{ position: 'relative', flex: 0 }}>

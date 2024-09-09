@@ -31,7 +31,7 @@ export const deleteUserDocument = async (userId: string) => {
     try {
         const userDocRef = await doc(db, firebaseCollection.userDetails, userId); 
         await deleteDoc(userDocRef);
-        console.log('User deleted successfully');
+        console.log('Successfully deleted user document with id:', userId);
     } catch (error) {
         console.error('Error deleting user: ', error);
     }

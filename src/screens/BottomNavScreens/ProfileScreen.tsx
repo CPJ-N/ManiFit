@@ -27,7 +27,7 @@ export default function ProfileScreen({navigation}) {
     const handlePress = (name: string) => {
 
         switch (name) {
-            case "Profile":
+            case "Edit Profile":
                 navigation.navigate(EDIT_PROFILE);
                 break;
             case "Favorite":

@@ -57,6 +57,7 @@ export default function EditProfileScreen({navigation}) {
     await updateUser(auth.currentUser?.uid, updateProfileInfo).then(() => {
       dispatch(setUser(updateProfileInfo));
       console.log('Profile updated:', updateProfileInfo);
+      navigation.goBack();
     }).catch((error) => {
       console.log('Error updating profile:', error);
     });
@@ -94,11 +95,9 @@ export default function EditProfileScreen({navigation}) {
             style={styles.profileImage}
           /> :
           <Image
-            source={{ 
-              uri: selectedImage ? 
-              selectedImage : 
-              'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-            }} 
+            source={selectedImage ?  
+              {uri: selectedImage}
+              : require('../../assets/placeholder-user-image.jpg')} 
             style={styles.profileImage}
           />}
           <TouchableOpacity style={styles.editIcon} onPress={handleImageUpload} >

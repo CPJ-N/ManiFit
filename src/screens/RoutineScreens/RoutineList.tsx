@@ -4,10 +4,11 @@ import RoutineItem from '../../components/RoutineItem';
 import { CONFIGURE_EXERCISES, CREATE_ROUTINE, EXERCISE_LIST } from '../../constants/screenNames';
 import { Routine } from '../../constants/dataModels/routine.model';
 import { Exercise } from '../../constants/dataModels/exercise.model';
-import { getAllRoutines } from '../../utils/controllers/routineController';
+import { getAllRoutines, getRoutinesByTrainee, getRoutinesByTrainer } from '../../utils/controllers/routineController';
 import ScreenHeader from '../../components/ScreenHeader';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
+import { auth } from '../../config/firebase';
 
 /*
 	1.	Create a New Routine or Select an Existing One:
@@ -36,10 +37,14 @@ export default function RoutineList ({navigation}) {
 
   useEffect(() => {
     const fetchRoutines = async () => {
-      const routines = await getAllRoutines();
+      // const routines = await getAllRoutines();
+      const routines = userInfo?.isTrainer ? 
+        await getRoutinesByTrainer(auth.currentUser?.uid) :
+        await getRoutinesByTrainee(auth.currentUser?.uid);
       setRoutines(routines);
       setLoading(false);
     };
+    
   
     fetchRoutines();
   }, []);

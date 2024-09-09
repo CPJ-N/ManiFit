@@ -56,6 +56,17 @@ export const getAllUnlinkedTrainees = async () => {
     return querySnapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id }));
 };
 
+// Get all unlinked trainees
+export const getAlllinkedTrainees = async ( trainerUid: string ) => {
+    const q = query(
+        collection(db, firebaseCollection.userDetails),
+        where("isTrainer", "==", false),
+        where("linkedTrainer", "==", trainerUid)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id }));
+};
+
 
 //get all user with isTrainer = true
 export const getAllTrainers = async () => {

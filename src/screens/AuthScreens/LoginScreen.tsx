@@ -85,7 +85,7 @@ export default function Login({navigation}) {
           style={styles.input} 
           placeholderTextColor="grey"
         />
-        <Icon onPress={() => setShowPassword(!showPassword)} name="eye-off-outline" size={24} color="grey" />
+        <Icon onPress={() => setShowPassword(!showPassword)} name={showPassword ? "eye-off-outline" : "eye-outline"} size={24} color="grey" />
       </View>
 
       <View style={styles.rememberMeContainer}>

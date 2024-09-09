@@ -1,16 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Exercise } from '../constants/dataModels/exercise.model';
+import { Routine } from '../constants/dataModels/routine.model';
 
-interface ExerciseState {
+interface WorkoutState {
   allExercises: Exercise[] | null;
+  userRoutines: Routine[] | null;
 }
 
-const initialState: ExerciseState = {
+const initialState: WorkoutState = {
     allExercises: [],
+    userRoutines: []
 };
 
-export const exerciseSlice = createSlice({
-  name: 'allExercises',
+export const workoutSlice = createSlice({
+  name: 'workout',
   initialState,
   reducers: {
     setExercises: (state, action: PayloadAction<Exercise[]>) => {
@@ -22,6 +25,6 @@ export const exerciseSlice = createSlice({
   },
 });
 
-export const { setExercises, clearExercises } = exerciseSlice.actions;
+export const { setExercises, clearExercises } = workoutSlice.actions;
 
-export default exerciseSlice.reducer;
+export default workoutSlice.reducer;
