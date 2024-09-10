@@ -16,7 +16,64 @@ Fitness App for trainers
 https://www.youtube.com/watch?v=ql4J6SpLXZA
 https://firebase.google.com/docs/web/setup#available-libraries
 
-
-// TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
+
+Overall Code and App Architecture
+Project Structure
+Root Directory: Contains configuration files like .env, app.json, babel.config.js, tsconfig.json, and package.json.
+src/ Directory: Main source code organized into subdirectories for assets, components, configuration, constants, navigation, screens, store, and utilities.
+Key Directories and Files
+**Root
+Files**:
+
+App.tsx: Main entry point. Sets up Redux store, navigation container, and main stack navigator.
+package.json: Lists dependencies and scripts.
+tsconfig.json: TypeScript configuration.
+src/ Directory:
+assets/: Static assets like fonts and images.
+components/: Reusable UI components (e.g., ExerciseCard, ExerciseForm).
+config/: Configuration files, including Firebase setup (firebase.ts).
+constants/: Constant values used throughout the app.
+navigation/: Navigation setup files (e.g., AuthNavigation.tsx).
+screens/: Main screens of the application, organized into subdirectories like AuthScreens and BottomNavScreens.
+store/: Redux store setup and slices (reduxStore.ts).
+utils/: Utility functions and helpers.
+Key Components and Screens
+App.tsx:
+
+Sets up Redux provider and navigation container.
+Defines main stack navigator with screens for authentication (AuthNavigation) and main app (BottomNavigation).
+src/config/firebase.ts:
+
+Initializes Firebase services (auth, Firestore, storage).
+src/store/reduxStore.ts:
+
+Configures Redux store with slices like userReducer and workoutReducer.
+src/navigation/AuthNavigation.tsx:
+
+Defines stack navigator for authentication-related screens (SignUp, Login, UserDetailsForm).
+src/screens/TempHome.tsx:
+
+Temporary home screen with navigation buttons for login and signup.
+src/screens/BottomNavScreens/Home.tsx:
+
+Home screen with sections for recommendations, weekly challenges, and articles/tips.
+Navigation
+React Navigation: Manages navigation between screens.
+AuthNavigation: Handles authentication-related screens.
+BottomNavigation: Handles main app screens after authentication.
+State Management
+Redux: Manages state with a centralized store configured in reduxStore.ts.
+Firebase Integration
+Firebase: Provides backend services for authentication, data storage, and file uploads, configured in firebase.ts.
+Summary
+The app architecture is modular and scalable, with a clear separation of concerns:
+
+Configuration: Centralized in the config directory.
+Components: Reusable UI components in the components directory.
+Screens: Organized into subdirectories for different parts of the app.
+Navigation: Managed using React Navigation.
+State Management: Handled using Redux.
+Firebase Integration: Provides backend services.
+This structure ensures maintainability, scalability, and ease of understanding.
 
