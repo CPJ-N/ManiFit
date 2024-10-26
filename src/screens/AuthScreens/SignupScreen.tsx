@@ -1,4 +1,4 @@
-import React, { useState }  from 'react';
+import React, { useEffect, useState }  from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../../config/firebase';
@@ -43,6 +43,16 @@ export default function SignUp({navigation}) {
       console.log(errorCode, errorMessage)
     });
   }
+
+  useEffect(() =>{
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if(user){
+        navigation.replace(BOTTOM_TABS, { screen: HOME })
+      }
+    })
+
+    return unsubscribe
+  }, [])
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>

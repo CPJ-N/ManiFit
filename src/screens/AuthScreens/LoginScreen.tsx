@@ -74,9 +74,9 @@ export default function Login({navigation}) {
       </View>
 
       <View style={styles.inputField}>
-        <Ionicons name="book-outline" size={24} color="grey" />
+        <Ionicons name="lock-closed" size={24} color="grey" />
         <TextInput 
-          placeholder="Password" 
+          placeholder="Password"
           value={userPassword}
           onChangeText={text => setUserPassword(text)}
           secureTextEntry={!showPassword} 
