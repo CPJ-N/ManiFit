@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { DELETE_ACCOUNT, LINK_TRAINEE, LINK_TRAINER, PASSWORD_SETTINGS, REGISTER_TRAINER } from '../../constants/screenNames';
+import { DELETE_ACCOUNT, LINK_TRAINEE, LINK_TRAINER, PASSWORD_SETTINGS, RAZORPAY_CHECKOUT, REGISTER_TRAINER } from '../../constants/screenNames';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { updateUser } from '../../utils/controllers/userController';
@@ -70,6 +70,11 @@ export default function SettingsScreen({navigation}) {
             onPress={() => {navigation.navigate(REGISTER_TRAINER)}}
             />
         )}
+        <SettingItem
+          icon="card"
+          title="Checkout"
+          onPress={() => {navigation.navigate(RAZORPAY_CHECKOUT)}}
+        />
       </View>
     </SafeAreaView>
   );

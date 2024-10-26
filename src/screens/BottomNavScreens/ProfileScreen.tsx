@@ -57,10 +57,10 @@ export default function ProfileScreen({navigation}) {
 
     const handleLogOut = () => {
         signOut(auth)
-        .then((res) => {
+        .then(async (res) => {
           console.log(res)
-          dispatch(clearUser())
-          dispatch(clearUserImageUrl())
+          await dispatch(clearUser())
+          await dispatch(clearUserImageUrl())
           navigation.navigate(AUTH_TABS, {screen: {LOGIN}})
           console.log('signed out')
         })
