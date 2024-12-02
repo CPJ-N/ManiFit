@@ -11,14 +11,13 @@ import {
   import { StatusBar } from 'expo-status-bar';
   import { useEffect, useState } from 'react';
 import { getExercisesByCategory } from '../../utils/controllers/exerciseController';
-import { exerciseImageUrlPrefix } from '../../constants/serverConstant';
 import { EXERCISE_DETAILS } from '../../constants/screenNames';
 import { Exercise } from '../../constants/dataModels/exercise.model';
 import ExerciseItem from '../../components/ExerciseItem';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
   
-export default function ExerciseCatalog({route, navigation}) {
+export default function ExerciseCatalog({route, navigation} : {route: any, navigation: any}) {
   const { category } = route.params || {};
   const [ exercises, setExercises] = useState<any[]>([]);
   const allExercises = useSelector((state: RootState) => state.workout.allExercises);

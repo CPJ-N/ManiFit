@@ -4,15 +4,14 @@ import { View, Text, TextInput, Button, FlatList, SafeAreaView, StyleSheet, Imag
 import { ROUTINE_LIST } from '../../constants/screenNames';
 import { addRoutine } from '../../utils/controllers/routineController';
 import { auth } from '../../config/firebase';
-import { exerciseImageUrlPrefix } from '../../constants/serverConstant';
 import { ExerciseDetails } from '../../constants/dataModels/exercise.model';
 import { Routine } from '../../constants/dataModels/routine.model';
 
-export default function ConfigureExercisesScreen({ route, navigation }){
+export default function ConfigureExercisesScreen({ route, navigation } : { route: any, navigation: any }) {
   const { selectedExercises, name, description } = route.params;
   const [imageUrls, setImageUrls] = useState<{ [key: string]: string }>({});
   const [exerciseDetails, setExerciseDetails] = useState(
-    selectedExercises.map((exercise) => ({
+    selectedExercises.map((exercise: any) => ({
       ...exercise,
       sets: '',
       repetitions: '',
@@ -39,7 +38,8 @@ export default function ConfigureExercisesScreen({ route, navigation }){
   //   fetchExerciseImages();
   // }, [])
 
-  const handleInputChange = (index, field, value) => {
+
+  const handleInputChange = (index: number, field: keyof any, value: string) => {
     const updatedDetails = [...exerciseDetails];
     updatedDetails[index][field] = value;
     setExerciseDetails(updatedDetails);
@@ -48,7 +48,7 @@ export default function ConfigureExercisesScreen({ route, navigation }){
   const saveRoutine = () => {
     // Save the routine with the exercise details to the database
     // Code to save the routine goes here
-    const exerciseDetailsConcise: ExerciseDetails[] = exerciseDetails.map((exercise) => ({
+    const exerciseDetailsConcise: ExerciseDetails[] = exerciseDetails.map((exercise: any) => ({
       exerciseId: exercise.id,
       sets: exercise.sets,
       repetitions: exercise.repetitions,
@@ -75,7 +75,7 @@ export default function ConfigureExercisesScreen({ route, navigation }){
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
           <View style={styles.subcontainer}>
-            {<Image source={{ uri: `${exerciseImageUrlPrefix}/${item.images[0]}` }} style={styles.image} />}
+            {<Image source={{ uri: `${process.env.GITHUB_EXERCISE_IMAGE_URL_PREFIX}/${item.images[0]}` }} style={styles.image} />}
             <Text style={styles.header}>{item.name}</Text>
             <TextInput
               style={styles.searchInput}

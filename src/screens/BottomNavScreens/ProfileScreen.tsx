@@ -12,7 +12,7 @@ import { clearUser, clearUserImageUrl } from '../../store/userSlice';
 // TODO: Add functionality to update user profile
 // TODO: Add functionality to go to all menu options
 
-export default function ProfileScreen({navigation}) {
+export default function ProfileScreen({navigation}: {navigation: any}) {
     const {userInfo, userImageUrl} = useSelector((state: RootState) => state.user);
     const menuItems = [
         { name: 'Edit Profile', icon: 'person-circle-outline' },
@@ -135,7 +135,6 @@ const styles = StyleSheet.create({
     profileImage: {
         width: 130,
         height: 130,
-        paddingBottom: 15,
         borderRadius: 65,
         marginBottom: 10,
     },

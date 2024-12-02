@@ -6,11 +6,17 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { updateUser } from '../../utils/controllers/userController';
 
-const SettingItem = ({ icon, title, onPress }) => (
+interface SettingItemProps {
+  icon: string;
+  title: string;
+  onPress: () => void;
+}
+
+const SettingItem: React.FC<SettingItemProps> = ({ icon, title, onPress }) => (
   <TouchableOpacity style={styles.settingItem} onPress={onPress}>
     <View style={styles.settingItemLeft}>
       <View style={styles.iconContainer}>
-        <Ionicons name={icon} size={24} color="#FFD20A" />
+        <Ionicons name={icon as any} size={24} color="#FFD20A" />
       </View>
       <Text style={styles.settingItemText}>{title}</Text>
     </View>
@@ -18,7 +24,7 @@ const SettingItem = ({ icon, title, onPress }) => (
   </TouchableOpacity>
 );
 
-export default function SettingsScreen({navigation}) {
+export default function SettingsScreen({navigation} :{navigation: any}) {
     const userInfo = useSelector((state: RootState) => state.user.userInfo);
 
     useEffect(() => {

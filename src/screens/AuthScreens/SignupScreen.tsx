@@ -9,7 +9,7 @@ import { setUser } from '../../store/userSlice';
 import { StatusBar } from 'expo-status-bar';
 // import { AppDispatch } from '../store/reduxStore';
 
-export default function SignUp({navigation}) {
+export default function SignUp({navigation} : {navigation: any}) {
   const [showPassword, setShowPassword] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [userPassword, setUserPassword] = useState('')
@@ -21,19 +21,14 @@ export default function SignUp({navigation}) {
     .then((userCredential) => {
       // Signed in
       const user = userCredential.user;
-      // console.log(user.email)
-      // console.log(user)
 
       const newUser = {
         uid: user.uid, 
         email: user.email
       }
-
-      // createUser(newUser);
-      // dispatch(setUser(newUser));
-
+      
       navigation.navigate(USER_DETAILS_FORM, {user: newUser});
-      // navigation.navigate(BOTTOM_TABS, {screen: {HOME}});
+      console.log('User signed up successfully', user.email);
     })
     .catch((error) => {
       const errorCode = error.code;

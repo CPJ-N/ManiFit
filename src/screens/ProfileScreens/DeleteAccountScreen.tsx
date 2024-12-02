@@ -9,7 +9,7 @@ import { deleteUserDocument } from '../../utils/controllers/userController';
 import { AUTH_TABS, LOGIN } from '../../constants/screenNames';
 import { clearUser, clearUserImageUrl } from '../../store/userSlice';
 
-export default function DeleteAccountScreen ({navigation}) {
+export default function DeleteAccountScreen ({navigation} : {navigation: any}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const dispatch = useDispatch();
@@ -18,13 +18,13 @@ export default function DeleteAccountScreen ({navigation}) {
     setIsDeleting(true);
     setTimeout( async () => {
       setIsDeleting(false);
-      await deleteUserDocument(auth.currentUser.uid)
+      await deleteUserDocument(auth.currentUser?.uid || '')
         .then(() => {
           
         })
         .catch( e => console.log(e))
 
-      await deleteUser(auth.currentUser)
+      auth.currentUser && await deleteUser(auth.currentUser)
         .then(() => {
             console.log(`Successfully deleted user with id:${userInfo?.uid} & email:${userInfo?.email}`);
             dispatch(clearUser());

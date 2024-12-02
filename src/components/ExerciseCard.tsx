@@ -1,31 +1,26 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Exercise, ExerciseDetails } from '../constants/dataModels/exercise.model'
-import { Icon } from 'react-native-elements';
 import { getExercise } from '../utils/controllers/exerciseController';
-import { exerciseImageUrlPrefix } from '../constants/serverConstant';
 
 
 const ExerciseCard = ({viewDetails, exerciseDetails }: {  
   viewDetails: (exercise: Exercise) => void,
   exerciseDetails: ExerciseDetails}) => {
 
-  const [exercise, setExercise] = useState<Exercise>(null);
-
-    useEffect(() => {
-      // console.log('exerciseId in card:', exerciseDetails.exerciseId);  
-        const fetchExercises = async () => {
-            const fetchedExercise = await getExercise(exerciseDetails.exerciseId);
-            // console.log('exercise fetched in card:', fetchedExercise);
-            setExercise(fetchedExercise);
-        };
-        fetchExercises();
-    }, []);
+  const [exercise, setExercise] = useState<Exercise | null>(null);
+    useEffect(() => {  
+      const fetchExercises = async () => {
+        const fetchedExercise = await getExercise(exerciseDetails.exerciseId);
+        setExercise(fetchedExercise);
+    };
+    fetchExercises();
+  }, []);
 
   return (
-    <TouchableOpacity style={styles.card} onPress={()=>viewDetails(exercise)}>
+    <TouchableOpacity style={styles.card} onPress={()=> exercise && viewDetails(exercise)}>
       {exercise?.image && <Image source={{ uri: exercise.image }} style={styles.image} />}
-      {exercise?.images && <Image source={{ uri: `${exerciseImageUrlPrefix}/${exercise.images[0]}`}} style={styles.image} />}
+      {exercise?.images && <Image source={{ uri: `${process.env.GITHUB_EXERCISE_IMAGE_URL_PREFIX}/${exercise.images[0]}`}} style={styles.image} />}
       <View style={styles.info}>
       {/* <View style={styles.icons}>
             <Icon name="edit" type="feather" color="#000" size={20} style={{padding: 5}}/>

@@ -4,14 +4,13 @@ import { View, Text, FlatList, Button, TextInput, SafeAreaView, Image, StyleShee
 import { CONFIGURE_EXERCISES } from '../../constants/screenNames';
 // import { Exercise } from '../constants/dataModels/exercise.model'; // Import the Exercise interface
 import { getAllExercises } from '../../utils/controllers/exerciseController';
-import { exerciseImageUrlPrefix } from '../../constants/serverConstant';
 
-export default function ExerciseSelectionScreen ({ route, navigation }) {
+export default function ExerciseSelectionScreen ({ route, navigation } : { route: any, navigation: any }) {
   const { routineId } = route.params || {};
   const { name, description } = route.params;
   const [searchQuery, setSearchQuery] = useState('');
   const [exercises, setExercises] = useState<any[]>([]);
-  const [selectedExercises, setSelectedExercises] = useState([]);
+  const [selectedExercises, setSelectedExercises] = useState<any[]>([]);
   const [imageUrls, setImageUrls] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
       fetchExercises();
   }, []);
 
-  const addExercise = (exercise) => {
+  const addExercise = (exercise: any) => {
     setSelectedExercises((prev) => [...prev, exercise]);
     setExercises((prev) =>
       prev.map((ex) =>
@@ -39,9 +38,9 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
     console.log(`adding: ${exercise.name}`);
   };
 
-  const removeExercise = (exercise) => {
+  const removeExercise = (exercise: any) => {
     setSelectedExercises((prev) =>
-      prev.filter((ex) => ex.id !== exercise.id)
+      prev.filter((ex: any) => ex.id !== exercise.id)
     );
     setExercises((prev) =>
       prev.map((ex) =>
@@ -75,7 +74,7 @@ export default function ExerciseSelectionScreen ({ route, navigation }) {
               item.isSelected ? removeExercise(item) : addExercise(item)
             }>
             {/* {imageUrls[item.id] && <Image source={{ uri: imageUrls[item.id] }} style={styles.image} />} */}
-            {<Image source={{ uri: `${exerciseImageUrlPrefix}/${item.images[0]}` }} style={styles.image} />}
+            {<Image source={{ uri: `${process.env.GITHUB_EXERCISE_IMAGE_URL_PREFIX}/${item.images[0]}` }} style={styles.image} />}
             <View style={styles.info}>
               <Text style={styles.title}>{item.name}</Text>
             </View>

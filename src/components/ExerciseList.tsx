@@ -13,7 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 
 
 
-function ExerciseList({navigation}) {
+function ExerciseList({navigation} : {navigation: any}) {
     const route = useRoute();
 
     const { routine } = (route.params as { routine: Routine }) || { routine: { name: '', description: '', exercises: [], createdBy: '' } };

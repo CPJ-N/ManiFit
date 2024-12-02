@@ -1,12 +1,10 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { exerciseImageUrlPrefix } from '../constants/serverConstant';
 
-
-export default function ExerciseItem({ exercise, viewDetails }) {
+export default function ExerciseItem({ exercise, viewDetails } : { exercise: any, viewDetails: (exercise: any) => void }) {
 
   return (
     <TouchableOpacity style={styles.videoCard} onPress={() => viewDetails(exercise)}>
-    <Image source={{ uri: `${exerciseImageUrlPrefix}/${exercise.images[0]}`}} style={styles.videoImage} />
+    <Image source={{ uri: `${process.env.GITHUB_EXERCISE_IMAGE_URL_PREFIX}/${exercise.images[0]}`}} style={styles.videoImage} />
     
     <View style={styles.videoInfo}>
       <Text style={styles.videoTitle}>{exercise.name}</Text>

@@ -41,19 +41,26 @@ interface OrderResponse {
 }
 
 import React, { useState } from 'react';
-import { View, Button, Alert, StyleSheet } from 'react-native';
+import { View, Button, Alert, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
+import { RAZORPAY_KEY, BACKEND_API_URL } from '@env';
+
+// TODO: Implement Razorpay Subscription functionality in the app 
+// to allow trainers to set up recurring payments for trainees. 
+// Additionally, integrate a notification system to send reminders 
+// to trainees regarding due payments at specified intervals 
+// (one week before, three days before, and on the due date).
 
 const RazorpayCheckout: React.FC = () => {
   const [showWebView, setShowWebView] = useState<boolean>(false);
   const [webViewContent, setWebViewContent] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Replace with your actual Razorpay key
-  const razorpayKey: string = 'YOUR_RAZORPAY_KEY';
+  const razorpayKey: string = RAZORPAY_KEY;
 
   const generateOrderId = async (): Promise<string> => {
     try {
-      const response = await fetch('YOUR_BACKEND_API/create-order', {
+      const response = await fetch(`${BACKEND_API_URL}/create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,22 +80,25 @@ const RazorpayCheckout: React.FC = () => {
 
   const handlePayment = async (): Promise<void> => {
     try {
+      console.log('Initiating payment...');
+      setLoading(true);
       const orderId = await generateOrderId();
+      console.log('Order ID generated:', orderId);
       setShowWebView(true);
 
       const options: RazorpayOptions = {
         key: razorpayKey,
         amount: '10000', // Amount in smallest currency unit
         currency: 'INR',
-        name: 'Your Company Name',
-        description: 'Purchase Description',
+        name: 'ManiFit Gym',
+        description: 'Base Subscription',
         order_id: orderId,
         prefill: {
           email: 'user@example.com',
           contact: '9999999999',
           name: 'User Name'
         },
-        theme: { color: '#F37254' }
+        theme: { color: '#FFD20A' }
       };
 
       const webViewContent = `
@@ -101,10 +111,12 @@ const RazorpayCheckout: React.FC = () => {
         <body>
           <script>
             var options = ${JSON.stringify(options)};
+            console.log('Razorpay options:', options);
             var rzp = new Razorpay(options);
             rzp.open();
             
             rzp.on('payment.success', function(response) {
+              console.log('Payment successful:', response);
               window.ReactNativeWebView.postMessage(JSON.stringify({
                 type: 'SUCCESS',
                 data: response
@@ -112,6 +124,7 @@ const RazorpayCheckout: React.FC = () => {
             });
             
             rzp.on('payment.error', function(response) {
+              console.log('Payment failed:', response);
               window.ReactNativeWebView.postMessage(JSON.stringify({
                 type: 'ERROR',
                 data: response
@@ -124,8 +137,12 @@ const RazorpayCheckout: React.FC = () => {
 
       setWebViewContent(webViewContent);
     } catch (error) {
+      console.error('Error initiating payment:', error);
       Alert.alert('Error', 'Failed to initiate payment');
       throw error;
+    } finally {
+      setLoading(false);
+      console.log('Payment initiation process completed.');
     }
   };
 
@@ -175,7 +192,13 @@ const RazorpayCheckout: React.FC = () => {
   return (
     <View style={styles.container}>
       {!showWebView ? (
-        <Button title="Pay Now" onPress={() => handlePayment()} />
+        <TouchableOpacity style={styles.payButton} onPress={() => handlePayment()}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.payButtonText}>Pay Now</Text>
+          )}
+        </TouchableOpacity>
       ) : (
         webViewContent && (
           <WebView
@@ -184,6 +207,12 @@ const RazorpayCheckout: React.FC = () => {
             style={styles.webview}
             javaScriptEnabled={true}
             domStorageEnabled={true}
+            startInLoadingState={true}
+            renderLoading={() => (
+              <View style={styles.loader}>
+                <ActivityIndicator size="large" color="#FFD20A" />
+              </View>
+            )}
           />
         )
       )}
@@ -194,12 +223,31 @@ const RazorpayCheckout: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#1a1a1a',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
+  },
+  payButton: {
+    backgroundColor: '#FFD20A',
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 10,
+  },
+  payButtonText: {
+    textAlign: 'center',
+    color: '#1a1a1a',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   webview: {
     flex: 1,
     width: '100%',
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

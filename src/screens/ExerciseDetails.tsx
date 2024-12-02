@@ -2,11 +2,10 @@ import { useRoute } from '@react-navigation/native';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Exercise } from '../constants/dataModels/exercise.model';
 import { EXERCISE_EDIT } from '../constants/screenNames';
-import { exerciseImageUrlPrefix } from '../constants/serverConstant';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useState } from 'react';
 
-export default function ExcerciseDetails ({route, navigation}) {
+export default function ExcerciseDetails ({route, navigation} : {route: any, navigation: any}) {
 
   // Access the current route
   // const route = useRoute();
@@ -31,7 +30,7 @@ export default function ExcerciseDetails ({route, navigation}) {
       <TouchableOpacity onPress={() => navigation.goBack()} >
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.title}>{exerciseInfo.name}</Text>
+        <Text style={styles.title}>{exerciseInfo?.name}</Text>
         {/* <View style={styles.detailsContainer}>
           <Text style={styles.detailsText}>15 Minutes</Text>
           {exerciseInfo.category && <Text style={styles.detailsText}>{exerciseInfo.category}</Text>}
@@ -46,13 +45,13 @@ export default function ExcerciseDetails ({route, navigation}) {
           source={{ uri: 'https://via.placeholder.com/350x200' }} // Replace with your image URL
           style={styles.image}
         />)} */}
-        {exerciseInfo?.images && <Image source={{ uri: `${exerciseImageUrlPrefix}/${exerciseInfo.images[imageNum]}`}} style={styles.image} />}
+        {exerciseInfo?.images && <Image source={{ uri: `${process.env.GITHUB_EXERCISE_IMAGE_URL_PREFIX}/${exerciseInfo.images[imageNum]}`}} style={styles.image} />}
          {/* {exerciseInfo.image && (<Image source={{ uri: exerciseInfo.image }} style={styles.image} />)}: */}
-         {/* {exerciseInfo.images && (<Image source={{ uri: `${exerciseImageUrlPrefix}/${exerciseInfo.images[0]}` }} style={styles.image} />)}: */}
+         {/* {exerciseInfo.images && (<Image source={{ uri: `${process.env.GITHUB_EXERCISE_IMAGE_URL_PREFIX}/${exerciseInfo.images[0]}` }} style={styles.image} />)}: */}
       </TouchableOpacity>
 
 
-      {(exerciseInfo.duration || exerciseInfo.weight || exerciseInfo.sets || exerciseInfo.repetitions) 
+      {exerciseInfo && (exerciseInfo.duration || exerciseInfo.weight || exerciseInfo.sets || exerciseInfo.repetitions) 
         && <View style={styles.section}>
         {/* <Text style={styles.sectionTitle}>Details</Text> */}
         {exerciseInfo.duration && <Text style={styles.ingredientText}>Duration: {exerciseInfo.duration} mins</Text>}
@@ -61,14 +60,14 @@ export default function ExcerciseDetails ({route, navigation}) {
         {exerciseInfo.repetitions && <Text style={styles.ingredientText}>Reps: {exerciseInfo.repetitions}</Text>}
       </View>}
 
-      {exerciseInfo.description && <View style={styles.section}>
+      {exerciseInfo?.description && <View style={styles.section}>
         <Text style={styles.sectionTitle}>Description</Text>
         <Text style={styles.description}>
           {exerciseInfo.description}
         </Text>
       </View>}
       
-      {exerciseInfo.instructions && 
+      {exerciseInfo?.instructions && 
         <View style={styles.section}>
         <Text style={styles.sectionTitle}>Instructions</Text>
         {exerciseInfo.instructions.map((instruction, index) => (

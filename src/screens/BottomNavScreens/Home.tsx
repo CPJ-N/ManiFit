@@ -26,18 +26,18 @@ import { setExercises } from '../../store/workoutSlice';
 
 const workoutVideos = exerciseCategories
 
-export default function Home({navigation}) {
+export default function Home({navigation} : {navigation: any}) {
 
   const {userInfo, userImageUrl} = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch()
 
   useEffect(() => {
     if (!userInfo) {
-      getUser(auth.currentUser?.uid)
+      getUser(auth.currentUser?.uid || '')
         .then((result) => {
           dispatch(setUser(result as UserDetails));
-          if (result?.profilePhotoName !== '' || result?.profilePhotoName !== undefined) {
-            getImageUrl(firebaseBucketName.userImages, result.profilePhotoName).then((url) => {
+          if (result && result.profilePhotoName) {
+            getImageUrl(firebaseBucketName.userImages, result.profilePhotoName || '').then((url) => {
               dispatch(setUserImageUrl(url));
             }).catch((error) => {
               console.error('Error fetching user image:', error);

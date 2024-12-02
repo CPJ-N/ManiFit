@@ -2,7 +2,6 @@ import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, get
 import { Exercise } from "../../constants/dataModels/exercise.model";
 import { firebaseCollection } from "../../constants/firebaseContant";
 import { db } from "../../config/firebase";
-import { exercisesUrl } from "../../constants/serverConstant";
 
 export const addExercise = async (exercise: Exercise) => {
   try {
@@ -69,7 +68,7 @@ export const deleteExercise = async (exerciseId: string) => {
   try {
     console.log("Deleting exercise...", exerciseId);
     const docRef = doc(db, `${firebaseCollection.exercises}/${exerciseId}`);
-    console.log(docRef);
+    console.log("Exercise DocRef: ", docRef);
     await deleteDoc(docRef);
     console.log("Exercise deleted successfully");
   } catch (error) {

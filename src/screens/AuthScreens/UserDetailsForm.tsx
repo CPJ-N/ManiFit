@@ -20,11 +20,11 @@ const FitnessGoals = [
   { id: '5', name: 'Others' },
 ];
 
-export default function UserDetailsForm({ navigation }) {
+export default function UserDetailsForm({navigation} : {navigation: any}) {
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     fullName: '',
-    email: auth.currentUser?.email,
+    email: auth.currentUser?.email ?? '',
     mobileNumber: '',
     dateOfBirth: '',
     weight: 0,
@@ -44,10 +44,9 @@ export default function UserDetailsForm({ navigation }) {
     if (imageUri) {
       setSelectedImage(imageUri);
       await uploadImage(imageUri).then(async (result) => {
-        userDetails.profilePhotoName = result.metadata.name;
-        const uploadedImageUrl = await getImageUrl(firebaseBucketName.userImages, userDetails.profilePhotoName);
-        setSelectedImage(uploadedImageUrl)
-        // console.log('Image URL:', uploadedImageUrl);
+        userDetails.profilePhotoName = result?.metadata.name;
+        const uploadedImageUrl = await getImageUrl(firebaseBucketName.userImages, userDetails.profilePhotoName || '');
+        setSelectedImage(uploadedImageUrl);
       }).catch((error) => {
         console.log('Error uploading image:', error);
       })
@@ -60,7 +59,7 @@ export default function UserDetailsForm({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    await createUser(userDetails, auth.currentUser?.uid);
+    await createUser(userDetails, auth.currentUser?.uid ?? '');
     dispatch(setUser(userDetails));
     console.log('userDetails updated:', userDetails);
     navigation.navigate(BOTTOM_TABS, {screen: {HOME}});
@@ -111,25 +110,25 @@ export default function UserDetailsForm({ navigation }) {
         <TextInput
           style={styles.input}
           onChangeText={(text) => handleChange(text, 'mobileNumber')}
-          value={userDetails['mobileNumber'].toString()}
+          value={userDetails['mobileNumber']?.toString() || ''}
         />
         <Text style={styles.label}>Date Of Birth</Text>
         <TextInput
           style={styles.input}
           onChangeText={(text) => handleChange(text, 'dateOfBirth')}
-          value={userDetails['dateOfBirth'].toString()}
+          value={userDetails['dateOfBirth']?.toString() || ''}
         />
         <Text style={styles.label}>Weight (kg)</Text>
         <TextInput
           style={styles.input}
           onChangeText={(text) => handleChange(text, 'weight')}
-          value={userDetails['weight'].toString()}
+          value={userDetails['weight']?.toString() || ''}
         />
         <Text style={styles.label}>Height (cm)</Text>
         <TextInput
           style={styles.input}
           onChangeText={(text) => handleChange(text, 'height')}
-          value={userDetails['height'].toString()}
+          value={userDetails['height']?.toString() || ''}
         />
         
         {/* <Text style={styles.label}>Are you a Trainer?</Text> */}

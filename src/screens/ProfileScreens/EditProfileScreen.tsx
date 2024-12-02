@@ -13,7 +13,7 @@ import { firebaseBucketName } from '../../constants/firebaseContant';
 import { pickImage } from '../../utils/imageHelpers/imagePicker';
 
 
-export default function EditProfileScreen({navigation}) {
+export default function EditProfileScreen({navigation} : {navigation: any}) {
 
   const dispatch = useDispatch(); // Initialize useDispatch
   const {userInfo, userImageUrl} = useSelector((state: RootState) => state.user);
@@ -34,10 +34,10 @@ export default function EditProfileScreen({navigation}) {
     if (imageUri) {
       setSelectedImage(imageUri);
       await uploadImage(imageUri).then(async (result) => {
-        const updateProfileInfo: UserDetails = { ...userInfo, profilePhotoName: result.metadata.name };
-        await updateUser(auth.currentUser?.uid, updateProfileInfo)
+        const updateProfileInfo: UserDetails = { ...userInfo, profilePhotoName: result?.metadata.name, email: userInfo?.email || '', fullName: userInfo?.fullName || '', isTrainer: userInfo?.isTrainer ?? false };
+        await updateUser(auth.currentUser?.uid || '', updateProfileInfo);
         dispatch(setUser(updateProfileInfo))
-        const uploadedImageUrl = await getImageUrl(firebaseBucketName.userImages, updateProfileInfo.profilePhotoName);
+        const uploadedImageUrl = await getImageUrl(firebaseBucketName.userImages, updateProfileInfo.profilePhotoName || '');
         dispatch(setUserImageUrl(uploadedImageUrl));
         setSelectedImage('')
         console.log('Image URL:', uploadedImageUrl);
@@ -54,7 +54,7 @@ export default function EditProfileScreen({navigation}) {
 
   const handleUpdate = async () => {
     const updateProfileInfo: UserDetails = {...userInfo, ...profile} as UserDetails;
-    await updateUser(auth.currentUser?.uid, updateProfileInfo).then(() => {
+    await updateUser(auth.currentUser?.uid || '', updateProfileInfo).then(() => {
       dispatch(setUser(updateProfileInfo));
       console.log('Profile updated:', updateProfileInfo);
       navigation.goBack();
