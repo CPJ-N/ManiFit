@@ -72,7 +72,7 @@ export default function SettingsScreen({navigation}) {
         )}
         <SettingItem
           icon="card"
-          title="Checkout"
+          title="Billing"
           onPress={() => {navigation.navigate(RAZORPAY_CHECKOUT)}}
         />
       </View>
