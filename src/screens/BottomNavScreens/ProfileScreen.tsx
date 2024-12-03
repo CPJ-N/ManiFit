@@ -9,9 +9,6 @@ import { RootState } from '../../store/reduxStore';
 import { StatusBar } from 'expo-status-bar';
 import { clearUser, clearUserImageUrl } from '../../store/userSlice';
 
-// TODO: Add functionality to update user profile
-// TODO: Add functionality to go to all menu options
-
 export default function ProfileScreen({navigation}: {navigation: any}) {
     const {userInfo, userImageUrl} = useSelector((state: RootState) => state.user);
     const menuItems = [

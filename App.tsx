@@ -12,6 +12,7 @@ import LoadingScreen from './src/screens/AuthScreens/LoadingScreen';
 import AuthNavigation from './src/navigation/AuthNavigation';
 import ProfileNavigation from './src/navigation/ProfileNavigation';
 import { useEffect, useState } from 'react';
+import { requestNotificationPermissions } from './src/utils/notificationHandler';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,10 @@ export default function App() {
       unsubscribe();
     };
   }, []); // Empty dependency array ensures this runs only on mount
+
+  useEffect(() => {
+    requestNotificationPermissions();
+  }, []);
 
   if (isLoading) {
     return <LoadingScreen />;

@@ -1,3 +1,11 @@
+import React, { useState } from 'react';
+import { View, Button, Alert, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { WebView, WebViewMessageEvent } from 'react-native-webview';
+import { auth } from '../config/firebase';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/reduxStore';
+
+
 // Types for Razorpay
 interface RazorpayOptions {
   key: string;
@@ -40,10 +48,6 @@ interface OrderResponse {
   // Add other order properties as needed
 }
 
-import React, { useState } from 'react';
-import { View, Button, Alert, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
-import { WebView, WebViewMessageEvent } from 'react-native-webview';
-import { RAZORPAY_KEY, BACKEND_API_URL } from '@env';
 
 // TODO: Implement Razorpay Subscription functionality in the app 
 // to allow trainers to set up recurring payments for trainees. 
@@ -52,15 +56,14 @@ import { RAZORPAY_KEY, BACKEND_API_URL } from '@env';
 // (one week before, three days before, and on the due date).
 
 const RazorpayCheckout: React.FC = () => {
+  const {userInfo} = useSelector((state: RootState) => state.user);
   const [showWebView, setShowWebView] = useState<boolean>(false);
   const [webViewContent, setWebViewContent] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const razorpayKey: string = RAZORPAY_KEY;
-
   const generateOrderId = async (): Promise<string> => {
     try {
-      const response = await fetch(`${BACKEND_API_URL}/create-order`, {
+      const response = await fetch(`${process.env.RAZORPAY_API_URL}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,10 +73,20 @@ const RazorpayCheckout: React.FC = () => {
           currency: 'INR',
         }),
       });
-      const order: OrderResponse = await response.json();
+
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+
+      if (!response.ok) {
+        console.error(`Server error ${response.status}: ${responseText}`);
+        throw new Error(`Server error ${response.status}: ${responseText}`);
+      }
+
+      const order = JSON.parse(responseText);
+      console.log('Order response:', order);
       return order.id;
     } catch (error) {
-      console.error('Error generating order:', error);
+      console.error('Error generating order:', error.message);
       throw error;
     }
   };
@@ -87,16 +100,17 @@ const RazorpayCheckout: React.FC = () => {
       setShowWebView(true);
 
       const options: RazorpayOptions = {
-        key: razorpayKey,
+        key: process.env.RAZORPAY_API_KEY_ID,
+        secret: process.env.RAZORPAY_API_KEY_SECRET,
         amount: '10000', // Amount in smallest currency unit
         currency: 'INR',
         name: 'ManiFit Gym',
         description: 'Base Subscription',
         order_id: orderId,
         prefill: {
-          email: 'user@example.com',
-          contact: '9999999999',
-          name: 'User Name'
+          email: auth.currentUser?.email ?? '',
+          contact: userInfo.mobileNumber ?? '',
+          name: userInfo.fullName ?? ''
         },
         theme: { color: '#FFD20A' }
       };
