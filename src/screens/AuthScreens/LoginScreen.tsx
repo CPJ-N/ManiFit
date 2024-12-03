@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import CheckBox from '@react-native-community/checkbox';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
@@ -12,7 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 import { getImageUrl } from '../../utils/controllers/imageController';
 import { firebaseBucketName } from '../../constants/firebaseContant';
 
-export default function Login({navigation}) {
+export default function Login({navigation} : {navigation: any}) {
   const [isSelected, setSelection] = useState(false);
   const [showPassword, setShowPassword] = useState(false)
   const [userEmail, setUserEmail] = useState('')
@@ -37,7 +36,9 @@ export default function Login({navigation}) {
       const user = userCredential.user;
       const userInfo = await getUser(user.uid)
 
-      dispatch(setUser(userInfo));
+      if (userInfo) {
+        dispatch(setUser(userInfo));
+      }
 
       if(userInfo?.profilePhotoName) {
         const imageUrl = await getImageUrl(firebaseBucketName.userImages, userInfo.profilePhotoName)
@@ -87,12 +88,6 @@ export default function Login({navigation}) {
       </View>
 
       <View style={styles.rememberMeContainer}>
-        {/* <CheckBox
-          value={isSelected}
-          onValueChange={setSelection}
-          style={styles.checkbox}
-        />
-        <Text style={{color: '#fff'}}>Remember me</Text> */}
         <TouchableOpacity>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
@@ -165,9 +160,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 20,
-  },
-  checkbox: {
-    alignSelf: "center",
   },
   forgotPassword: {
     justifyContent: 'center',

@@ -1,4 +1,3 @@
-// useImagePicker.ts
 import * as ImagePicker from 'expo-image-picker';
 import { requestMediaLibraryPermissions } from '../../config/permissions';
 
