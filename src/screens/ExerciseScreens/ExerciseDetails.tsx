@@ -1,7 +1,7 @@
 import { useRoute } from '@react-navigation/native';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Exercise } from '../constants/dataModels/exercise.model';
-import { EXERCISE_EDIT } from '../constants/screenNames';
+import { EXERCISE_EDIT } from '../../constants/screenNames';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useState } from 'react';
 

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Button, Alert, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { View, Alert, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { auth } from '../config/firebase';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/reduxStore';
-
+import * as Notifications from 'expo-notifications';
+import { generateOrderId } from '../utils/controllers/paymentController';
+import { RAZORPAY_API_KEY_ID } from '@env'
 
 // Types for Razorpay
 interface RazorpayOptions {
@@ -48,48 +50,28 @@ interface OrderResponse {
   // Add other order properties as needed
 }
 
+// Function to schedule monthly notifications
+const scheduleMonthlyNotification = async (title: string, body: string, dueDate: Date) => {
+  const trigger = new Date(dueDate);
+  trigger.setMonth(trigger.getMonth() + 1); // Schedule for next month
 
-// TODO: Implement Razorpay Subscription functionality in the app 
-// to allow trainers to set up recurring payments for trainees. 
-// Additionally, integrate a notification system to send reminders 
-// to trainees regarding due payments at specified intervals 
-// (one week before, three days before, and on the due date).
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title,
+      body,
+    },
+    trigger: {
+      date: trigger,
+      repeats: true,
+    },
+  });
+};
 
 const RazorpayCheckout: React.FC = () => {
-  const {userInfo} = useSelector((state: RootState) => state.user);
+  const { userInfo } = useSelector((state: RootState) => state.user);
   const [showWebView, setShowWebView] = useState<boolean>(false);
   const [webViewContent, setWebViewContent] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const generateOrderId = async (): Promise<string> => {
-    try {
-      const response = await fetch(`${process.env.RAZORPAY_API_URL}/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: 100 * 100, // amount in smallest currency unit (e.g., paise)
-          currency: 'INR',
-        }),
-      });
-
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-
-      if (!response.ok) {
-        console.error(`Server error ${response.status}: ${responseText}`);
-        throw new Error(`Server error ${response.status}: ${responseText}`);
-      }
-
-      const order = JSON.parse(responseText);
-      console.log('Order response:', order);
-      return order.id;
-    } catch (error) {
-      console.error('Error generating order:', error.message);
-      throw error;
-    }
-  };
 
   const handlePayment = async (): Promise<void> => {
     try {
@@ -100,8 +82,7 @@ const RazorpayCheckout: React.FC = () => {
       setShowWebView(true);
 
       const options: RazorpayOptions = {
-        key: process.env.RAZORPAY_API_KEY_ID,
-        secret: process.env.RAZORPAY_API_KEY_SECRET,
+        key: RAZORPAY_API_KEY_ID,
         amount: '10000', // Amount in smallest currency unit
         currency: 'INR',
         name: 'ManiFit Gym',
@@ -151,7 +132,7 @@ const RazorpayCheckout: React.FC = () => {
 
       setWebViewContent(webViewContent);
     } catch (error) {
-      console.error('Error initiating payment:', error);
+      console.error('Error initiating payment:', error.message);
       Alert.alert('Error', 'Failed to initiate payment');
       throw error;
     } finally {
@@ -160,7 +141,7 @@ const RazorpayCheckout: React.FC = () => {
     }
   };
 
-  const handleWebViewMessage = (event: WebViewMessageEvent): void => {
+  const handleWebViewMessage = async (event: WebViewMessageEvent): Promise<void> => {
     try {
       const response: WebViewMessage = JSON.parse(event.nativeEvent.data);
       
@@ -169,7 +150,15 @@ const RazorpayCheckout: React.FC = () => {
         Alert.alert('Success', `Payment successful! Payment ID: ${paymentData.razorpay_payment_id}`);
         // Handle successful payment
         setShowWebView(false);
-        
+
+        // Schedule monthly notification
+        const dueDate = new Date(); // Set the due date to the current date
+        await scheduleMonthlyNotification(
+          'Payment Reminder',
+          'Your subscription payment is due today.',
+          dueDate
+        );
+
         // You might want to verify the payment on your backend
         verifyPayment(paymentData);
       } else if (response.type === 'ERROR') {

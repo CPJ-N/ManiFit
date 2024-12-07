@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ExerciseList from "../components/ExerciseList";
 import ExerciseForm from "../components/ExerciseForm";
-import EditExercise from "../screens/EditExcercise";
-import ExcerciseDetails from "../screens/ExerciseDetails";
+import EditExercise from "../screens/ExerciseScreens/EditExcercise";
+import ExcerciseDetails from "../screens/ExerciseScreens/ExerciseDetails";
 import RoutineList from "../screens/RoutineScreens/RoutineList";
 import CompleteExerciseList from "../screens/RoutineScreens/CompleteExerciseList";
 import ConfigureExercisesScreen from "../screens/RoutineScreens/ConfigureExercisesScreen";

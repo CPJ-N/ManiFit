@@ -17,6 +17,7 @@
     "@react-navigation/native-stack": "^6.9.26",
     "@reduxjs/toolkit": "^2.2.6",
     "@types/react": "~18.2.45",
+    "base-64": "^1.0.0",
     "expo": "^52.0.14",
     "expo-constants": "^17.0.3",
     "expo-device": "^7.0.1",
@@ -31,7 +32,7 @@
     "react-native-elements": "^3.4.3",
     "react-native-fs": "^2.20.0",
     "react-native-image-picker": "^7.1.2",
-    "react-native-webview": "11.18.1",
+    "react-native-webview": "13.12.5",
     "react-redux": "^9.1.2",
     "typescript": "^5.3.0"
   },
