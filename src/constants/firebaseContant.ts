@@ -7,4 +7,5 @@ export const firebaseCollection = {
     exercises: 'Exercises',
     routines: 'Routines',
     userDetails: 'UsersDetails',
+    transactionDetails: 'TransactionDetails',
 }

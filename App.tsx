@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider } from 'react-redux';
 import { store } from './src/store/reduxStore';
+import { enableScreens } from 'react-native-screens';
 
 //App Screens & Componets
 import { AUTH_TABS, BOTTOM_TABS, LOGIN, PROFILE_TABS, REGISTER } from './src/constants/screenNames';
@@ -14,9 +15,9 @@ import ProfileNavigation from './src/navigation/ProfileNavigation';
 import { useEffect, useState } from 'react';
 import { requestNotificationPermissions } from './src/utils/notificationHandler';
 
-const Stack = createNativeStackNavigator();
+enableScreens();
 
-// TODO: configure redux toolkit state management for loading screen
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);

@@ -1,5 +1,10 @@
-import { RAZORPAY_API_KEY_ID, RAZORPAY_API_KEY_SECRET, RAZORPAY_API_URL } from '@env';
+import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc, query, where } from "firebase/firestore";
+import Constants from 'expo-constants';
 import { encode } from 'base-64';
+import CryptoJS from 'crypto-js';
+import { firebaseCollection } from "../../constants/firebaseContant";
+import { auth } from "../../config/firebase";
+import { db } from "../../config/firebase";
 
 interface OrderResponse {
     id: string;
@@ -12,16 +17,16 @@ interface OrderResponse {
     created_at: number;
 }
 
-export const generateOrderId = async (): Promise<string> => {
+export const generateOrderId = async (amount: number): Promise<string> => {
     try {
-        const response = await fetch(`${RAZORPAY_API_URL}/orders`, {
+        const response = await fetch(`${Constants.expoConfig?.extra?.razorpayApiUrl}/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Basic ${encode(`${RAZORPAY_API_KEY_ID}:${RAZORPAY_API_KEY_SECRET}`)}`,
+                'Authorization': `Basic ${encode(`${Constants.expoConfig?.extra?.razorpayApiKeyId}:${Constants.expoConfig?.extra?.razorpayApiKeySecret}`)}`,
             },
             body: JSON.stringify({
-                amount: 100 * 100, // amount in smallest currency unit (e.g., paise)
+                amount: amount, // amount in smallest currency unit (e.g., paise)
                 currency: 'INR',
                 receipt: 'receipt#1',
                 notes: {
@@ -43,7 +48,58 @@ export const generateOrderId = async (): Promise<string> => {
         console.log('Order response:', order);
         return order.id;
     } catch (error) {
-        console.error('Error generating order:', error.message);
+        if (error instanceof Error) {
+            console.error('Error generating order:', error.message);
+        } else {
+            console.error('Error generating order:', error);
+        }
         throw error;
     }
 };
+
+export const verifyPayment = async (paymentData: any): Promise<void> => {
+    try {
+        const razorpayOrderId = paymentData.razorpay_order_id;
+        const razorpayPaymentId = paymentData.razorpay_payment_id;
+        const razorpaySignature = paymentData.razorpay_signature
+
+        const secret = Constants.expoConfig?.extra?.razorpayApiKeySecret;
+        const payload = `${razorpayOrderId}|${razorpayPaymentId}`;
+
+        console.log('Payload:', payload);
+        console.log('Using Razorpay Secret:', secret);
+        console.log('Razorpay Signature:', razorpaySignature);
+
+        const generatedSignature = CryptoJS.HmacSHA256(payload, secret).toString(CryptoJS.enc.Hex);
+        console.log('Generated Signature:', generatedSignature);
+
+        if (generatedSignature === razorpaySignature) {
+            console.log('Payment verified successfully!');
+        } else {
+            throw new Error('Payment verification failed! Invalid signature.');
+        }
+    } catch (error) {
+        console.error('Error verifying payment:', error);
+        throw error;
+    }
+};
+
+export const recordPaymentInFirestore = async (paymentData: any, amount: number, paymentDesc: string) => {
+    try {
+      const transactionRef = collection(db, firebaseCollection.transactionDetails);
+      await addDoc(transactionRef, {
+        userId: auth.currentUser?.uid,
+        email: auth.currentUser?.email,
+        amount: amount,
+        currency: 'INR',
+        paymentId: paymentData.razorpay_payment_id,
+        orderId: paymentData.razorpay_order_id,
+        description: paymentDesc,
+        status: 'success',
+        timestamp: new Date(),
+      });
+      console.log('Payment recorded in Firestore');
+    } catch (error) {
+      console.error('Error recording payment in Firestore:', error);
+    }
+  };
