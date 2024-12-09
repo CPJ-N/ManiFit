@@ -50,7 +50,7 @@ export default function RazorpayCheckoutScreen() {
       RazorpayCheckout.open(options).then(async (data) => {
         // handle success
         console.log(`Payment successful!`);
-        Alert.alert('Success', `Payment successful! Payment Amount: ₹${amount}`);
+        Alert.alert('Success', `Payment successful! Payment Amount: ₹${amount/100}`);
         await verifyPayment(data);
         await recordPaymentInFirestore(data, amount, paymentDesc);
       }).catch((error) => {

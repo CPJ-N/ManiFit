@@ -20,7 +20,12 @@ export default {
       supportsTablet: true,
       bundleIdentifier: "com.nodemerge.manifit",
       infoPlist: {
-        UIBackgroundModes: ["fetch", "remote-notification"]
+        UIBackgroundModes: ["fetch", "remote-notification"],
+        LSApplicationQueriesSchemes: [
+          "tez",
+          "phonepe",
+          "paytmmp",  
+        ]
       }
     },
     android: {
