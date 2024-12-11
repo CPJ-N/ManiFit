@@ -1,6 +1,21 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+// Schedule a test notification
+export const scheduleTestNotification = async (title: string, body: string, delayInSeconds: number) => {
+  const trigger = new Date(Date.now() + delayInSeconds * 1000); // Schedule for a few seconds from now
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title,
+      body,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: trigger,
+    },
+  });
+};
 
 // Schedule a monthly notification
 export const scheduleMonthlyNotification = async (title: string, body: string, dueDate: Date) => {
@@ -19,14 +34,33 @@ export const scheduleMonthlyNotification = async (title: string, body: string, d
   });
 };
 
+// Request notification permissions
+export const requestNotificationPermissions = async () => {
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== 'granted') {
+    alert('Permission to access notifications was denied');
+  }
+};
+
 // Configure notification settings
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+export const configureNotifications = () => {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+};
 
 // Handle notification response
 Notifications.addNotificationResponseReceivedListener(response => {
