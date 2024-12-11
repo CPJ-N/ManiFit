@@ -1,5 +1,5 @@
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider } from 'react-redux';
@@ -7,13 +7,13 @@ import { store } from './src/store/reduxStore';
 import { enableScreens } from 'react-native-screens';
 
 //App Screens & Componets
-import { AUTH_TABS, BOTTOM_TABS, LOGIN, PROFILE_TABS, REGISTER } from './src/constants/screenNames';
+import { AUTH_TABS, BOTTOM_TABS, PROFILE_TABS } from './src/constants/screenNames';
 import BottomNavigation from './src/navigation/BottomNavigation';
 import LoadingScreen from './src/screens/AuthScreens/LoadingScreen';
 import AuthNavigation from './src/navigation/AuthNavigation';
 import ProfileNavigation from './src/navigation/ProfileNavigation';
 import { useEffect, useState } from 'react';
-import { requestNotificationPermissions } from './src/utils/notificationHandler';
+import { requestNotificationPermissions } from './src/config/permissions';
 
 enableScreens();
 

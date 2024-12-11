@@ -1,14 +1,6 @@
-// src/utils/notificationHandler.ts
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
-// Request permissions for notifications
-export const requestNotificationPermissions = async () => {
-  const { status } = await Notifications.requestPermissionsAsync();
-  // if (status !== 'granted') {
-  //   alert('You need to enable notifications in settings');
-  // }
-};
 
 // Schedule a monthly notification
 export const scheduleMonthlyNotification = async (title: string, body: string, dueDate: Date) => {
@@ -21,8 +13,8 @@ export const scheduleMonthlyNotification = async (title: string, body: string, d
       body,
     },
     trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
       date: trigger,
-      repeats: true,
     },
   });
 };

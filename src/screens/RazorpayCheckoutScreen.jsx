@@ -4,10 +4,9 @@ import Constants from 'expo-constants';
 import RazorpayCheckout from 'react-native-razorpay';
 import { auth } from '../config/firebase';
 import { generateOrderId, verifyPayment, recordPaymentInFirestore } from '../utils/controllers/paymentController';
+import { scheduleMonthlyNotification } from '../utils/notificationHandler';
 import RadioForm from 'react-native-simple-radio-button';
 import { useSelector } from 'react-redux';
-
-// TODO: Implement functionality to record successful payments in Firebase database
 
 export default function RazorpayCheckoutScreen() {
   const [loading, setLoading] = useState(false);
@@ -21,6 +20,21 @@ export default function RazorpayCheckoutScreen() {
     { label: 'Meal Plans - ₹2000', value: 2000 },
     { label: 'Exercise Routine & Meal Plans - ₹5000', value: 5000 }
   ];
+
+  const schedulePaymentReminder = async () => {
+    try {
+      const dueDate = new Date();
+      // Schedule the next payment reminder for next month
+      await scheduleMonthlyNotification(
+        'Payment Reminder',
+        `Your ${paymentDesc} payment of ₹${amount/100} is due today.`,
+        dueDate
+      );
+      console.log('Payment reminder scheduled successfully');
+    } catch (error) {
+      console.error('Error scheduling payment reminder:', error);
+    }
+  };
 
   const handlePayment = async () => {
     try {
@@ -53,6 +67,9 @@ export default function RazorpayCheckoutScreen() {
         Alert.alert('Success', `Payment successful! Payment Amount: ₹${amount/100}`);
         await verifyPayment(data);
         await recordPaymentInFirestore(data, amount, paymentDesc);
+        
+        // Schedule payment reminder after successful payment
+        await schedulePaymentReminder();
       }).catch((error) => {
         // handle failure
         console.error('Payment failed:', error);
