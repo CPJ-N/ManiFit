@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import RazorpayCheckout from 'react-native-razorpay';
 import { auth } from '../config/firebase';
 import { generateOrderId, verifyPayment, recordPaymentInFirestore } from '../utils/controllers/paymentController';
-import { scheduleMonthlyNotification } from '../utils/notificationHandler';
+import { scheduleMonthlyNotification, scheduleTestNotification } from '../utils/notificationHandler';
 import RadioForm from 'react-native-simple-radio-button';
 import { useSelector } from 'react-redux';
 
@@ -30,6 +30,10 @@ export default function RazorpayCheckoutScreen() {
         `Your ${paymentDesc} payment of ₹${amount/100} is due today.`,
         dueDate
       );
+
+      // Schedule a test notification for 10 seconds from now
+      await scheduleTestNotification('Test Notification', 'This is a test notification.', 20);
+
       console.log('Payment reminder scheduled successfully');
     } catch (error) {
       console.error('Error scheduling payment reminder:', error);

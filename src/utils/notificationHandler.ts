@@ -5,6 +5,8 @@ import { Platform } from 'react-native';
 export const scheduleTestNotification = async (title: string, body: string, delayInSeconds: number) => {
   const trigger = new Date(Date.now() + delayInSeconds * 1000); // Schedule for a few seconds from now
 
+  console.log(`Scheduling test notification with title: ${title}, body: ${body}, delay: ${delayInSeconds} seconds`);
+
   await Notifications.scheduleNotificationAsync({
     content: {
       title,
@@ -15,6 +17,19 @@ export const scheduleTestNotification = async (title: string, body: string, dela
       date: trigger,
     },
   });
+
+  console.log('Test notification scheduled successfully');
+
+  let counter = delayInSeconds;
+  const intervalId = setInterval(() => {
+    if (counter > 0) {
+      console.log(`Notification will pop in ${counter} seconds`);
+      counter--;
+    } else {
+      console.log('Notification should pop now');
+      clearInterval(intervalId);
+    }
+  }, 1000);
 };
 
 // Schedule a monthly notification
