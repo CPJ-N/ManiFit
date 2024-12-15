@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Alert, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import Constants from 'expo-constants';
 import RazorpayCheckout from 'react-native-razorpay';
 import { auth } from '../config/firebase';
 import { generateOrderId, verifyPayment, recordPaymentInFirestore } from '../utils/controllers/paymentController';
-import { scheduleMonthlyNotification, scheduleTestNotification } from '../utils/notificationHandler';
+import { scheduleTestNotification, requestNotificationPermissions, configureNotifications, scheduleMonthlyNotification } from '../utils/notificationHandler';
+import { addSubscription, updateSubscription } from '../utils/controllers/subscriptionController';
 import RadioForm from 'react-native-simple-radio-button';
 import { useSelector } from 'react-redux';
 
-export default function RazorpayCheckoutScreen() {
+export default function CheckoutScreen() {
   const [loading, setLoading] = useState(false);
   const { userInfo } = useSelector(state => state.user);
   const [amount, setAmount] = useState(10000 * 100);
@@ -21,6 +22,11 @@ export default function RazorpayCheckoutScreen() {
     { label: 'Exercise Routine & Meal Plans - ₹5000', value: 5000 }
   ];
 
+  useEffect(() => {
+    requestNotificationPermissions();
+    configureNotifications();
+  }, []);
+
   const schedulePaymentReminder = async () => {
     try {
       const dueDate = new Date();
@@ -30,13 +36,39 @@ export default function RazorpayCheckoutScreen() {
         `Your ${paymentDesc} payment of ₹${amount/100} is due today.`,
         dueDate
       );
-
-      // Schedule a test notification for 10 seconds from now
-      await scheduleTestNotification('Test Notification', 'This is a test notification.', 20);
-
       console.log('Payment reminder scheduled successfully');
     } catch (error) {
       console.error('Error scheduling payment reminder:', error);
+    }
+  };
+
+  const handleSubscription = async () => {
+    try {
+      if (userInfo.isSubscribed) {
+        // Update existing subscription
+        await updateSubscription(userInfo.subscriptionId, {
+          plan: paymentDesc,
+          amount: amount/100,
+          status: 'active',
+          startDate: new Date(),
+          endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+        });
+        console.log('Subscription updated successfully');
+      } else {
+        // Create new subscription
+        const newSubscription = {
+          userId: auth.currentUser?.uid,
+          plan: paymentDesc,
+          amount: amount/100,
+          status: 'active',
+          startDate: new Date(),
+          endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+        };
+        await addSubscription(newSubscription);
+        console.log('Subscription added successfully');
+      }
+    } catch (error) {
+      console.error('Error handling subscription:', error);
     }
   };
 
@@ -51,7 +83,7 @@ export default function RazorpayCheckoutScreen() {
 
       const options = {
         key: Constants.expoConfig.extra.razorpayApiKeyId,
-        amount: amount, // Amount in smallest currency unit in paise
+        amount: amount,
         currency: 'INR',
         name: 'ManiFit Gym',
         description: paymentDesc,
@@ -72,10 +104,15 @@ export default function RazorpayCheckoutScreen() {
         await verifyPayment(data);
         await recordPaymentInFirestore(data, amount, paymentDesc);
         
+        // Handle subscription
+        await handleSubscription();
+        
         // Schedule payment reminder after successful payment
         await schedulePaymentReminder();
+
+        // Schedule a test notification for 10 seconds from now
+        await scheduleTestNotification('Test Notification', 'This is a test notification.', 10);
       }).catch((error) => {
-        // handle failure
         console.error('Payment failed:', error);
         Alert.alert('Error', 'Payment failed');
       });
@@ -111,7 +148,7 @@ export default function RazorpayCheckoutScreen() {
       }
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

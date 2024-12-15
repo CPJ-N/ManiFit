@@ -8,4 +8,5 @@ export const firebaseCollection = {
     routines: 'Routines',
     userDetails: 'UsersDetails',
     transactionDetails: 'TransactionDetails',
+    subscriptions: 'Subscriptions',
 }

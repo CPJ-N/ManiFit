@@ -102,4 +102,23 @@ export const recordPaymentInFirestore = async (paymentData: any, amount: number,
     } catch (error) {
       console.error('Error recording payment in Firestore:', error);
     }
-  };
+};
+
+export const getUserSubscriptions = async (userId: string) => {
+    try {
+        const subscriptionsRef = collection(db, firebaseCollection.subscriptions);
+        const q = query(subscriptionsRef, where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
+
+        const subscriptions = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        console.log('User subscriptions:', subscriptions);
+        return subscriptions;
+    } catch (error) {
+        console.error('Error getting user subscriptions:', error);
+        throw error;
+    }
+};

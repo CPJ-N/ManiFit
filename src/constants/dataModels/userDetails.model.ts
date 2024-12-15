@@ -12,4 +12,6 @@ export interface UserDetails {
     fitnessGoals?: string[]; // Fitness goals of the user
     linkedTrainees?: string[]; // Array of trainee IDs (applicable only for trainers)
     linkedTrainer?: string; // Trainer ID (applicable only for trainees)
-}   
+    subscriptionId?: string; // Subscription ID of the user
+    isSubscribed?: boolean; // Subscription status of the user
+}

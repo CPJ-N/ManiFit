@@ -6,7 +6,7 @@ export default {
     slug: "ManiFit",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./src/assets/icon.png",
+    icon: "./src/assets/manifit-icon.png",
     userInterfaceStyle: "light",
     splash: {
       image: "./src/assets/splash.png",

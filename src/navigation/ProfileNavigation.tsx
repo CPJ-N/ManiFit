@@ -1,15 +1,15 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { 
-    DELETE_ACCOUNT, 
-    EDIT_PROFILE, 
-    LINK_TRAINEE, 
-    LINK_TRAINER, 
-    PASSWORD_SETTINGS, 
-    PRIVACY_POLICY, 
-    PROFILE, 
-    RAZORPAY_CHECKOUT, 
-    REGISTER_TRAINER, 
-    SETTINGS 
+import {
+    DELETE_ACCOUNT,
+    EDIT_PROFILE,
+    LINK_TRAINEE,
+    LINK_TRAINER,
+    PASSWORD_SETTINGS,
+    PRIVACY_POLICY,
+    PROFILE,
+    CHECKOUT,
+    REGISTER_TRAINER,
+    SETTINGS
 } from "../constants/screenNames";
 
 //Screens
@@ -22,7 +22,7 @@ import PrivacyPolicyScreen from "../screens/ProfileScreens/PrivacyPolicyScreen";
 import DeleteAccountScreen from "../screens/ProfileScreens/DeleteAccountScreen";
 import PasswordSettingsScreen from "../screens/ProfileScreens/PasswordSettingsScreen";
 import TrainerRegistrationScreen from "../screens/ProfileScreens/TrainerRegistrationScreen";
-import RazorpayCheckoutScreen from "../screens/RazorpayCheckoutScreen";
+import CheckoutScreen from "../screens/CheckoutScreen";
 
 
 const ProfileScreens = createNativeStackNavigator();
@@ -36,7 +36,7 @@ export default function ProfileNavigation() {
             <ProfileScreens.Screen name={LINK_TRAINER} component={LinkedTrainerScreen} />
             <ProfileScreens.Screen name={PRIVACY_POLICY} component={PrivacyPolicyScreen} />
             <ProfileScreens.Screen name={SETTINGS} component={SettingsScreen} />
-            <ProfileScreens.Screen name={RAZORPAY_CHECKOUT} component={RazorpayCheckoutScreen} />
+            <ProfileScreens.Screen name={CHECKOUT} component={CheckoutScreen} />
             <ProfileScreens.Screen name={DELETE_ACCOUNT} component={DeleteAccountScreen} />
             <ProfileScreens.Screen name={PASSWORD_SETTINGS} component={PasswordSettingsScreen} />
             <ProfileScreens.Screen name={REGISTER_TRAINER} component={TrainerRegistrationScreen} />

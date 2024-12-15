@@ -1,15 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
 const LoadingScreen: React.FC = () => {
   return (
     <View style={styles.container}>
+      <StatusBar style="dark" />
       <Image
         source={require('../../assets/ManiFit Logo.png')}
         style={styles.logo}
       />
       {/* <Text style={styles.brandName}>MANIFIT</Text> */}
-      {/* <TempHome /> */}
     </View>
   );
 };
