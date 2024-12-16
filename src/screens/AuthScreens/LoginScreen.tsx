@@ -3,16 +3,15 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, KeyboardAvo
 import { Ionicons } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
-import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
+import { BOTTOM_TABS, FORGOT_PASSWORD, HOME } from '../../constants/screenNames';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../../store/userSlice';
+import { setUser, setUserImageUrl } from '../../store/userSlice';
 import { getUser } from '../../utils/controllers/userController';
 import { StatusBar } from 'expo-status-bar';
 import { getImageUrl } from '../../utils/controllers/imageController';
 import { firebaseBucketName } from '../../constants/firebaseContant';
 
 export default function Login({navigation} : {navigation: any}) {
-  const [isSelected, setSelection] = useState(false);
   const [showPassword, setShowPassword] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [userPassword, setUserPassword] = useState('')
@@ -88,7 +87,7 @@ export default function Login({navigation} : {navigation: any}) {
       </View>
 
       <View style={styles.rememberMeContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate(FORGOT_PASSWORD)}>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
       </View>
@@ -220,7 +219,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-function setUserImageUrl(arg0: string): any {
-  throw new Error('Function not implemented.');
-}
 

@@ -1,4 +1,5 @@
 export interface Subscription {
+    id?: string; // Subscription ID
     userId: string; // User associated with the subscription
     plan: 'Monthly' | 'Yearly' | 'Trial'; // Plan type
     details: string; // Additional details about the subscription

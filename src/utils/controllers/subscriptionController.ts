@@ -1,7 +1,7 @@
 import { addDoc, collection, doc, updateDoc, query, getDocs, where } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { firebaseCollection } from "../../constants/firebaseContant";
-import { Subscription } from "../models/Subscription";
+import { Subscription } from "../../constants/dataModels/subscription.model";
 
 // Add a new subscription
 export const addSubscription = async (subscription: Subscription) => {
@@ -30,7 +30,7 @@ export const updateSubscription = async (subscriptionId: string, updatedData: Pa
 };
 
 // Get subscription with specific userId
-export const getSubscriptionByUserId = async (userId: string): Promise<Subscription | null> => {
+export const getSubscriptionByUserId = async (userId: string) => {
     try {
         const q = query(collection(db, firebaseCollection.subscriptions), where("userId", "==", userId));
         const querySnapshot = await getDocs(q);
@@ -41,7 +41,7 @@ export const getSubscriptionByUserId = async (userId: string): Promise<Subscript
         return {
             id: doc.id,
             ...doc.data(),
-        } as Subscription;
+        };
     } catch (error) {
         console.error("Error getting subscription: ", error);
         throw new Error("Failed to get subscription");

@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
 import { auth } from '../../config/firebase'
 import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
-import { Picker } from '@react-native-picker/picker';
 import { setUser, setUserImageUrl } from '../../store/userSlice';
 import { useDispatch } from 'react-redux';
 import { createUser, updateUser } from '../../utils/controllers/userController';

@@ -1,5 +1,7 @@
 export const LOGIN = 'LOGIN';
 export const REGISTER = 'REGISTER';
+export const FORGOT_PASSWORD = 'FORGOT_PASSWORD';
+export const PASSWORD_RESET = 'PASSWORD_RESET';
 export const HOME = 'HOME';
 export const WELCOME = 'WELCOME';
 export const FAVORITE = 'FAVORITE';
