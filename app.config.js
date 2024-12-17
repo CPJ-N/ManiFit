@@ -29,8 +29,9 @@ export default {
       }
     },
     android: {
+      package: "com.nodemerge.manifit",
       adaptiveIcon: {
-        foregroundImage: "./src/assets/adaptive-icon.png",
+        foregroundImage: "./src/assets/manifit-icon.png",
         backgroundColor: "#ffffff"
       }
     },
