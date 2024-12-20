@@ -19,12 +19,15 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.nodemerge.manifit",
+      googleServicesFile: process.env.GOOGLE_SERVICE_PLIST,
       infoPlist: {
         UIBackgroundModes: ["fetch", "remote-notification"],
         LSApplicationQueriesSchemes: [
+          "googlechrome",
+          "firefox",
           "tez",
           "phonepe",
-          "paytmmp",  
+          "paytmmp"
         ]
       }
     },
@@ -33,7 +36,8 @@ export default {
       adaptiveIcon: {
         foregroundImage: "./src/assets/manifit-icon.png",
         backgroundColor: "#ffffff"
-      }
+      },
+      googleServicesFile: process.env.GOOGLE_SERVICE_JSON,
     },
     web: {
       favicon: "./src/assets/favicon.png"
@@ -53,7 +57,9 @@ export default {
       firebaseAppId: process.env.FIREBASE_APP_ID,
       firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
       githubExerciseImageUrlPrefix: process.env.GITHUB_EXERCISE_IMAGE_URL_PREFIX,
-      githubExercisesUrl: process.env.GITHUB_EXERCISES_URL
+      githubExercisesUrl: process.env.GITHUB_EXERCISES_URL,
+      googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      firebaseIosClientId: process.env.EXPO_PUBLIC_FIREBASE_IOS_CLIENT_ID
     }
   }
 };

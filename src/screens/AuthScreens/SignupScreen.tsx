@@ -1,112 +1,139 @@
-import React, { useEffect, useState }  from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../../config/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM, WELCOME } from '../../constants/screenNames';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM } from '../../constants/screenNames';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 import { StatusBar } from 'expo-status-bar';
-// import { AppDispatch } from '../store/reduxStore';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
+import { getUser } from '../../utils/controllers/userController';
+import Constants from 'expo-constants'
 
-export default function SignUp({navigation} : {navigation: any}) {
-  const [showPassword, setShowPassword] = useState(false)
-  const [userEmail, setUserEmail] = useState('')
-  const [userPassword, setUserPassword] = useState('')
-  const [error, setError] = useState('')
+WebBrowser.maybeCompleteAuthSession();
+
+export default function SignUp({ navigation }: { navigation: any }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [error, setError] = useState('');
   const dispatch = useDispatch();
+
+  // Updated code: clientId removed from the configuration
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: Constants.expoConfig?.extra?.googleWebClientId,
+    iosClientId: Constants.expoConfig?.extra?.firebaseIosClientId,
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      if (id_token) {
+        const credential = GoogleAuthProvider.credential(id_token);
+        signInWithCredential(auth, credential)
+          .then(async (userCredential) => {
+            const user = userCredential.user;
+            const userInfo = await getUser(user.uid);
+            if (userInfo) {
+              dispatch(setUser(userInfo));
+              navigation.replace(BOTTOM_TABS, { screen: HOME });
+            } else {
+              const newUser = {
+                uid: user.uid,
+                email: user.email
+              };
+              navigation.navigate(USER_DETAILS_FORM, { user: newUser });
+            }
+          })
+          .catch((error) => {
+            console.error('Error during Firebase sign-in:', error);
+            setError('Google Sign-In failed. Try again later.');
+          });
+      }
+    }
+  }, [response]);
 
   const handleSignUp = () => {
     createUserWithEmailAndPassword(auth, userEmail, userPassword)
-    .then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
+      .then((userCredential) => {
+        const user = userCredential.user;
+        const newUser = {
+          uid: user.uid,
+          email: user.email,
+        };
+        navigation.navigate(USER_DETAILS_FORM, { user: newUser });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        setError(errorCode);
+        console.log(errorCode, error.message);
+      });
+  };
 
-      const newUser = {
-        uid: user.uid, 
-        email: user.email
-      }
-      
-      navigation.navigate(USER_DETAILS_FORM, {user: newUser});
-      console.log('User signed up successfully', user.email);
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      setError(errorCode);
-
-      console.log(errorCode, errorMessage)
-    });
-  }
-
-  useEffect(() =>{
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if(user){
-        navigation.replace(BOTTOM_TABS, { screen: HOME })
-      }
-    })
-
-    return unsubscribe
-  }, [])
+  const handleSignUpWithGoogle = async () => {
+    try {
+      await promptAsync();
+    } catch (error) {
+      console.error('Error during Google sign-in:', error);
+      setError('Google Sign-In failed. Try again later.');
+    }
+  };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior='padding'>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
       <StatusBar style="light" />
-      <Text style={styles.header}>Create Your Account </Text>
-      {/* 💪 */}
-      <Text style={styles.subheader}>Sign up now to get access to personalized workouts and achieve your fitness goals.</Text>
+      <Text style={styles.header}>Create Your Account</Text>
+      <Text style={styles.subheader}>
+        Sign up now to get access to personalized workouts and achieve your fitness goals.
+      </Text>
 
       <View style={styles.inputContainer}>
         <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
-        <TextInput 
-          placeholder="Email" 
+        <TextInput
+          placeholder="Email"
           value={userEmail}
           onChangeText={text => setUserEmail(text)}
-          style={styles.input} 
-          placeholderTextColor="grey" />
+          style={styles.input}
+          placeholderTextColor="grey"
+        />
       </View>
 
       <View style={styles.inputContainer}>
         <Ionicons name="lock-closed" size={20} color="#666" style={styles.inputIcon} />
-        <TextInput 
-          placeholder="Password" 
+        <TextInput
+          placeholder="Password"
           value={userPassword}
           onChangeText={text => setUserPassword(text)}
-          secureTextEntry={!showPassword} 
-          style={styles.input} 
-          placeholderTextColor="grey"/>
-        <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} onPress={() => setShowPassword(!showPassword)} size={20} color="#666" style={styles.inputIcon} />
+          secureTextEntry={!showPassword}
+          style={styles.input}
+          placeholderTextColor="grey"
+        />
+        <Ionicons
+          name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+          onPress={() => setShowPassword(!showPassword)}
+          size={20}
+          color="#666"
+          style={styles.inputIcon}
+        />
       </View>
 
-      <TouchableOpacity
-       style={styles.button}
-       onPress={handleSignUp}>
+      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign up</Text>
       </TouchableOpacity>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Text 
-        style={styles.loginText} 
-        onPress={() => navigation.navigate(LOGIN)}>
+      <Text style={styles.loginText} onPress={() => navigation.navigate(LOGIN)}>
         Already have an account? Log in
       </Text>
 
       <Text style={styles.orText}>or</Text>
 
-      <TouchableOpacity style={styles.socialButtonGoogle}>
+      <TouchableOpacity style={styles.socialButtonGoogle} onPress={handleSignUpWithGoogle}>
         <Ionicons name="logo-google" size={20} color="#fff" />
         <Text style={styles.socialButtonText}>Continue with Google</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.socialButtonApple}>
-        <Ionicons name="logo-apple" size={20} color="#fff" />
-        <Text style={styles.socialButtonText}>Continue with Apple</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.socialButtonFacebook}>
-        <Ionicons name="logo-facebook" size={20} color="#fff" />
-        <Text style={styles.socialButtonText}>Continue with Facebook</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
@@ -173,35 +200,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#dd4b39',
-    padding: 10,
-    borderRadius: 25,
-    marginBottom: 10,
-  },
-  socialButtonApple: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#555',
-    padding: 10,
-    borderRadius: 25,
-    marginBottom: 10,
-  },
-  socialButtonFacebook: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#3b5998',
-    padding: 10,
-    borderRadius: 25,
+    backgroundColor: '#DB4437', // Google red color
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
   },
   socialButtonText: {
     color: '#fff',
     marginLeft: 10,
+    fontSize: 16,
   },
   error: {
     color: 'red',
-    margin: 10,
     textAlign: 'center',
+    marginTop: 10,
   },
 });
