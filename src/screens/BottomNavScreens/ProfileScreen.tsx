@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#ffd20a',
+        paddingTop: 30,
     },
     userInfoSection: {
         backgroundColor: '#ffd20a',

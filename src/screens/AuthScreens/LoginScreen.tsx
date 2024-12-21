@@ -107,7 +107,7 @@ export default function Login({navigation} : {navigation: any}) {
         <Text style={styles.buttonText}>Continue with Google</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.appleButton}>
+      {/* <TouchableOpacity style={styles.appleButton}>
         <Ionicons name="logo-apple" size={20} color="#fff" />
         <Text style={styles.buttonText}>Continue with Apple</Text>
       </TouchableOpacity>
@@ -115,7 +115,7 @@ export default function Login({navigation} : {navigation: any}) {
       <TouchableOpacity style={styles.facebookButton}>
         <Ionicons name="logo-facebook" size={20} color="#fff" />
         <Text style={styles.buttonText}>Continue with Facebook</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </KeyboardAvoidingView>
   );
 }
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   },
   googleButton: {
     backgroundColor: '#dd4b39',
-    padding: 10,
+    padding: 15,
     borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',

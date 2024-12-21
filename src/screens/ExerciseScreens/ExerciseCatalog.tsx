@@ -7,9 +7,9 @@ import {
     TouchableOpacity,
     SafeAreaView,
   } from 'react-native';
-  import { Ionicons } from '@expo/vector-icons';
-  import { StatusBar } from 'expo-status-bar';
-  import { useEffect, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 import { getExercisesByCategory } from '../../utils/controllers/exerciseController';
 import { EXERCISE_DETAILS } from '../../constants/screenNames';
 import { Exercise } from '../../constants/dataModels/exercise.model';
@@ -89,14 +89,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1E1E1E',
+    paddingTop: 20,
   },
-  // header: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   alignItems: 'center',
-  //   padding: 20,
-  //   marginTop: 20,
-  // },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -108,19 +102,6 @@ const styles = StyleSheet.create({
     color: '#FFD20A',
     marginLeft: 16,
   },
-//     quickActions: {
-//       flexDirection: 'row',
-//       justifyContent: 'space-around',
-//       padding: 16,
-//     },
-//     actionButton: {
-//       alignItems: 'center',
-//     },
-//     actionText: {
-//       color: 'white',
-//       marginTop: 4,
-//       fontSize: 12,
-//     },
   videoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

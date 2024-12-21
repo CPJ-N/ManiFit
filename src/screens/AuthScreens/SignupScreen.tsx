@@ -198,12 +198,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   socialButtonGoogle: {
+    padding: 15,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#DB4437', // Google red color
-    padding: 15,
-    borderRadius: 10,
     marginTop: 20,
   },
   socialButtonText: {

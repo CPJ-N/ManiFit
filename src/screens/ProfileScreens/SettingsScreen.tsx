@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { DELETE_ACCOUNT, LINK_TRAINEE, LINK_TRAINER, PASSWORD_SETTINGS, CHECKOUT, REGISTER_TRAINER } from '../../constants/screenNames';
 import { useSelector } from 'react-redux';
@@ -33,7 +34,7 @@ export default function SettingsScreen({navigation} :{navigation: any}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar style="light"/>
       <View style={styles.header}>
         <TouchableOpacity onPress={()=>navigation.goBack()}>
           <Ionicons name="chevron-back" size={24} color="#FFD20A" />

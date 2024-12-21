@@ -12,7 +12,6 @@ import { getImageUrl, uploadImage } from '../../utils/controllers/imageControlle
 import { firebaseBucketName } from '../../constants/firebaseContant';
 import { pickImage } from '../../utils/imageHelpers/imagePicker';
 
-
 export default function EditProfileScreen({navigation} : {navigation: any}) {
 
   const dispatch = useDispatch(); // Initialize useDispatch
@@ -138,6 +137,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1E1E1E',
+    paddingTop: 30,
   },
   header: {
     flexDirection: 'row',
@@ -159,8 +159,8 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     alignItems: 'center',
-    marginVertical: 20,
     backgroundColor: '#FFD20A',
+    marginBottom: 25,
     borderRadius: 15,
     padding: 20,
     flexDirection: 'row',
