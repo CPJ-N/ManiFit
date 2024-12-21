@@ -25,6 +25,7 @@ export default function SignUp({ navigation }: { navigation: any }) {
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     clientId: Constants.expoConfig?.extra?.googleWebClientId,
     iosClientId: Constants.expoConfig?.extra?.firebaseIosClientId,
+    androidClientId: Constants.expoConfig?.extra?.firebaseAndroidClientId,
   });
 
   useEffect(() => {

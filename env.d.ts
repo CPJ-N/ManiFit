@@ -13,6 +13,7 @@ declare module '@env' {r
     export const GITHUB_EXERCISE_IMAGE_URL_PREFIX: string;
     export const EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: string;
     export const EXPO_PUBLIC_FIREBASE_IOS_CLIENT_ID: string;
+    export const EXPO_PUBLIC_FIREBASE_ANDROID_CLIENT_ID: string;
     export const GOOGLE_SERVICE_JSON: string;
     export const GOOGLE_SERVICE_PLIST: string;
 }

@@ -59,7 +59,8 @@ export default {
       githubExerciseImageUrlPrefix: process.env.GITHUB_EXERCISE_IMAGE_URL_PREFIX,
       githubExercisesUrl: process.env.GITHUB_EXERCISES_URL,
       googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-      firebaseIosClientId: process.env.EXPO_PUBLIC_FIREBASE_IOS_CLIENT_ID
+      firebaseIosClientId: process.env.EXPO_PUBLIC_FIREBASE_IOS_CLIENT_ID,
+      firebaseAndroidClientId: process.env.EXPO_PUBLIC_FIREBASE_ANDROID_CLIENT_ID,
     }
   }
 };
