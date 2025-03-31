@@ -66,6 +66,10 @@ State Management
 Redux: Manages state with a centralized store configured in reduxStore.ts.
 Firebase Integration
 Firebase: Provides backend services for authentication, data storage, and file uploads, configured in firebase.ts.
+
+## Firebase Setup
+Place the google-services.json and GoogleService-Info.plist files in the root directory, matching the paths defined in your .env.
+
 Summary
 The app architecture is modular and scalable, with a clear separation of concerns:
 
