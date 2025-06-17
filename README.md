@@ -12,6 +12,56 @@ The application provides trainers the ability to add special instructions for ea
 
 The backend leverages Firebase for essential services, including user authentication, data storage, and real-time updates, enabling trainees to view their assigned routines, track their progress, and receive notifications about new or updated workouts. The platform aims to streamline the interaction between trainers and trainees, making it easier to set goals, monitor progress, and continuously adapt routines based on performance and feedback, all within a user-friendly mobile application.
 
+## 🎯 MVP Features
+
+### 👨‍💼 **Trainer Side**
+
+#### **Client Management**
+- Add/remove clients from trainer dashboard
+- View client status (active/inactive)
+- Assign personalized workout & meal plans to clients
+- Track client progress and engagement
+
+#### **Program Templates**
+- Create basic workout plans with exercises, sets, reps, and instructions
+- Design basic meal plans with nutritional guidance
+- Duplicate existing plans for multiple clients
+- Template library for quick program creation
+
+#### **Payment Tracking**
+- Set individual client pricing & subscription start dates
+- Automated monthly billing aligned to each client's start date
+- Payment status dashboard (paid/overdue/failed)
+- Revenue tracking and financial reporting
+
+### 👤 **Client Side**
+
+#### **View Plans**
+- Daily workout display with exercises and instructions
+- Personalized meal plan access
+- Mark workouts as completed
+- Progress tracking and workout history
+
+#### **AI Food Photo**
+- Take photos of meals → automatic calorie recognition
+- Daily calorie intake tracking
+- Nutritional insights and goal monitoring
+- Food diary with photo history
+
+#### **Chat & Communication**
+- Direct messaging with assigned trainer
+- Push notifications for new messages
+- Workout reminders and motivational messages
+- Progress updates and feedback sharing
+
+### 🔧 **Admin & Setup**
+
+#### **Sign Up Flow**
+- Trainer account creation and verification
+- Client invitation system via shareable links
+- Secure payment method integration
+- Account linking and subscription management
+
 Quick Start
 
 npm install
