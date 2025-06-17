@@ -1,6 +1,12 @@
 General Descripiton 
 
-We are developing a comprehensive fitness application tailored for personal trainers and their trainees. The app’s core functionality focuses on creating, managing, and tracking personalized fitness routines and exercises. Trainers will be able to design detailed exercise plans, specifying attributes such as weight, repetitions, sets, and duration. These exercises can be grouped into routines that trainers can assign to their trainees to follow on particular days.
+In simple terms, this application aims to be the best fitness platform for gym trainers and coaches who need to:
+
+- Provide personalized workouts, meal plans, and supplements guidance  
+- Track client subscriptions with monthly payments aligned to their start dates  
+- Manage client progress, scheduling, and communication
+
+We are developing a comprehensive fitness application tailored for personal trainers and their trainees. The app's core functionality focuses on creating, managing, and tracking personalized fitness routines and exercises. Trainers will be able to design detailed exercise plans, specifying attributes such as weight, repetitions, sets, and duration. These exercises can be grouped into routines that trainers can assign to their trainees to follow on particular days.
 
 The application provides trainers the ability to add special instructions for each exercise, offering customized guidance to trainees. Trainers can also link to multiple trainees who have no assigned trainer, while trainees can only be linked to a single trainer. This linking functionality ensures that trainers manage their trainees effectively and that trainees receive dedicated guidance.
 
