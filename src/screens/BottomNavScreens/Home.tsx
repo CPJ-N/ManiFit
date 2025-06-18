@@ -41,14 +41,10 @@ const QuickActionCard = ({
   gradient?: [string, string, ...string[]];
 }) => (
   <TouchableOpacity onPress={onPress} style={{ flex: 1, margin: 6 }}>
-    <LinearGradient
-      colors={gradient}
+    <View 
       style={{
         borderRadius: 16,
-        padding: 16,
-        alignItems: 'center',
-        minHeight: 80,
-        justifyContent: 'center',
+        backgroundColor: '#FFD20A', // Solid background for shadow optimization
         shadowColor: '#FFD20A',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
@@ -56,15 +52,26 @@ const QuickActionCard = ({
         elevation: 8,
       }}
     >
-      <Ionicons name={icon as any} size={28} color="#1E1E1E" />
-      <Text 
-        size="xs" 
-        className="mt-2 text-center font-semibold" 
-        style={{ color: '#1E1E1E', fontSize: 11 }}
+      <LinearGradient
+        colors={gradient}
+        style={{
+          borderRadius: 16,
+          padding: 16,
+          alignItems: 'center',
+          minHeight: 80,
+          justifyContent: 'center',
+        }}
       >
-        {label}
-      </Text>
-    </LinearGradient>
+        <Ionicons name={icon as any} size={28} color="#1E1E1E" />
+        <Text 
+          size="xs" 
+          className="mt-2 text-center font-semibold" 
+          style={{ color: '#1E1E1E', fontSize: 11 }}
+        >
+          {label}
+        </Text>
+      </LinearGradient>
+    </View>
   </TouchableOpacity>
 );
 

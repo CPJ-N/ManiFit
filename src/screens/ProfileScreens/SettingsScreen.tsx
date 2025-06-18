@@ -55,23 +55,32 @@ const SettingItemCard = ({
       <Box className="px-5 py-5">
         <HStack className="items-center justify-between">
           <HStack className="items-center flex-1">
-            <LinearGradient
-              colors={isDangerous ? ['#FF6B6B', '#E53E3E'] : gradient}
+            <View 
               style={{
                 width: 48,
                 height: 48,
                 borderRadius: 24,
-                justifyContent: 'center',
-                alignItems: 'center',
+                backgroundColor: isDangerous ? '#FF6B6B' : '#FFD20A', // Solid background for shadow optimization
                 marginRight: 16,
               }}
             >
-              <Ionicons 
-                name={icon as any} 
-                size={24} 
-                color="#1E1E1E" 
-              />
-            </LinearGradient>
+              <LinearGradient
+                colors={isDangerous ? ['#FF6B6B', '#E53E3E'] : gradient}
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 24,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Ionicons 
+                  name={icon as any} 
+                  size={24} 
+                  color="#1E1E1E" 
+                />
+              </LinearGradient>
+            </View>
             <VStack className="flex-1">
               <HStack className="items-center">
                 <Text

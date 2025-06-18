@@ -41,14 +41,10 @@ const StatCard = ({
   gradient?: [string, string, ...string[]];
 }) => (
   <Box style={{ flex: 1, margin: 6 }}>
-    <LinearGradient
-      colors={gradient}
+    <View 
       style={{
         borderRadius: 16,
-        padding: 16,
-        alignItems: 'center',
-        minHeight: 80,
-        justifyContent: 'center',
+        backgroundColor: '#FFD20A', // Solid background for shadow optimization
         shadowColor: '#FFD20A',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
@@ -56,28 +52,39 @@ const StatCard = ({
         elevation: 8,
       }}
     >
-      <Ionicons name={icon as any} size={20} color="#1E1E1E" style={{ marginBottom: 6 }} />
-      <Text 
-        style={{ 
-          fontSize: 18, 
-          fontWeight: 'bold', 
-          color: '#1E1E1E',
-          marginBottom: 2,
+      <LinearGradient
+        colors={gradient}
+        style={{
+          borderRadius: 16,
+          padding: 16,
+          alignItems: 'center',
+          minHeight: 80,
+          justifyContent: 'center',
         }}
       >
-        {value}
-      </Text>
-      <Text 
-        style={{ 
-          fontSize: 11, 
-          color: '#1E1E1E', 
-          opacity: 0.8,
-          textAlign: 'center',
-        }}
-      >
-        {label}
-      </Text>
-    </LinearGradient>
+        <Ionicons name={icon as any} size={20} color="#1E1E1E" style={{ marginBottom: 6 }} />
+        <Text 
+          style={{ 
+            fontSize: 18, 
+            fontWeight: 'bold', 
+            color: '#1E1E1E',
+            marginBottom: 2,
+          }}
+        >
+          {value}
+        </Text>
+        <Text 
+          style={{ 
+            fontSize: 11, 
+            color: '#1E1E1E', 
+            opacity: 0.8,
+            textAlign: 'center',
+          }}
+        >
+          {label}
+        </Text>
+      </LinearGradient>
+    </View>
   </Box>
 );
 
