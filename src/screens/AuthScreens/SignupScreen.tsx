@@ -4,8 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM } from '../../constants/screenNames';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../../store/userSlice';
 import { StatusBar } from 'expo-status-bar';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
@@ -22,7 +20,6 @@ export default function SignUp({ navigation }: { navigation: any }) {
   const [isLoading, setIsLoading] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
-  const dispatch = useDispatch();
 
   // Animation values
   const fadeAnim = new Animated.Value(0);
@@ -60,16 +57,15 @@ export default function SignUp({ navigation }: { navigation: any }) {
           .then(async (userCredential) => {
             const user = userCredential.user;
             const userInfo = await getUser(user.uid);
-            if (userInfo) {
-              dispatch(setUser(userInfo));
-              navigation.replace(BOTTOM_TABS, { screen: HOME });
-            } else {
+            if (!userInfo) {
+              // User doesn't exist in Firestore, navigate to user details form
               const newUser = {
                 uid: user.uid,
                 email: user.email
               };
               navigation.navigate(USER_DETAILS_FORM, { user: newUser });
             }
+            // If user exists, authentication state will be handled by App.tsx
           })
           .catch((error) => {
             console.error('Error during Firebase sign-in:', error);
@@ -77,7 +73,7 @@ export default function SignUp({ navigation }: { navigation: any }) {
           });
       }
     }
-  }, [response]);
+  }, [response, navigation]);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

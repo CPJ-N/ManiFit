@@ -17,43 +17,71 @@ import AuthNavigation from './src/navigation/AuthNavigation';
 import ProfileNavigation from './src/navigation/ProfileNavigation';
 import { useEffect, useState, useRef } from 'react';
 import { requestNotificationPermissions } from './src/config/permissions';
+import { auth } from './src/config/firebase';
+import { User } from 'firebase/auth';
+import { useDispatch } from 'react-redux';
+import { setUser, clearUser } from './src/store/userSlice';
+import { getUser } from './src/utils/controllers/userController';
+import { UserDetails } from './src/constants/dataModels/userDetails.model';
 
 enableScreens();
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
+// Main App Component wrapped with Redux Provider
+function AppContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+  const [user, setUserState] = useState<User | null>(null);
+  const [initializing, setInitializing] = useState(true);
+  const dispatch = useDispatch();
   const loadingFadeAnim = useRef(new Animated.Value(1)).current;
   const appFadeAnim = useRef(new Animated.Value(0)).current;
   const appScaleAnim = useRef(new Animated.Value(0.95)).current;
 
   useEffect(() => {
-    // Set an initial delay (e.g., 2.5 seconds) before starting transition
-    const delay = 2500; // 2500 ms = 2.5 seconds
+    // Authentication state listener
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      console.log('Auth state changed:', user ? 'User signed in' : 'User signed out');
+      setUserState(user);
+      
+      if (user) {
+        // User is signed in, fetch user details and store in Redux
+        try {
+          const userDetails = await getUser(user.uid);
+          if (userDetails) {
+            dispatch(setUser(userDetails));
+          }
+        } catch (error) {
+          console.error('Error fetching user details:', error);
+        }
+      } else {
+        // User is signed out, clear Redux state
+        dispatch(clearUser());
+      }
+      
+      if (initializing) setInitializing(false);
+    });
+
+    return unsubscribe; // unsubscribe on unmount
+  }, [dispatch, initializing]);
+
+  useEffect(() => {
+    // Set an initial delay before starting transition
+    const delay = 1500; // Reduced delay since we're handling auth state properly
 
     const timeoutId = setTimeout(() => {
-      if (store.getState()) {
+      if (!initializing) {
         setIsLoading(false);
         startTransition();
       }
     }, delay);
 
-    // Subscribe to store updates
-    const unsubscribe = store.subscribe(() => {
-      if (isLoading) {
-        setIsLoading(false);
-        startTransition();
-      }
-    });
-
-    // Clean up the timeout and subscription when the component unmounts
+    // Clean up the timeout when component unmounts
     return () => {
       clearTimeout(timeoutId);
-      unsubscribe();
     };
-  }, [isLoading]); // Add isLoading dependency to prevent multiple calls
+  }, [initializing]);
 
   useEffect(() => {
     // Request notification permissions (safe for Expo Go)
@@ -73,7 +101,7 @@ export default function App() {
       Animated.timing(appFadeAnim, {
         toValue: 1,
         duration: 800,
-        delay: 200, // Slight delay for smoother transition
+        delay: 200,
         useNativeDriver: true,
       }),
       // Scale in main app for a subtle zoom effect
@@ -92,6 +120,15 @@ export default function App() {
     });
   };
 
+  // Show loading screen while checking authentication state
+  if (initializing) {
+    return (
+      <View style={{ flex: 1 }}>
+        <LoadingScreen />
+      </View>
+    );
+  }
+
   const MainApp = () => (
     <Animated.View 
       style={{ 
@@ -100,39 +137,54 @@ export default function App() {
         transform: [{ scale: appScaleAnim }]
       }}
     >
-      <Provider store={store}>
-        <NavigationContainer>
-          <StatusBar style="auto" />
-          <Stack.Navigator screenOptions={{headerShown: false}}>
+      <NavigationContainer>
+        <StatusBar style="auto" />
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          {user ? (
+            // User is signed in, show main app screens
+            <>
+              <Stack.Screen name={BOTTOM_TABS} component={BottomNavigation}/>
+              <Stack.Screen name={PROFILE_TABS} component={ProfileNavigation} />
+            </>
+          ) : (
+            // User is not signed in, show auth screens
             <Stack.Screen name={AUTH_TABS} component={AuthNavigation} />
-            <Stack.Screen name={BOTTOM_TABS} component={BottomNavigation}/>
-            <Stack.Screen name={PROFILE_TABS} component={ProfileNavigation} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </Provider>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
     </Animated.View>
   );
 
   return (
-    <GluestackUIProvider mode="light"><View style={{ flex: 1 }}>
-        {/* Main App - Always rendered but initially transparent */}
-        <MainApp />
-        {/* Loading Screen Overlay */}
-        {showLoadingScreen && (
-          <Animated.View 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              opacity: loadingFadeAnim,
-              zIndex: 1000,
-            }}
-          >
-            <LoadingScreen />
-          </Animated.View>
-        )}
-      </View></GluestackUIProvider>
+    <View style={{ flex: 1 }}>
+      {/* Main App - Always rendered but initially transparent */}
+      <MainApp />
+      {/* Loading Screen Overlay */}
+      {showLoadingScreen && (
+        <Animated.View 
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: loadingFadeAnim,
+            zIndex: 1000,
+          }}
+        >
+          <LoadingScreen />
+        </Animated.View>
+      )}
+    </View>
+  );
+}
+
+export default function App() {
+  return (
+    <GluestackUIProvider mode="light">
+      <Provider store={store}>
+        <AppContent />
+      </Provider>
+    </GluestackUIProvider>
   );
 }

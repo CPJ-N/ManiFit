@@ -4,12 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { BOTTOM_TABS, FORGOT_PASSWORD, HOME, REGISTER } from '../../constants/screenNames';
-import { useDispatch } from 'react-redux';
-import { setUser, setUserImageUrl } from '../../store/userSlice';
-import { getUser } from '../../utils/controllers/userController';
 import { StatusBar } from 'expo-status-bar';
-import { getImageUrl } from '../../utils/controllers/imageController';
-import { firebaseBucketName } from '../../constants/firebaseContant';
 
 export default function Login({navigation} : {navigation: any}) {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +14,6 @@ export default function Login({navigation} : {navigation: any}) {
   const [isLoading, setIsLoading] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
-  const dispatch = useDispatch();
 
   // Animation values
   const fadeAnim = new Animated.Value(0);
@@ -41,15 +35,8 @@ export default function Login({navigation} : {navigation: any}) {
     ]).start();
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if(user){
-        navigation.replace(BOTTOM_TABS, { screen: HOME })
-      }
-    })
-
-    return unsubscribe
-  }, [])
+  // Note: Authentication state is now handled at the App level
+  // User data fetching and Redux updates are handled there too
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -79,22 +66,8 @@ export default function Login({navigation} : {navigation: any}) {
     setIsLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
-      const user = userCredential.user;
-      const userInfo = await getUser(user.uid);
-
-      if (userInfo) {
-        dispatch(setUser(userInfo));
-      }
-
-      if(userInfo?.profilePhotoName) {
-        const imageUrl = await getImageUrl(firebaseBucketName.userImages, userInfo.profilePhotoName);
-        console.log('Image URL:', imageUrl);
-        console.log('UserImage:', userInfo.profilePhotoName);
-        dispatch(setUserImageUrl(imageUrl));
-      }
-
-      navigation.navigate(BOTTOM_TABS, {screen: HOME});
+      await signInWithEmailAndPassword(auth, userEmail, userPassword);
+      // Navigation and user data handling will be done automatically by App.tsx auth state listener
     } catch (error: any) {
       const errorCode = error.code;
       let errorMessage = 'An error occurred. Please try again.';
@@ -111,6 +84,9 @@ export default function Login({navigation} : {navigation: any}) {
           break;
         case 'auth/user-disabled':
           errorMessage = 'This account has been disabled.';
+          break;
+        case 'auth/invalid-credential':
+          errorMessage = 'Invalid credentials. Please check your email and password.';
           break;
         default:
           errorMessage = 'Failed to sign in. Please check your credentials.';

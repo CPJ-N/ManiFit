@@ -61,7 +61,7 @@ export default function UserDetailsForm({navigation} : {navigation: any}) {
     await createUser(userDetails, auth.currentUser?.uid ?? '');
     dispatch(setUser(userDetails));
     console.log('userDetails updated:', userDetails);
-    navigation.navigate(BOTTOM_TABS, {screen: {HOME}});
+    // Navigation will be handled automatically by App.tsx auth state listener
   };
 
   const handleChange = (value: any, field: keyof UserDetails) => {

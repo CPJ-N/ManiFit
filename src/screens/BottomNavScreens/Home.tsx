@@ -7,9 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { auth } from '../../config/firebase';
 import { COMPLETE_EXERCISE_LIST, EXERCISE_CATALOG, EXERCISE_TABS, PROFILE_TABS } from '../../constants/screenNames';
-import { setUser, setUserImageUrl } from '../../store/userSlice';
-import { getUser } from '../../utils/controllers/userController';
-import { UserDetails } from '../../constants/dataModels/userDetails.model';
+import { setUserImageUrl } from '../../store/userSlice';
 import { getImageUrl } from '../../utils/controllers/imageController';
 import { firebaseBucketName } from '../../constants/firebaseContant';
 import { getAllExercisesFromUrl } from '../../utils/controllers/exerciseController';
@@ -32,32 +30,28 @@ export default function Home({navigation} : {navigation: any}) {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (!userInfo) {
-      getUser(auth.currentUser?.uid || '')
-        .then((result) => {
-          dispatch(setUser(result as UserDetails));
-          if (result && result.profilePhotoName) {
-            getImageUrl(firebaseBucketName.userImages, result.profilePhotoName || '').then((url) => {
-              dispatch(setUserImageUrl(url));
-            }).catch((error) => {
-              console.error('Error fetching user image:', error);
-            });
-          }
+    // Only fetch user image if we have userInfo but no image URL yet
+    if (userInfo && userInfo.profilePhotoName && !userImageUrl) {
+      getImageUrl(firebaseBucketName.userImages, userInfo.profilePhotoName)
+        .then((url) => {
+          dispatch(setUserImageUrl(url));
         })
         .catch((error) => {
-          console.error('Error fetching user:', error);
+          console.error('Error fetching user image:', error);
         });
     }
+
+    // Fetch exercises data
     const fetchAllExercises = async () => {
       try {
         const exercises = await getAllExercisesFromUrl();
         dispatch(setExercises(exercises));
-        } catch (error) {
-          console.error('Error fetching exercises:', error);
-        }
+      } catch (error) {
+        console.error('Error fetching exercises:', error);
+      }
     }
     fetchAllExercises();
-  }, []);
+  }, [userInfo, userImageUrl, dispatch]);
 
   return (
     <SafeAreaView className="flex-1" style={{backgroundColor: '#1E1E1E'}}>

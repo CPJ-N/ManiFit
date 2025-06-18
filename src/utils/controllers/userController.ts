@@ -12,45 +12,58 @@ export const createUser = async (userInfo: UserDetails, userId: string) => {
         console.log('User created with ID: ', docRef);
     } catch (error) {
         console.error('Error creating user: ', error);
+        throw error;
     }
 };
 
 // Update user info
-export const updateUser = async (userId: string, updatedInfo: Partial<UserDetails>) => {
+export const updateUser = async (userId: string, userInfo: Partial<UserDetails>) => {
     try {
-        const userDocRef = await doc(db, firebaseCollection.userDetails, userId); 
-        await updateDoc(userDocRef, updatedInfo);
-        console.log('User updated successfully');
+        const userDocRef = doc(db, firebaseCollection.userDetails, userId);
+        await updateDoc(userDocRef, userInfo);
+        console.log('User updated: ', userId);
     } catch (error) {
         console.error('Error updating user: ', error);
+        throw error;
     }
 };
 
-// Delete user info
+// Delete user document
 export const deleteUserDocument = async (userId: string) => {
     try {
-        const userDocRef = await doc(db, firebaseCollection.userDetails, userId); 
+        const userDocRef = doc(db, firebaseCollection.userDetails, userId);
         await deleteDoc(userDocRef);
-        console.log('Successfully deleted user document with id:', userId);
+        console.log('User document deleted: ', userId);
     } catch (error) {
         console.error('Error deleting user document: ', error);
+        throw error;
     }
 };
 
-// Get user info
-export const getUser = async (userId: string) => {
+// Get user info with better error handling
+export const getUser = async (userId: string): Promise<UserDetails | null> => {
     try {
         const userDocSnap = await getDoc(doc(db, firebaseCollection.userDetails, userId)); 
         if (userDocSnap.exists()) {
             const userInfo = {...userDocSnap.data() as UserDetails, uid: userDocSnap.id};
-            console.log('User info: ', userInfo);
+            console.log('User info retrieved: ', userInfo);
             return userInfo;
         } else {
             console.log('User not found');
             return null;
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error getting user: ', error);
+        
+        // Handle offline errors more gracefully  
+        if (error.code === 'unavailable' || error.message.includes('offline')) {
+            console.warn('Firebase is offline, user data may not be current');
+            // You could return cached data here if you implement caching
+            return null;
+        }
+        
+        // Re-throw other errors
+        throw error;
     }
 };
 
@@ -66,8 +79,16 @@ export const getUserByEmail = async (email: string) => {
             console.log('User not found');
             return null;
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error getting user: ', error);
+        
+        // Handle offline errors more gracefully  
+        if (error.code === 'unavailable' || error.message.includes('offline')) {
+            console.warn('Firebase is offline, user data may not be current');
+            return null;
+        }
+        
+        throw error;
     }
 };
 
