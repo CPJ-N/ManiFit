@@ -1,4 +1,6 @@
 import React from 'react';
+import "@/global.css";
+import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -112,26 +114,25 @@ export default function App() {
   );
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* Main App - Always rendered but initially transparent */}
-      <MainApp />
-      
-      {/* Loading Screen Overlay */}
-      {showLoadingScreen && (
-        <Animated.View 
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            opacity: loadingFadeAnim,
-            zIndex: 1000,
-          }}
-        >
-          <LoadingScreen />
-        </Animated.View>
-      )}
-    </View>
+    <GluestackUIProvider mode="light"><View style={{ flex: 1 }}>
+        {/* Main App - Always rendered but initially transparent */}
+        <MainApp />
+        {/* Loading Screen Overlay */}
+        {showLoadingScreen && (
+          <Animated.View 
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              opacity: loadingFadeAnim,
+              zIndex: 1000,
+            }}
+          >
+            <LoadingScreen />
+          </Animated.View>
+        )}
+      </View></GluestackUIProvider>
   );
 }

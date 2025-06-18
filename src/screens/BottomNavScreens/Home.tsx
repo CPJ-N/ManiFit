@@ -1,12 +1,5 @@
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
+import React, { useEffect } from 'react';
+import { ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { exerciseCategories } from '../../constants/categories';
 import { StatusBar } from 'expo-status-bar';
@@ -14,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 import { auth } from '../../config/firebase';
 import { COMPLETE_EXERCISE_LIST, EXERCISE_CATALOG, EXERCISE_TABS, PROFILE_TABS } from '../../constants/screenNames';
-import { useEffect } from 'react';
 import { setUser, setUserImageUrl } from '../../store/userSlice';
 import { getUser } from '../../utils/controllers/userController';
 import { UserDetails } from '../../constants/dataModels/userDetails.model';
@@ -23,11 +15,19 @@ import { firebaseBucketName } from '../../constants/firebaseContant';
 import { getAllExercisesFromUrl } from '../../utils/controllers/exerciseController';
 import { setExercises } from '../../store/workoutSlice';
 
+// Gluestack UI Components
+import { Box } from '@/components/ui/box';
+import { VStack } from '@/components/ui/vstack';
+import { HStack } from '@/components/ui/hstack';
+import { Heading } from '@/components/ui/heading';
+import { Text } from '@/components/ui/text';
+import { Avatar, AvatarFallbackText, AvatarImage } from '@/components/ui/avatar';
+import { Card } from '@/components/ui/card';
+import { Image } from '@/components/ui/image';
 
-const workoutVideos = exerciseCategories
+const workoutVideos = exerciseCategories;
 
 export default function Home({navigation} : {navigation: any}) {
-
   const {userInfo, userImageUrl} = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch()
 
@@ -60,180 +60,111 @@ export default function Home({navigation} : {navigation: any}) {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1" style={{backgroundColor: '#1E1E1E'}}>
       <StatusBar style="light" />
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Hi, {userInfo ? userInfo.fullName : auth.currentUser?.email}</Text>
-          <Text style={styles.subGreeting}>It's Time To Challenge Your Limits.</Text>
-        </View>
-        <View style={{ position: 'relative', flex: 0 }}>
-          <Image
-              source={userImageUrl ? { uri: userImageUrl } : require('../../assets/placeholder-user-image.jpg')} // Replace with your image URL
-              style={styles.profileImage}
-            />
-        </View>
-      </View>
-      <View style={styles.quickActions}>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="barbell" size={24} color="#FFD20A" />
-          <Text style={styles.actionText}>Workout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="stats-chart" size={24} color="#FFD20A" />
-          <Text style={styles.actionText}>Progress Tracking</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="nutrition" size={24} color="#FFD20A" />
-          <Text style={styles.actionText}>Nutrition</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="people" size={24} color="#FFD20A" />
-          <Text style={styles.actionText}>Community</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView contentContainerStyle={styles.videoGrid}>
-      <Text style={styles.sectionTitle}>Quick & Easy Workout Videos</Text>
-      <Text style={styles.sectionSubtitle}>Discover Fresh Workouts: Elevate Your Training</Text>
+      
+      {/* Header Section - Original Layout */}
+      <Box className="px-5 pt-5 pb-3 mt-5">
+        <HStack className="justify-between items-center">
+          <VStack>
+            <Heading size="xl" className="font-bold mb-1" style={{color: '#FFD20A', paddingHorizontal: 5}}>
+              Hi, {userInfo ? userInfo.fullName : auth.currentUser?.email}
+            </Heading>
+            <Text size="sm" style={{color: '#f4f4f4'}}>
+              It's Time To Challenge Your Limits.
+            </Text>
+          </VStack>
+          
+          <Avatar size="xl" className="border-0">
+            {userImageUrl ? (
+              <AvatarImage 
+                source={{ uri: userImageUrl }}
+                alt="Profile"
+                style={{width: 80, height: 80, borderRadius: 40}}
+              />
+            ) : (
+              <AvatarFallbackText className="text-typography-0 font-semibold">
+                {userInfo?.fullName?.split(' ').map(name => name[0]).join('') || 'U'}
+              </AvatarFallbackText>
+            )}
+          </Avatar>
+        </HStack>
+      </Box>
+
+      {/* Quick Actions - Original Layout */}
+      <Box className="px-4 py-4">
+        <HStack className="justify-around items-center">
+          <TouchableOpacity>
+            <VStack className="items-center">
+              <Ionicons name="barbell" size={24} color="#FFD20A" />
+              <Text size="xs" className="mt-1" style={{color: 'white'}}>
+                Workout
+              </Text>
+            </VStack>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <VStack className="items-center">
+              <Ionicons name="stats-chart" size={24} color="#FFD20A" />
+              <Text size="xs" className="mt-1" style={{color: 'white'}}>
+                Progress Tracking
+              </Text>
+            </VStack>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <VStack className="items-center">
+              <Ionicons name="nutrition" size={24} color="#FFD20A" />
+              <Text size="xs" className="mt-1" style={{color: 'white'}}>
+                Nutrition
+              </Text>
+            </VStack>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <VStack className="items-center">
+              <Ionicons name="people" size={24} color="#FFD20A" />
+              <Text size="xs" className="mt-1" style={{color: 'white'}}>
+                Community
+              </Text>
+            </VStack>
+          </TouchableOpacity>
+        </HStack>
+      </Box>
+
+      {/* Workout Categories - Original Layout */}
+      <ScrollView className="flex-1" contentContainerStyle={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around', padding: 8}}>
+        <Heading size="lg" className="w-full font-bold ml-4 mt-4 mb-0" style={{color: 'white'}}>
+          Quick & Easy Workout Videos
+        </Heading>
+        <Text size="sm" className="w-full ml-4 mb-4" style={{color: 'gray'}}>
+          Discover Fresh Workouts: Elevate Your Training
+        </Text>
+        
         {workoutVideos.map((video, index) => (
-          <TouchableOpacity key={index} style={styles.videoCard} onPress={() => navigation.navigate(EXERCISE_TABS, {screen: EXERCISE_CATALOG, params:{category: video.name}})}>
-            <Image source={video.image} style={styles.videoImage} />
-            <View style={styles.videoInfo}>
-              <Text style={styles.videoTitle}>{video.name}</Text>
-              {/* <Text style={styles.videoTitle}>{video.title}</Text> */}
-              {/* <View style={styles.videoMetrics}>
-                <Ionicons name="time" size={16} color="#8A2BE2" />
-                <Text style={styles.videoMetricText}>{video.duration}</Text>
-                <Ionicons name="barbell" size={16} color="#8A2BE2" />
-                <Text style={styles.videoMetricText}>{video.exercises} Exercises</Text>
-              </View> */}
-            </View>
-            {/* <TouchableOpacity style={styles.playButton}>
-              <Ionicons name="play" size={24} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.favoriteButton}>
-              <Ionicons name="star-outline" size={20} color="white" />
-            </TouchableOpacity> */}
+          <TouchableOpacity 
+            key={index} 
+            className="mb-4"
+            style={{width: '48%'}}
+            onPress={() => navigation.navigate(EXERCISE_TABS, {
+              screen: EXERCISE_CATALOG, 
+              params: {category: video.name}
+            })}
+          >
+            <Card className="overflow-hidden p-0" style={{backgroundColor: '#2A2A2A', borderRadius: 12}}>
+              <Image
+                source={video.image}
+                alt={video.name}
+                className="w-full rounded-t-lg"
+                style={{height: 160}}
+                resizeMode="cover"
+              />
+              <Box className="px-3 py-3">
+                <Heading size="sm" className="font-bold" style={{color: 'white'}}>
+                  {video.name}
+                </Heading>
+              </Box>
+            </Card>
           </TouchableOpacity>
         ))}
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1E1E1E',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    marginTop: 20,
-  },
-  greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFD20A',
-    padding: 5,
-    marginBottom: 5,
-  },
-  subGreeting: {
-    fontSize: 14,
-    color: '#f4f4f4',
-  },
-  profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-},
-  quickActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 16,
-  },
-  actionButton: {
-    alignItems: 'center',
-  },
-  actionText: {
-    color: 'white',
-    marginTop: 4,
-    fontSize: 12,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-    marginLeft: 16,
-    marginTop: 16,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: 'gray',
-    marginLeft: 16,
-    marginBottom: 16,
-  },
-  videoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    padding: 8,
-  },
-  videoCard: {
-    width: '48%',
-    marginBottom: 16,
-    backgroundColor: '#2A2A2A',
-    borderRadius: 10,
-    overflow: 'hidden',
-    padding: 5,
-  },
-  videoImage: {
-    width: '100%',
-    height: 120,
-    resizeMode: 'cover',
-    borderRadius: 10,
-    padding: 2,
-  },
-  videoInfo: {
-    padding: 8,
-  },
-  videoTitle: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  videoMetrics: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  videoMetricText: {
-    color: 'gray',
-    fontSize: 12,
-    marginLeft: 4,
-    marginRight: 8,
-  },
-  playButton: {
-    position: 'absolute',
-    right: 8,
-    bottom: 8,
-    backgroundColor: '#8A2BE2',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  favoriteButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 15,
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
-});
