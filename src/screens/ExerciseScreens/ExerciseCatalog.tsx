@@ -1,17 +1,9 @@
-import {
-    View,
-    Text,
-    Image,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    SafeAreaView,
-    StatusBar as RNStatusBar,
-    Dimensions,
-  } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, TouchableOpacity, ScrollView, Dimensions, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { getExercisesByCategory } from '../../utils/controllers/exerciseController';
 import { EXERCISE_DETAILS } from '../../constants/screenNames';
 import { Exercise } from '../../constants/dataModels/exercise.model';
@@ -19,196 +11,269 @@ import ExerciseItem from '../../components/ExerciseItem';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
 
+// Gluestack UI Components
+import { Box } from '@/components/ui/box';
+import { VStack } from '@/components/ui/vstack';
+import { HStack } from '@/components/ui/hstack';
+import { Heading } from '@/components/ui/heading';
+import { Text } from '@/components/ui/text';
+
 const { width } = Dimensions.get('window');
-  
-export default function ExerciseCatalog({route, navigation} : {route: any, navigation: any}) {
+
+// Enhanced Section Header Component
+const SectionHeader = ({ 
+  title, 
+  subtitle, 
+  icon = 'fitness' 
+}: { 
+  title: string; 
+  subtitle: string; 
+  icon?: string;
+}) => (
+  <Box className="px-6 py-4">
+    <HStack className="items-center mb-3">
+      <LinearGradient
+        colors={['#FFD20A', '#FFA500']}
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginRight: 12,
+        }}
+      >
+        <Ionicons name={icon as any} size={18} color="#1E1E1E" />
+      </LinearGradient>
+      <VStack className="flex-1">
+        <Heading size="lg" className="font-bold" style={{ color: '#FFFFFF', fontSize: 20 }}>
+          {title}
+        </Heading>
+        <Text style={{ color: '#B0B0B0', fontSize: 14, marginTop: 2 }}>
+          {subtitle}
+        </Text>
+      </VStack>
+    </HStack>
+  </Box>
+);
+
+// Enhanced Empty State Component
+const EmptyState = () => (
+  <Box className="items-center justify-center py-16 px-8">
+    <LinearGradient
+      colors={['rgba(255, 210, 10, 0.1)', 'transparent']}
+      style={{
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+      }}
+    >
+      <Ionicons name="barbell-outline" size={48} color="#FFD20A" />
+    </LinearGradient>
+    
+    <Heading size="md" className="font-bold text-center mb-3" style={{ color: '#FFFFFF' }}>
+      No Exercises Found
+    </Heading>
+    <Text 
+      className="text-center" 
+      style={{ 
+        color: '#B0B0B0', 
+        fontSize: 15,
+        lineHeight: 22,
+        maxWidth: 280,
+      }}
+    >
+      We couldn't find any exercises for this category yet. Check back soon for new additions!
+    </Text>
+  </Box>
+);
+
+export default function ExerciseCatalog({ route, navigation }: { route: any; navigation: any }) {
   const { category } = route.params || {};
-  const [ exercises, setExercises] = useState<any[]>([]);
+  const [exercises, setExercises] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const allExercises = useSelector((state: RootState) => state.workout.allExercises);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const filterByCategory = () => {
-      if (allExercises){
-      const filteredExercises = allExercises.filter((exercise: any) => exercise.primaryMuscles.includes(category.toLowerCase()));
-      console.log(filteredExercises)
-      setExercises(filteredExercises);
+      if (allExercises && Array.isArray(allExercises)) {
+        const filteredExercises = allExercises.filter((exercise: any) => 
+          exercise.primaryMuscles && 
+          Array.isArray(exercise.primaryMuscles) &&
+          exercise.primaryMuscles.some((muscle: string) => 
+            muscle.toLowerCase().includes(category.toLowerCase())
+          )
+        );
+        console.log('Filtered exercises:', filteredExercises);
+        setExercises(filteredExercises);
       } else {
         setExercises([]);
       }
+    };
+    filterByCategory();
+  }, [category, allExercises]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Add refresh logic here if needed
+      console.log('Refreshing exercises...');
+    } catch (error) {
+      console.error('Error refreshing exercises:', error);
     }
-    filterByCategory()
-    console.log('Exercise Catalogue Screen', category);
-  }, [category]);
+    setRefreshing(false);
+  };
 
   const viewDetails = (exerciseInfo: Exercise) => {
     navigation.navigate(EXERCISE_DETAILS, { exerciseInfo });
     console.log(`View Exercise Details: ${exerciseInfo.id}`);
-  }
+  };
 
   return (
-    <View style={styles.container}>
+    <View style={{ 
+      flex: 1, 
+      backgroundColor: '#1E1E1E',
+    }}>
       <StatusBar style="light" />
       
-      {/* Enhanced Header with SafeArea */}
-      <SafeAreaView style={styles.headerSafeArea}>
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
+      {/* Enhanced Header Section with Gradient Background */}
+      <LinearGradient
+        colors={['rgba(255, 210, 10, 0.12)', 'rgba(255, 210, 10, 0.04)', 'transparent']}
+        style={{ 
+          paddingTop: insets.top + 10,
+          paddingBottom: 10,
+        }}
+      >
+        <Box className="px-6 py-4">
+          <HStack className="items-center">
             <TouchableOpacity 
-              style={styles.backButton} 
               onPress={() => navigation.goBack()}
-              activeOpacity={0.7}
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: 'rgba(255, 210, 10, 0.15)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 16,
+                shadowColor: '#FFD20A',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+                elevation: 4,
+              }}
+              activeOpacity={0.8}
             >
               <Ionicons name="chevron-back" size={24} color="#FFD20A" />
             </TouchableOpacity>
-                      <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{category}</Text>
-            <Text style={styles.headerSubtitle}>Exercises</Text>
-          </View>
-        </View>
-        </View>
-      </SafeAreaView>
+            
+            <VStack className="flex-1">
+              <Heading 
+                size="xl" 
+                className="font-bold" 
+                style={{ 
+                  color: '#FFD20A', 
+                  fontSize: 26,
+                  letterSpacing: -0.5,
+                  marginBottom: 2,
+                }}
+              >
+                {category}
+              </Heading>
+              <Text style={{ color: '#B0B0B0', fontSize: 15, fontWeight: '500' }}>
+                Exercise Collection
+              </Text>
+            </VStack>
+
+            {/* Exercise Count Badge */}
+            {exercises.length > 0 && (
+              <LinearGradient
+                colors={['#4CAF50', '#2E7D32']}
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 16,
+                  marginLeft: 12,
+                }}
+              >
+                <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '600' }}>
+                  {exercises.length} {exercises.length === 1 ? 'Exercise' : 'Exercises'}
+                </Text>
+              </LinearGradient>
+            )}
+          </HStack>
+        </Box>
+      </LinearGradient>
 
       <ScrollView 
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        style={{ backgroundColor: '#1E1E1E' }}
+        contentContainerStyle={{ 
+          backgroundColor: '#1E1E1E',
+          flexGrow: 1,
+          paddingBottom: insets.bottom + 20,
+        }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFD20A" />
+        }
         showsVerticalScrollIndicator={false}
       >
-        {/* Section Header */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Quick & Easy Workouts</Text>
-          <Text style={styles.sectionSubtitle}>
-            Discover new exercises to elevate your training
-          </Text>
-        </View>
+        {/* Enhanced Section Header */}
+        <SectionHeader
+          title="Training Library"
+          subtitle="Discover exercises to elevate your workout"
+          icon="library"
+        />
 
-        {/* Exercise Grid */}
-        <View style={styles.exerciseGrid}>
-          {exercises.length > 0 ? (
-            exercises.map((exercise, index) => (
-              <ExerciseItem 
-                key={`${exercise.id}-${index}`}
-                exercise={exercise}
-                viewDetails={() => viewDetails(exercise)}
-              />
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="barbell-outline" size={64} color="#FFD20A" />
-              <Text style={styles.emptyStateTitle}>No Exercises Found</Text>
-              <Text style={styles.emptyStateText}>
-                We couldn't find any exercises for this category yet.
+        {/* Exercise Content */}
+        {exercises.length > 0 ? (
+          <Box className="px-4">
+            <VStack space="md" style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              {exercises.map((exercise, index) => (
+                <ExerciseItem 
+                  key={`${exercise.id}-${index}`}
+                  exercise={exercise}
+                  viewDetails={() => viewDetails(exercise)}
+                />
+              ))}
+            </VStack>
+          </Box>
+        ) : (
+          <EmptyState />
+        )}
+
+        {/* Additional Info Section */}
+        {exercises.length > 0 && (
+          <Box className="px-6 py-6 mt-4">
+            <LinearGradient
+              colors={['rgba(255, 210, 10, 0.05)', 'transparent']}
+              style={{
+                borderRadius: 20,
+                padding: 20,
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons name="information-circle" size={24} color="#FFD20A" style={{ marginBottom: 12 }} />
+              <Heading size="sm" className="font-bold text-center mb-2" style={{ color: '#FFFFFF' }}>
+                Pro Tip
+              </Heading>
+              <Text 
+                style={{ 
+                  textAlign: 'center', 
+                  color: '#B0B0B0', 
+                  fontSize: 14,
+                  lineHeight: 20,
+                }}
+              >
+                Focus on proper form over speed. Quality repetitions lead to better results and injury prevention.
               </Text>
-            </View>
-          )}
-        </View>
+            </LinearGradient>
+          </Box>
+        )}
       </ScrollView>
     </View>
   );
-};
-  
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1A1A1A',
-  },
-  headerSafeArea: {
-    backgroundColor: '#1A1A1A',
-  },
-  header: {
-    backgroundColor: '#1A1A1A',
-    paddingBottom: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-  },
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 210, 10, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  headerTextContainer: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#FFD20A',
-    letterSpacing: -0.5,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#888',
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: '#0F0F0F',
-  },
-  scrollContent: {
-    paddingBottom: 20,
-    backgroundColor: '#0F0F0F',
-  },
-  sectionHeader: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
-    letterSpacing: -0.3,
-  },
-  sectionSubtitle: {
-    fontSize: 16,
-    color: '#888',
-    fontWeight: '400',
-    lineHeight: 22,
-  },
-  exerciseGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    gap: 16,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 40,
-    width: '100%',
-  },
-  emptyStateTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: '#888',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-});
+}
