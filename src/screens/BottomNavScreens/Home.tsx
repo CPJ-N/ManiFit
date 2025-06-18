@@ -118,22 +118,6 @@ const WorkoutCategoryCard = ({
             borderTopRightRadius: 20,
           }}
         />
-        {/* Play Button Overlay */}
-        <Box
-          style={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            backgroundColor: 'rgba(255, 210, 10, 0.9)',
-            borderRadius: 20,
-            width: 36,
-            height: 36,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Ionicons name="play" size={18} color="#1E1E1E" />
-        </Box>
       </Box>
       
       <Box className="px-4 py-4">

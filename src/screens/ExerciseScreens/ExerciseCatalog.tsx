@@ -6,6 +6,8 @@ import {
     StyleSheet,
     TouchableOpacity,
     SafeAreaView,
+    StatusBar as RNStatusBar,
+    Dimensions,
   } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
@@ -16,6 +18,8 @@ import { Exercise } from '../../constants/dataModels/exercise.model';
 import ExerciseItem from '../../components/ExerciseItem';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
+
+const { width } = Dimensions.get('window');
   
 export default function ExerciseCatalog({route, navigation} : {route: any, navigation: any}) {
   const { category } = route.params || {};
@@ -42,83 +46,169 @@ export default function ExerciseCatalog({route, navigation} : {route: any, navig
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="light" />
-      <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={24} color="#FFD20A" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{category} Exercises</Text>
-      </View>
-      <ScrollView contentContainerStyle={styles.videoGrid}>
-      <Text style={styles.sectionTitle}>Quick & Easy Workout Exercises</Text>
-      <Text style={styles.sectionSubtitle}>Discover New Exercises: Elevate Your Training</Text>
-        {exercises.map((video, index) => (
-          // <TouchableOpacity key={index} style={styles.videoCard} onPress={() => viewDetails(video)}>
-          //   <Image source={{ uri: `${exerciseImageUrlPrefix}/${video.images[0]}`}} style={styles.videoImage} />
-            
-          //   <View style={styles.videoInfo}>
-          //     <Text style={styles.videoTitle}>{video.name}</Text>
-          //     {/* <Text style={styles.videoTitle}>{video.title}</Text> */}
-          //     {/* <View style={styles.videoMetrics}>
-          //       <Ionicons name="time" size={16} color="#8A2BE2" />
-          //       <Text style={styles.videoMetricText}>{video.duration}</Text>
-          //       <Ionicons name="barbell" size={16} color="#8A2BE2" />
-          //       <Text style={styles.videoMetricText}>{video.exercises} Exercises</Text>
-          //     </View> */}
-          //   </View>
-          //   {/* <TouchableOpacity style={styles.playButton}>
-          //     <Ionicons name="play" size={24} color="white" />
-          //   </TouchableOpacity>
-          //   <TouchableOpacity style={styles.favoriteButton}>
-          //     <Ionicons name="star-outline" size={20} color="white" />
-          //   </TouchableOpacity> */}
-          // </TouchableOpacity>
-          <ExerciseItem 
-            key={index}
-            exercise={video}
-            viewDetails={() => viewDetails(video)}
-          />
-        ))}
+      
+      {/* Enhanced Header with SafeArea */}
+      <SafeAreaView style={styles.headerSafeArea}>
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="chevron-back" size={24} color="#FFD20A" />
+            </TouchableOpacity>
+                      <View style={styles.headerTextContainer}>
+            <Text style={styles.headerTitle}>{category}</Text>
+            <Text style={styles.headerSubtitle}>Exercises</Text>
+          </View>
+        </View>
+        </View>
+      </SafeAreaView>
+
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Section Header */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Quick & Easy Workouts</Text>
+          <Text style={styles.sectionSubtitle}>
+            Discover new exercises to elevate your training
+          </Text>
+        </View>
+
+        {/* Exercise Grid */}
+        <View style={styles.exerciseGrid}>
+          {exercises.length > 0 ? (
+            exercises.map((exercise, index) => (
+              <ExerciseItem 
+                key={`${exercise.id}-${index}`}
+                exercise={exercise}
+                viewDetails={() => viewDetails(exercise)}
+              />
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons name="barbell-outline" size={64} color="#FFD20A" />
+              <Text style={styles.emptyStateTitle}>No Exercises Found</Text>
+              <Text style={styles.emptyStateText}>
+                We couldn't find any exercises for this category yet.
+              </Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
   
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E1E1E',
-    paddingTop: 20,
+    backgroundColor: '#1A1A1A',
+  },
+  headerSafeArea: {
+    backgroundColor: '#1A1A1A',
   },
   header: {
+    backgroundColor: '#1A1A1A',
+    paddingBottom: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 210, 10, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '700',
     color: '#FFD20A',
-    marginLeft: 16,
+    letterSpacing: -0.5,
   },
-  videoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    padding: 8,
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#888',
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#0F0F0F',
+  },
+  scrollContent: {
+    paddingBottom: 20,
+    backgroundColor: '#0F0F0F',
+  },
+  sectionHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-    marginLeft: 16,
-    marginTop: 16,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 8,
+    letterSpacing: -0.3,
   },
   sectionSubtitle: {
-    fontSize: 14,
-    color: 'gray',
-    marginLeft: 16,
-    marginBottom: 16,
+    fontSize: 16,
+    color: '#888',
+    fontWeight: '400',
+    lineHeight: 22,
+  },
+  exerciseGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    gap: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 40,
+    width: '100%',
+  },
+  emptyStateTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#888',
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
