@@ -67,6 +67,20 @@ Quick Start
 npm install
 npm run start
 
+### Post-build (iOS Simulator)
+
+After an EAS build finishes you can download and install the most recent iOS build directly into the Simulator with:
+
+```bash
+eas build:run -p ios --latest
+```
+
+If you need to pick a specific build from the list instead of automatically pulling the most recent one, just omit the `--latest` flag:
+
+```bash
+eas build:run -p ios
+```
+
 Fitness App for trainers 
 
 https://www.youtube.com/watch?v=ql4J6SpLXZA
