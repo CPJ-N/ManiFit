@@ -1,6 +1,6 @@
 import RNFS from 'react-native-fs';
 
-const saveImageLocally = async (uri, filename) => {
+const saveImageLocally = async (uri: string, filename: string) => {
   try {
     const destPath = `${RNFS.DocumentDirectoryPath}/${filename}`;
     await RNFS.moveFile(uri, destPath);
