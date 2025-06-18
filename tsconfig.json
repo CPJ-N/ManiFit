@@ -33,6 +33,7 @@
   "extends": "expo/tsconfig.base",
   "include": [
     "src",
+    "components",
     "env.d.ts",
     "nativewind-env.d.ts"
   ]
