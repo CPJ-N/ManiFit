@@ -3,10 +3,27 @@ export const firebaseBucketName = {
     userImages: 'user-images',
 }
 
+// ===== ENHANCED FIREBASE COLLECTIONS =====
 export const firebaseCollection = {
+    // ===== Existing Collections (Keep as-is) =====
     exercises: 'Exercises',
     routines: 'Routines',
     userDetails: 'UsersDetails',
     transactionDetails: 'TransactionDetails',
     subscriptions: 'Subscriptions',
+    
+    // ===== New Collections =====
+    workoutSessions: 'WorkoutSessions', // Real-time workout tracking
+    exerciseLibrary: 'ExerciseLibrary', // Custom exercises created by trainers
+    progressPhotos: 'ProgressPhotos', // Client progress photos
+    workoutTemplates: 'WorkoutTemplates', // Shareable workout templates
+    clientMetrics: 'ClientMetrics', // Progress tracking data
+}
+
+// ===== SUB-COLLECTIONS =====
+// These are sub-collections under main documents
+export const firebaseSubCollections = {
+    sessionExercises: 'exercises', // Under workout sessions
+    routineComments: 'comments', // Under routines
+    progressEntries: 'progress', // Under client metrics
 }
