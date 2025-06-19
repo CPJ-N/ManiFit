@@ -15,7 +15,6 @@ export const firebaseCollection = {
     // ===== New Collections =====
     workoutSessions: 'WorkoutSessions', // Real-time workout tracking
     exerciseLibrary: 'ExerciseLibrary', // Custom exercises created by trainers
-    progressPhotos: 'ProgressPhotos', // Client progress photos
     workoutTemplates: 'WorkoutTemplates', // Shareable workout templates
     clientMetrics: 'ClientMetrics', // Progress tracking data
 }
@@ -25,5 +24,4 @@ export const firebaseCollection = {
 export const firebaseSubCollections = {
     sessionExercises: 'exercises', // Under workout sessions
     routineComments: 'comments', // Under routines
-    progressEntries: 'progress', // Under client metrics
 }
