@@ -156,7 +156,7 @@ export default function ExerciseCatalog({ route, navigation }: { route: any; nav
                 width: 48,
                 height: 48,
                 borderRadius: 24,
-                backgroundColor: 'rgba(255, 210, 10, 0.15)',
+                backgroundColor: '#2A2A2A', // Solid background for shadow
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginRight: 16,
@@ -165,6 +165,8 @@ export default function ExerciseCatalog({ route, navigation }: { route: any; nav
                 shadowOpacity: 0.2,
                 shadowRadius: 8,
                 elevation: 4,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 210, 10, 0.3)',
               }}
               activeOpacity={0.8}
             >

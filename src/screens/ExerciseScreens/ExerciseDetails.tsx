@@ -11,7 +11,7 @@ import {
   Dimensions,
   RefreshControl
 } from 'react-native';
-import { Exercise } from '../../constants/dataModels/exercise.model';
+import { Exercise, ExerciseDetails } from '../../constants/dataModels/exercise.model';
 import { EXERCISE_EDIT } from '../../constants/screenNames';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useState } from 'react';
@@ -190,7 +190,7 @@ const MuscleTag = ({ muscle }: { muscle: string }) => (
 );
 
 export default function ExcerciseDetails ({route, navigation} : {route: any, navigation: any}) {
-  const exerciseInfo = (route.params as { exerciseInfo?: Exercise })?.exerciseInfo;
+  const exerciseInfo = (route.params as { exerciseInfo?: Exercise & Partial<ExerciseDetails> })?.exerciseInfo;
   const [imageNum, setImageNum] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const insets = useSafeAreaInsets();
@@ -204,7 +204,7 @@ export default function ExcerciseDetails ({route, navigation} : {route: any, nav
     setTimeout(() => setRefreshing(false), 1000);
   };
 
-  const handleEdit = (exerciseInfo: Exercise) => {
+  const handleEdit = (exerciseInfo: Exercise & Partial<ExerciseDetails>) => {
     navigation.navigate(EXERCISE_EDIT, { exerciseInfo });
     console.log(`Edit Exercise: ${exerciseInfo.id}`);
   };
@@ -232,7 +232,7 @@ export default function ExcerciseDetails ({route, navigation} : {route: any, nav
                 width: 44,
                 height: 44,
                 borderRadius: 22,
-                backgroundColor: 'rgba(255, 210, 10, 0.2)',
+                backgroundColor: '#2A2A2A', // Solid background for shadow
                 justifyContent: 'center',
                 alignItems: 'center',
                 shadowColor: '#FFD20A',
@@ -240,6 +240,8 @@ export default function ExcerciseDetails ({route, navigation} : {route: any, nav
                 shadowOpacity: 0.3,
                 shadowRadius: 8,
                 elevation: 6,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 210, 10, 0.4)',
               }}
             >
               <Ionicons name="chevron-back" size={24} color="#FFD20A" />
@@ -317,6 +319,7 @@ export default function ExcerciseDetails ({route, navigation} : {route: any, nav
               style={{
                 borderRadius: 20,
                 overflow: 'hidden',
+                backgroundColor: '#2A2A2A', // Solid background for shadow
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.3,
