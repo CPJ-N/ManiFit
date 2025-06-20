@@ -19,7 +19,13 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=4096"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     }
   },
   "submit": {

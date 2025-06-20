@@ -58,12 +58,9 @@ export default function SignUp({ navigation }: { navigation: any }) {
             const user = userCredential.user;
             const userInfo = await getUser(user.uid);
             if (!userInfo) {
-              // User doesn't exist in Firestore, navigate to user details form
-              const newUser = {
-                uid: user.uid,
-                email: user.email
-              };
-              navigation.navigate(USER_DETAILS_FORM, { user: newUser });
+              // User doesn't exist in Firestore, auth state change will handle navigation
+              console.log('Google sign-in complete, user needs to complete profile - auth flow will handle navigation');
+              // No need to navigate manually - App.tsx auth listener will handle this
             }
             // If user exists, authentication state will be handled by App.tsx
           })
@@ -114,11 +111,9 @@ export default function SignUp({ navigation }: { navigation: any }) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, userEmail, userPassword);
       const user = userCredential.user;
-      const newUser = {
-        uid: user.uid,
-        email: user.email,
-      };
-      navigation.navigate(USER_DETAILS_FORM, { user: newUser });
+      console.log('Account created successfully, auth state change will handle navigation');
+      // No need to navigate manually - App.tsx auth listener will handle this
+      // The user will be automatically taken to USER_DETAILS_FORM via AuthNavigation
     } catch (error: any) {
       const errorCode = error.code;
       let errorMessage = 'An error occurred. Please try again.';
@@ -399,13 +394,15 @@ const styles = StyleSheet.create({
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    backgroundColor: '#2A2A2A', // Solid background for shadow optimization
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 12,
     marginBottom: 20,
     borderLeftWidth: 4,
     borderLeftColor: '#FF6B6B',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 107, 107, 0.3)',
   },
   errorText: {
     color: '#FF6B6B',

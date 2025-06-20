@@ -19,10 +19,11 @@ import { useEffect, useState, useRef } from 'react';
 import { requestNotificationPermissions } from './src/config/permissions';
 import { auth } from './src/config/firebase';
 import { User } from 'firebase/auth';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser } from './src/store/userSlice';
 import { getUser } from './src/utils/controllers/userController';
 import { UserDetails } from './src/constants/dataModels/userDetails.model';
+import { RootState } from './src/store/reduxStore';
 
 enableScreens();
 
@@ -34,7 +35,9 @@ function AppContent() {
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
   const [user, setUserState] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
+  const [hasCompletedProfile, setHasCompletedProfile] = useState<boolean>(false);
   const dispatch = useDispatch();
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const loadingFadeAnim = useRef(new Animated.Value(1)).current;
   const appFadeAnim = useRef(new Animated.Value(0)).current;
   const appScaleAnim = useRef(new Animated.Value(0.95)).current;
@@ -42,22 +45,33 @@ function AppContent() {
   useEffect(() => {
     // Authentication state listener
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      console.log('Auth state changed:', user ? 'User signed in' : 'User signed out');
+      console.log('🔐 Auth state changed:', user ? `User signed in: ${user.email}` : 'User signed out');
       setUserState(user);
       
       if (user) {
         // User is signed in, fetch user details and store in Redux
         try {
+          console.log('👤 Checking user details for:', user.uid);
           const userDetails = await getUser(user.uid);
           if (userDetails) {
+            console.log('✅ User details found, updating Redux state:', userDetails.fullName);
             dispatch(setUser(userDetails));
+            setHasCompletedProfile(true);
+          } else {
+            console.log('❌ No user details found in Firestore - user needs to complete registration');
+            console.log('🔄 This will show AUTH_TABS with WELCOME_ONBOARDING as initial route');
+            // Don't clear Redux state, just mark as incomplete profile
+            setHasCompletedProfile(false);
           }
         } catch (error) {
-          console.error('Error fetching user details:', error);
+          console.error('💥 Error fetching user details:', error);
+          setHasCompletedProfile(false);
         }
       } else {
         // User is signed out, clear Redux state
+        console.log('🧹 Clearing user state');
         dispatch(clearUser());
+        setHasCompletedProfile(false); // Set to false instead of null for signed out users
       }
       
       if (initializing) setInitializing(false);
@@ -72,6 +86,7 @@ function AppContent() {
 
     const timeoutId = setTimeout(() => {
       if (!initializing) {
+        console.log('⏰ Starting transition - initializing:', initializing, 'hasCompletedProfile:', hasCompletedProfile);
         setIsLoading(false);
         startTransition();
       }
@@ -120,8 +135,22 @@ function AppContent() {
     });
   };
 
+  // Add a fallback timeout to prevent infinite loading
+  useEffect(() => {
+    const fallbackTimeout = setTimeout(() => {
+      if (initializing) {
+        console.log('⚠️ Fallback timeout triggered - forcing auth state resolution');
+        setInitializing(false);
+        setHasCompletedProfile(false); // Default to showing auth screens
+      }
+    }, 5000); // 5 second fallback
+
+    return () => clearTimeout(fallbackTimeout);
+  }, []);
+
   // Show loading screen while checking authentication state
   if (initializing) {
+    console.log('🔄 Still loading - initializing:', initializing, 'hasCompletedProfile:', hasCompletedProfile);
     return (
       <View style={{ flex: 1 }}>
         <LoadingScreen />
@@ -140,16 +169,24 @@ function AppContent() {
         <NavigationContainer>
           <StatusBar style="auto" />
           <Stack.Navigator screenOptions={{headerShown: false}}>
-          {user ? (
-            // User is signed in, show main app screens
+          {(() => {
+            if (user && hasCompletedProfile && userInfo) {
+              console.log('🏠 Showing main app - user is fully authenticated and has complete profile');
+              return (
             <>
               <Stack.Screen name={BOTTOM_TABS} component={BottomNavigation}/>
               <Stack.Screen name={PROFILE_TABS} component={ProfileNavigation} />
             </>
-          ) : (
-            // User is not signed in, show auth screens
-            <Stack.Screen name={AUTH_TABS} component={AuthNavigation} />
-          )}
+              );
+            } else {
+              console.log('🔐 Showing auth screens - user:', user ? 'authenticated' : 'not authenticated', 'profile:', hasCompletedProfile ? 'complete' : 'incomplete');
+              return (
+                <Stack.Screen name={AUTH_TABS}>
+                  {() => <AuthNavigation user={user} hasCompletedProfile={hasCompletedProfile} />}
+                </Stack.Screen>
+              );
+            }
+          })()}
           </Stack.Navigator>
         </NavigationContainer>
     </Animated.View>

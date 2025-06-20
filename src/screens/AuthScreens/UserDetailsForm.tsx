@@ -1,29 +1,400 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, SafeAreaView, ActivityIndicator } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, ScrollView, TouchableOpacity, TextInput, Dimensions, Animated, SafeAreaView, Platform, ActivityIndicator } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { UserDetails } from '../../constants/dataModels/userDetails.model';
-import { auth } from '../../config/firebase'
-import { BOTTOM_TABS, HOME } from '../../constants/screenNames';
-import { setUser, setUserImageUrl } from '../../store/userSlice';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
-import { createUser, updateUser } from '../../utils/controllers/userController';
-import { getImageUrl, uploadImage } from '../../utils/controllers/imageController';
-import { firebaseBucketName } from '../../constants/firebaseContant';
-import { pickImage } from '../../utils/imageHelpers/imagePicker';
+import { auth } from '../../config/firebase';
+import { createUser } from '../../utils/controllers/userController';
+import { setUser } from '../../store/userSlice';
+import { UserDetails } from '../../constants/dataModels/userDetails.model';
 
-const FitnessGoals = [
-  { id: '1', name: 'Lose Wight' },
-  { id: '2', name: 'Gain Wight' },
-  { id: '3', name: 'Muscle Mass Gail' },
-  { id: '4', name: 'Shape Body' },
-  { id: '5', name: 'Others' },
+// Gluestack UI Components
+import { Box } from '@/components/ui/box';
+import { VStack } from '@/components/ui/vstack';
+import { HStack } from '@/components/ui/hstack';
+import { Heading } from '@/components/ui/heading';
+import { Text } from '@/components/ui/text';
+import { Card } from '@/components/ui/card';
+import { Avatar, AvatarFallbackText } from '@/components/ui/avatar';
+
+// Navigation
+import { TRAINER_ONBOARDING, TRAINEE_ONBOARDING } from '../../constants/screenNames';
+
+const { width } = Dimensions.get('window');
+
+const userTypes = [
+  {
+    id: 'trainer',
+    title: 'Personal Trainer',
+    subtitle: 'I train others',
+    description: 'Share your expertise and help others achieve their fitness goals',
+    icon: 'barbell-outline',
+    isTrainer: true,
+    gradient: ['#FFD20A', '#FFA500'] as [string, string, ...string[]],
+    bgColor: 'rgba(255, 210, 10, 0.1)',
+  },
+  {
+    id: 'trainee',
+    title: 'Looking for Training',
+    subtitle: 'I want to get fit',
+    description: 'Get personalized workouts and professional guidance',
+    icon: 'fitness-outline',
+    isTrainer: false,
+    gradient: ['#4CAF50', '#2E7D32'] as [string, string, ...string[]],
+    bgColor: 'rgba(76, 175, 80, 0.1)',
+  },
 ];
 
-export default function UserDetailsForm({navigation} : {navigation: any}) {
+// Modern Form Field Component with Animation
+const FormField = ({ 
+  icon, 
+  label, 
+  placeholder, 
+  value, 
+  onChangeText, 
+  keyboardType = 'default',
+  animatedValue,
+  index = 0,
+  error = false
+}: {
+  icon: string;
+  label: string;
+  placeholder: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  keyboardType?: any;
+  animatedValue: Animated.Value;
+  index?: number;
+  error?: boolean;
+}) => (
+  <Animated.View
+    style={{
+      opacity: animatedValue,
+      transform: [{ 
+        translateY: animatedValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [30 + (index * 8), 0]
+        })
+      }]
+    }}
+  >
+    <Card 
+      className="mb-4 p-0" 
+      style={{
+        backgroundColor: '#2A2A2A',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: error ? 'rgba(255, 107, 107, 0.3)' : 'rgba(255, 210, 10, 0.1)',
+        shadowColor: error ? '#FF6B6B' : '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+      }}
+    >
+      <Box className="p-4">
+        <HStack className="items-center mb-3">
+          <Box
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              backgroundColor: error ? 'rgba(255, 107, 107, 0.1)' : 'rgba(255, 210, 10, 0.1)',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: 12,
+            }}
+          >
+            <Ionicons name={icon as any} size={16} color={error ? '#FF6B6B' : '#FFD20A'} />
+          </Box>
+          <Text style={{ 
+            color: error ? '#FF6B6B' : '#FFD20A', 
+            fontSize: 14, 
+            fontWeight: '600' 
+          }}>
+            {label}
+          </Text>
+        </HStack>
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          keyboardType={keyboardType}
+          style={{
+            backgroundColor: '#1E1E1E',
+            borderColor: error ? 'rgba(255, 107, 107, 0.3)' : 'rgba(255, 210, 10, 0.2)',
+            borderWidth: 1,
+            borderRadius: 12,
+            paddingHorizontal: 16,
+            paddingVertical: 14,
+            color: '#FFFFFF',
+            fontSize: 16,
+            minHeight: 48,
+          }}
+          placeholderTextColor="#888"
+        />
+      </Box>
+    </Card>
+  </Animated.View>
+);
+
+// Enhanced User Type Selection Card
+const UserTypeCard = ({ 
+  type, 
+  isSelected, 
+  onPress,
+  animatedValue,
+  index = 0
+}: {
+  type: typeof userTypes[0];
+  isSelected: boolean;
+  onPress: () => void;
+  animatedValue: Animated.Value;
+  index?: number;
+}) => (
+  <Animated.View
+    style={{
+      opacity: animatedValue,
+      transform: [{ 
+        translateY: animatedValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [40 + (index * 15), 0]
+        })
+      }]
+    }}
+  >
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+      <Card 
+        className="mb-4 p-0" 
+        style={{
+          backgroundColor: '#2A2A2A',
+          borderRadius: 20,
+          borderWidth: isSelected ? 3 : 1,
+          borderColor: isSelected ? type.gradient[0] : 'rgba(255, 255, 255, 0.05)',
+          shadowColor: isSelected ? type.gradient[0] : 'transparent',
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: isSelected ? 0.3 : 0,
+          shadowRadius: 16,
+          elevation: isSelected ? 12 : 0,
+          transform: [{ scale: isSelected ? 1.02 : 1 }],
+        }}
+      >
+        {/* Background gradient for selected state */}
+        {isSelected && (
+          <LinearGradient
+            colors={[type.bgColor, 'transparent']}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              borderRadius: 20,
+            }}
+          />
+        )}
+        
+        <Box className="p-6">
+          <HStack className="items-center">
+            {/* Icon Container */}
+            <View
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 32,
+                marginRight: 16,
+                overflow: 'hidden',
+                borderWidth: 2,
+                borderColor: isSelected ? type.gradient[0] : 'rgba(255, 210, 10, 0.2)',
+              }}
+            >
+              <LinearGradient
+                colors={isSelected ? type.gradient : ['#333333', '#2A2A2A']}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Ionicons 
+                  name={type.icon as any} 
+                  size={28} 
+                  color={isSelected ? '#FFFFFF' : type.gradient[0]} 
+                />
+              </LinearGradient>
+            </View>
+            
+            <VStack className="flex-1">
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: '700',
+                  color: isSelected ? type.gradient[0] : '#FFFFFF',
+                  marginBottom: 4,
+                  letterSpacing: -0.2,
+                }}
+              >
+                {type.title}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: '600',
+                  color: isSelected ? type.gradient[0] : '#B0B0B0',
+                  marginBottom: 8,
+                  opacity: 0.9,
+                }}
+              >
+                {type.subtitle}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: '#B0B0B0',
+                  lineHeight: 18,
+                }}
+              >
+                {type.description}
+              </Text>
+            </VStack>
+            
+            {/* Selection Indicator */}
+            <Box
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 14,
+                backgroundColor: isSelected ? type.gradient[0] : 'transparent',
+                borderWidth: 2,
+                borderColor: isSelected ? type.gradient[0] : '#666',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              {isSelected && (
+                <Ionicons name="checkmark" size={18} color="#FFFFFF" />
+              )}
+            </Box>
+          </HStack>
+        </Box>
+      </Card>
+    </TouchableOpacity>
+  </Animated.View>
+);
+
+// Enhanced Profile Image Section
+const ProfileImageSection = ({ 
+  userDetails,
+  animatedValue
+}: {
+  userDetails: UserDetails;
+  animatedValue: Animated.Value;
+}) => (
+  <Animated.View
+    style={{
+      opacity: animatedValue,
+      transform: [{ 
+        scale: animatedValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.8, 1]
+        })
+      }]
+    }}
+  >
+    <Box className="items-center mb-8">
+      <Box style={{ position: 'relative' }}>
+        <TouchableOpacity
+          style={{
+            shadowColor: '#FFD20A',
+            shadowOffset: { width: 0, height: 12 },
+            shadowOpacity: 0.3,
+            shadowRadius: 20,
+            elevation: 15,
+          }}
+          activeOpacity={0.8}
+        >
+          <Avatar size="2xl" style={{ width: 120, height: 120, borderWidth: 4, borderColor: '#FFD20A' }}>
+            <LinearGradient
+              colors={['#FFD20A', '#FFA500']}
+              style={{ 
+                width: 120, 
+                height: 120, 
+                borderRadius: 60, 
+                justifyContent: 'center', 
+                alignItems: 'center' 
+              }}
+            >
+              <AvatarFallbackText 
+                className="font-bold"
+                style={{ color: '#1E1E1E', fontSize: 28 }}
+              >
+                {userDetails.fullName ? userDetails.fullName.split(' ').map(name => name[0]).join('') : 'U'}
+              </AvatarFallbackText>
+            </LinearGradient>
+          </Avatar>
+        </TouchableOpacity>
+        
+        {/* Camera Icon */}
+        <Box
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 3,
+            borderColor: '#1E1E1E',
+          }}
+        >
+          <LinearGradient
+            colors={['#FFD20A', '#FFA500']}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Ionicons name="camera" size={16} color="#1E1E1E" />
+          </LinearGradient>
+        </Box>
+      </Box>
+      
+      <VStack className="items-center mt-4">
+        <Text style={{ color: '#B0B0B0', fontSize: 13, textAlign: 'center', marginTop: 8 }}>
+          Complete your profile to get started
+        </Text>
+      </VStack>
+    </Box>
+  </Animated.View>
+);
+
+export default function UserDetailsForm({navigation, route} : {navigation: any, route?: any}) {
+  const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
+
+  // Get user data from navigation params or current auth user
+  const passedUserData = route?.params?.user;
+  const currentUser = auth.currentUser;
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('UserDetailsForm loaded with params:', passedUserData);
+    console.log('Current auth user:', currentUser?.uid);
+    console.log('Will use user data from:', passedUserData ? 'route params' : 'current auth user');
+  }, [passedUserData, currentUser]);
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
+    uid: passedUserData?.uid || currentUser?.uid || '',
     fullName: '',
-    email: auth.currentUser?.email ?? '',
+    email: passedUserData?.email || currentUser?.email || '',
     mobileNumber: '',
     dateOfBirth: '',
     weight: 0,
@@ -31,241 +402,452 @@ export default function UserDetailsForm({navigation} : {navigation: any}) {
     isTrainer: false,
     profilePhotoName: '',
   });
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
-  const [selectedImage, setSelectedImage] = useState<string>('');
 
-  const dispatch = useDispatch();
+  const [selectedUserType, setSelectedUserType] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{[key: string]: boolean}>({});
 
-  const handleImageUpload = async () => {
-    setIsUploading(true);
-    const imageUri = await pickImage();
-    if (imageUri) {
-      setSelectedImage(imageUri);
-      await uploadImage(imageUri).then(async (result) => {
-        userDetails.profilePhotoName = result?.metadata.name;
-        const uploadedImageUrl = await getImageUrl(firebaseBucketName.userImages, userDetails.profilePhotoName || '');
-        setSelectedImage(uploadedImageUrl);
-      }).catch((error) => {
-        console.log('Error uploading image:', error);
-      })
-    } else {
-      console.log("No image picked");
-    }
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const headerAnim = useRef(new Animated.Value(0)).current;
+  const profileAnim = useRef(new Animated.Value(0)).current;
+  const formAnim = useRef(new Animated.Value(0)).current;
+  const userTypeAnim = useRef(new Animated.Value(0)).current;
+  const buttonAnim = useRef(new Animated.Value(0)).current;
+  const progressAnim = useRef(new Animated.Value(0)).current;
 
-    setIsUploading(false);
-    setUploadSuccess(true); // Assuming the upload is always successful
+  useEffect(() => {
+    // Complex entrance animation sequence
+    Animated.sequence([
+      // Header animation first
+      Animated.timing(headerAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      // Profile section
+      Animated.timing(profileAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      // Form fields
+      Animated.timing(formAnim, {
+        toValue: 1,
+        duration: 700,
+        useNativeDriver: true,
+      }),
+      // User type selection
+      Animated.timing(userTypeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      // Button last
+      Animated.timing(buttonAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Overall fade and slide animation
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Progress animation
+    Animated.timing(progressAnim, {
+      toValue: 0.5, // 50% progress (step 2 of 4)
+      duration: 1200,
+      useNativeDriver: false,
+    }).start();
+  }, []);
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: boolean} = {};
+    
+    if (!userDetails.fullName.trim()) newErrors.fullName = true;
+    if (!userDetails.mobileNumber?.trim()) newErrors.mobileNumber = true;
+    if (!userDetails.dateOfBirth?.trim()) newErrors.dateOfBirth = true;
+    if (!userDetails.weight || userDetails.weight <= 0) newErrors.weight = true;
+    if (!userDetails.height || userDetails.height <= 0) newErrors.height = true;
+    if (!selectedUserType) newErrors.userType = true;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
-    await createUser(userDetails, auth.currentUser?.uid ?? '');
-    dispatch(setUser(userDetails));
-    console.log('userDetails updated:', userDetails);
-    // Navigation will be handled automatically by App.tsx auth state listener
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const selectedType = userTypes.find(type => type.id === selectedUserType);
+      const finalUserDetails = {
+        ...userDetails,
+        uid: passedUserData?.uid || currentUser?.uid || '',
+        isTrainer: selectedType?.isTrainer || false,
+      };
+
+      const currentUserId = currentUser?.uid;
+      if (!currentUserId) {
+        throw new Error('User not authenticated');
+      }
+      await createUser(finalUserDetails, currentUserId);
+      dispatch(setUser(finalUserDetails));
+      
+      // Add exit animation before branching to onboarding
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: -30,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // Navigate based on user type
+        if (finalUserDetails.isTrainer) {
+          navigation.navigate(TRAINER_ONBOARDING);
+        } else {
+          navigation.navigate(TRAINEE_ONBOARDING);
+        }
+      });
+    } catch (error) {
+      console.error('Error creating user:', error);
+      setIsSubmitting(false);
+    }
   };
 
-  const handleChange = (value: any, field: keyof UserDetails) => {
-    setUserDetails({ ...userDetails, [field]: value });
+  const handleChange = (value: string, field: keyof UserDetails) => {
+    setUserDetails(prev => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: false }));
+    }
   };
+
+  const formFields = [
+    { key: 'fullName', label: 'Full Name', icon: 'person-outline', placeholder: 'Enter your full name' },
+    { key: 'mobileNumber', label: 'Mobile Number', icon: 'call-outline', placeholder: 'Enter your mobile number', keyboardType: 'phone-pad' },
+    { key: 'dateOfBirth', label: 'Date of Birth', icon: 'calendar-outline', placeholder: 'DD/MM/YYYY' },
+    { key: 'weight', label: 'Weight (kg)', icon: 'fitness-outline', placeholder: '70', keyboardType: 'numeric' },
+    { key: 'height', label: 'Height (cm)', icon: 'resize-outline', placeholder: '175', keyboardType: 'numeric' },
+  ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
-          <Ionicons name="chevron-back" size={24} color="#FFD20A" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Setup Your Profile</Text>
-      </View>
-    <ScrollView style={styles.container}>
-      <View style={styles.profileSection}>
-        <View style={{ position: 'relative', flex: 0 }}>
-          <Image
-            source={{ uri: selectedImage ? selectedImage :
-              'https://images.pexels.com/photos/3470076/pexels-photo-3470076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Replace with your image URL
-            style={styles.profileImage}
-          />
-          <TouchableOpacity style={styles.editIcon} onPress={handleImageUpload}>
-            {isUploading ? 
-              (<ActivityIndicator size="small" color="#ffd20a" />) : 
-              (<Ionicons name="camera" size={24} color="#ffd20a" style={{padding:3}}/>)
-            }
-          </TouchableOpacity>
-        </View> 
-        <View style={styles.infoContainer}>
-          {/* <Text style={styles.name}>{userDetails.fullName}</Text> */}
-          <Text style={styles.detailsText}>{auth.currentUser?.email}</Text>
-          {/* <Text style={styles.detailsText}>Birthday: {userDetails.dateOfBirth}</Text> */}
-        </View>
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Full Name</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => handleChange(text, 'fullName')}
-          value={userDetails['fullName'].toString()}
-          placeholderTextColor='grey'
-        />
-        <Text style={styles.label}>Phone Number</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => handleChange(text, 'mobileNumber')}
-          value={userDetails['mobileNumber']?.toString() || ''}
-        />
-        <Text style={styles.label}>Date Of Birth</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => handleChange(text, 'dateOfBirth')}
-          value={userDetails['dateOfBirth']?.toString() || ''}
-        />
-        <Text style={styles.label}>Weight (kg)</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => handleChange(text, 'weight')}
-          value={userDetails['weight']?.toString() || ''}
-        />
-        <Text style={styles.label}>Height (cm)</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => handleChange(text, 'height')}
-          value={userDetails['height']?.toString() || ''}
-        />
-        
-        {/* <Text style={styles.label}>Are you a Trainer?</Text> */}
-        {/* <Picker
-          selectedValue={userDetails.isTrainer}
-          onValueChange={(itemValue, itemIndex) => handleChange(itemValue, 'isTrainer')}
-          style={styles.picker}
-        >
-          <Picker.Item label="Yes" value={true} />
-          <Picker.Item label="No" value={false} />
-        </Picker> */}
-      </View>
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit Profile</Text>
-      </TouchableOpacity>
-    </ScrollView>
-    </SafeAreaView>
-  );
-};
+    <View style={{ flex: 1, backgroundColor: '#1E1E1E' }}>
+      <StatusBar style="light" />
+      
+      <Animated.View
+        style={{
+          flex: 1,
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }]
+        }}
+      >
+        {/* Enhanced Header */}
+        <SafeAreaView style={{ paddingTop: insets.top }}>
+          <Animated.View
+            style={{
+              opacity: headerAnim,
+              transform: [{ 
+                translateY: headerAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-30, 0]
+                })
+              }]
+            }}
+          >
+            <LinearGradient
+              colors={['rgba(255, 210, 10, 0.12)', 'rgba(255, 210, 10, 0.04)', 'transparent']}
+              style={{ paddingBottom: 20 }}
+            >
+              <VStack className="px-6 py-4">
+                <HStack className="justify-between items-center mb-6">
+                  <VStack className="flex-1">
+                    <Text style={{ color: '#B0B0B0', fontSize: 14, fontWeight: '600' }}>
+                      Step 2 of 4
+                    </Text>
+                    <Heading 
+                      size="2xl" 
+                      className="font-bold" 
+                      style={{ 
+                        color: '#FFD20A', 
+                        fontSize: 28, 
+                        marginTop: 4,
+                        letterSpacing: -0.5,
+                      }}
+                    >
+                      Complete Your Profile
+                    </Heading>
+                    <Text style={{ 
+                      color: '#B0B0B0', 
+                      fontSize: 15, 
+                      marginTop: 4,
+                      lineHeight: 20,
+                    }}>
+                      Tell us about yourself to personalize your experience
+                    </Text>
+                  </VStack>
+                </HStack>
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1E1E1E',
-  },
-  // header: {
-  //   padding: 20,
-  //   paddingTop: 70,
-  //   backgroundColor: '#FFD20A',
-  //   alignItems: 'center',
-  //   flexDirection: 'row',
-  //   justifyContent: 'center',
-  //   borderBottomRightRadius: 15,
-  //   borderBottomLeftRadius: 15,
-  // },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FFD20A',
-    marginLeft: 16,
-  },
-  backButton: {
-    paddingTop: 30,
-    paddingLeft: 10,
-    position: 'absolute',
-    left: 10,
-    top: 15,
-  },
-  // headerText: {
-  //   fontSize: 24,
-  //   color: '#333',
-  //   fontWeight: 'bold',
-  // },
-  profileSection: {
-    alignItems: 'center',
-    marginVertical: 20,
-    backgroundColor: '#FFD20A',
-    borderRadius: 15,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 50,
-  },
-  infoContainer: {
-    paddingTop: 5,
-    alignItems: 'center',
-  },
-  editIcon: {
-    position: 'absolute', 
-    bottom: 0, 
-    right: 0, 
-    padding: 5, 
-    backgroundColor: '#1e1e1e',
-    borderRadius: 30,
-  },
-  name: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  label: {
-    fontSize: 16,
-    marginTop: 10,
-    paddingBottom: 5,
-    color: '#FFD20A',
-  },
-  picker: {
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-  },
-  detailsText: {
-    fontSize: 18,
-    color: '#333',
-    fontWeight: 'semibold',
-    marginVertical: 5,
-  },
-  inputContainer: {
-    paddingHorizontal: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    color: '#fff',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 10,
-  },
-  button: {
-    backgroundColor: '#FFD20A',
-    marginHorizontal: 20,
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 40,
-  },
-  buttonText: {
-    color: '#333',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  item: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  text: {
-    fontSize: 16,
-  },
-});
+                {/* Enhanced Progress Bar */}
+                <Box style={{ 
+                  height: 6, 
+                  backgroundColor: '#333333', 
+                  borderRadius: 3,
+                  overflow: 'hidden',
+                }}>
+                  <Animated.View
+                    style={{
+                      height: 6,
+                      borderRadius: 3,
+                      width: progressAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0%', '100%'],
+                      }),
+                    }}
+                  >
+                    <LinearGradient
+                      colors={['#FFD20A', '#FFA500']}
+                      style={{ flex: 1, borderRadius: 3 }}
+                    />
+                  </Animated.View>
+                </Box>
+              </VStack>
+            </LinearGradient>
+          </Animated.View>
+        </SafeAreaView>
+
+        {/* Content */}
+        <ScrollView 
+          style={{ flex: 1 }}
+          contentContainerStyle={{ 
+            paddingHorizontal: 24, 
+            paddingBottom: insets.bottom + 140,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Profile Image Section */}
+          <ProfileImageSection
+            userDetails={userDetails}
+            animatedValue={profileAnim}
+          />
+
+          {/* Form Fields Section */}
+          <VStack className="mb-8">
+            <Animated.View
+              style={{
+                opacity: formAnim,
+                transform: [{ 
+                  translateY: formAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [20, 0]
+                  })
+                }]
+              }}
+            >
+              <HStack className="items-center mb-6">
+                <Box
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: 'rgba(255, 210, 10, 0.1)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 12,
+                  }}
+                >
+                  <Ionicons name="information-circle" size={16} color="#FFD20A" />
+                </Box>
+                <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: '700' }}>
+                  Personal Information
+                </Text>
+              </HStack>
+            </Animated.View>
+
+            {formFields.map((field, index) => (
+              <FormField
+                key={field.key}
+                icon={field.icon}
+                label={field.label}
+                placeholder={field.placeholder}
+                value={(userDetails[field.key as keyof UserDetails] ?? '').toString()}
+                onChangeText={(text) => handleChange(text, field.key as keyof UserDetails)}
+                keyboardType={field.keyboardType || 'default'}
+                animatedValue={formAnim}
+                index={index}
+                error={errors[field.key]}
+              />
+            ))}
+          </VStack>
+
+          {/* User Type Selection */}
+          <VStack className="mb-8">
+            <Animated.View
+              style={{
+                opacity: userTypeAnim,
+                transform: [{ 
+                  translateY: userTypeAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [30, 0]
+                  })
+                }]
+              }}
+            >
+              <HStack className="items-center mb-6">
+                <Box
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: 'rgba(255, 210, 10, 0.1)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 12,
+                  }}
+                >
+                  <Ionicons name="people" size={16} color="#FFD20A" />
+                </Box>
+                <VStack className="flex-1">
+                  <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: '700', marginBottom: 4 }}>
+                    I am a...
+                  </Text>
+                  <Text style={{ 
+                    color: errors.userType ? '#FF6B6B' : '#B0B0B0', 
+                    fontSize: 14, 
+                    lineHeight: 20 
+                  }}>
+                    {errors.userType ? 'Please select your role to continue' : 'Choose your role to customize your experience'}
+                  </Text>
+                </VStack>
+              </HStack>
+            </Animated.View>
+            
+            {userTypes.map((type, index) => (
+              <UserTypeCard
+                key={type.id}
+                type={type}
+                isSelected={selectedUserType === type.id}
+                onPress={() => {
+                  setSelectedUserType(type.id);
+                  if (errors.userType) {
+                    setErrors(prev => ({ ...prev, userType: false }));
+                  }
+                }}
+                animatedValue={userTypeAnim}
+                index={index}
+              />
+            ))}
+          </VStack>
+        </ScrollView>
+
+        {/* Enhanced Bottom Button */}
+        <SafeAreaView style={{ paddingBottom: insets.bottom }}>
+          <Animated.View
+            style={{
+              opacity: buttonAnim,
+              transform: [{ 
+                translateY: buttonAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [50, 0]
+                })
+              }]
+            }}
+          >
+            <Box className="px-6 py-4">
+              <TouchableOpacity
+                onPress={handleSubmit}
+                disabled={isSubmitting}
+                style={{
+                  borderRadius: 24,
+                  overflow: 'hidden',
+                  opacity: isSubmitting ? 0.8 : 1,
+                  shadowColor: '#FFD20A',
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 16,
+                  elevation: 12,
+                }}
+                activeOpacity={0.9}
+              >
+                <LinearGradient
+                  colors={['#FFD20A', '#FFA500']}
+                  style={{
+                    paddingVertical: 18,
+                    alignItems: 'center',
+                  }}
+                >
+                  <HStack className="items-center">
+                    {isSubmitting ? (
+                      <>
+                        <ActivityIndicator size="small" color="#1E1E1E" style={{ marginRight: 12 }} />
+                        <Text style={{ color: '#1E1E1E', fontSize: 18, fontWeight: '800' }}>
+                          Creating Profile...
+                        </Text>
+                      </>
+                    ) : (
+                      <>
+                        <Text style={{ 
+                          color: '#1E1E1E', 
+                          fontSize: 18, 
+                          fontWeight: '800', 
+                          marginRight: 8,
+                          letterSpacing: 0.2,
+                        }}>
+                          Continue to Next Step
+                        </Text>
+                        <Ionicons name="chevron-forward" size={22} color="#1E1E1E" />
+                      </>
+                    )}
+                  </HStack>
+                </LinearGradient>
+      </TouchableOpacity>
+
+              {/* Form validation hint */}
+              {Object.keys(errors).length > 0 && !isSubmitting && (
+                <Box className="mt-4">
+                  <LinearGradient
+                    colors={['rgba(255, 107, 107, 0.1)', 'transparent']}
+                    style={{
+                      borderRadius: 12,
+                      padding: 12,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <HStack className="items-center">
+                      <Ionicons name="alert-circle" size={16} color="#FF6B6B" style={{ marginRight: 8 }} />
+                      <Text style={{ color: '#FF6B6B', fontSize: 13, textAlign: 'center' }}>
+                        Please fill in all required fields to continue
+                      </Text>
+                    </HStack>
+                  </LinearGradient>
+                </Box>
+              )}
+            </Box>
+          </Animated.View>
+    </SafeAreaView>
+      </Animated.View>
+    </View>
+  );
+}
+
+
