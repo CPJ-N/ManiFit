@@ -428,7 +428,7 @@ export default function Home({ navigation }: { navigation: any }) {
                   marginBottom: 8
                 }}
               >
-                {userInfo?.fullName?.split(' ')[0] || 'Champion'}
+                Welcome, {userInfo?.fullName?.split(' ')[0] || 'Champion'}!
               </Heading>
               <Text size="md" style={{ color: '#B0B0B0', lineHeight: 22 }}>
                 Ready to transform your fitness journey?

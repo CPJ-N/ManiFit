@@ -19,8 +19,7 @@ import { Text } from '@/components/ui/text';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallbackText } from '@/components/ui/avatar';
 
-// Navigation
-import { TRAINER_ONBOARDING, TRAINEE_ONBOARDING } from '../../constants/screenNames';
+// Navigation imports removed - App.tsx handles navigation automatically
 
 const { width } = Dimensions.get('window');
 
@@ -468,7 +467,7 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
 
     // Progress animation
     Animated.timing(progressAnim, {
-      toValue: 0.5, // 50% progress (step 2 of 4)
+      toValue: 0.75, // 75% progress (optional step)
       duration: 1200,
       useNativeDriver: false,
     }).start();
@@ -506,10 +505,21 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
       if (!currentUserId) {
         throw new Error('User not authenticated');
       }
+      console.log('🔄 Creating user with details:', finalUserDetails);
       await createUser(finalUserDetails, currentUserId);
-      dispatch(setUser(finalUserDetails));
+      console.log('✅ User created successfully in Firestore');
       
-      // Add exit animation before branching to onboarding
+      dispatch(setUser(finalUserDetails));
+      console.log('✅ User details dispatched to Redux store');
+      
+      // Give Firestore a moment to save the data, then trigger auth state refresh
+      setTimeout(() => {
+        // Force auth state to refresh by calling the current user again
+        console.log('🔄 Triggering auth state refresh after profile creation');
+        auth.currentUser?.reload();
+      }, 500);
+      
+      // Add exit animation before automatic navigation
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
@@ -522,12 +532,10 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
           useNativeDriver: true,
         }),
       ]).start(() => {
-        // Navigate based on user type
-        if (finalUserDetails.isTrainer) {
-          navigation.navigate(TRAINER_ONBOARDING);
-        } else {
-          navigation.navigate(TRAINEE_ONBOARDING);
-        }
+        // No manual navigation - let App.tsx auth state handle the redirect
+        // After user data is saved and Redux is updated, App.tsx will automatically 
+        // show the main app (BOTTOM_TABS) since user is authenticated and has complete profile
+        console.log('✅ User profile completed successfully. App.tsx will handle navigation to main app.');
       });
     } catch (error) {
       console.error('Error creating user:', error);
@@ -550,6 +558,61 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
     { key: 'weight', label: 'Weight (kg)', icon: 'fitness-outline', placeholder: '70', keyboardType: 'numeric' },
     { key: 'height', label: 'Height (cm)', icon: 'resize-outline', placeholder: '175', keyboardType: 'numeric' },
   ];
+
+  const handleSkip = async () => {
+    setIsSubmitting(true);
+    try {
+      // Create minimal trainee profile with defaults
+      const minimalUserDetails: UserDetails = {
+        uid: passedUserData?.uid || currentUser?.uid || '',
+        fullName: currentUser?.displayName || 'User',
+        email: passedUserData?.email || currentUser?.email || '',
+        mobileNumber: '',
+        dateOfBirth: '',
+        weight: 0,
+        height: 0,
+        isTrainer: false, // Default to trainee when skipping
+        profilePhotoName: '',
+      };
+
+      const currentUserId = currentUser?.uid;
+      if (!currentUserId) {
+        throw new Error('User not authenticated');
+      }
+      
+      console.log('⏩ Skipping profile form, creating minimal trainee profile:', minimalUserDetails);
+      await createUser(minimalUserDetails, currentUserId);
+      console.log('✅ Minimal trainee profile created successfully');
+      
+      dispatch(setUser(minimalUserDetails));
+      console.log('✅ Minimal user details dispatched to Redux store');
+      
+      // Give Firestore a moment to save the data, then trigger auth state refresh
+      setTimeout(() => {
+        console.log('🔄 Triggering auth state refresh after profile skip');
+        auth.currentUser?.reload();
+      }, 500);
+      
+      // Add exit animation before automatic navigation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: -30,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        console.log('✅ Profile skipped successfully. App.tsx will handle navigation to main app.');
+      });
+    } catch (error) {
+      console.error('Error creating minimal profile:', error);
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: '#1E1E1E' }}>
@@ -583,7 +646,7 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
                 <HStack className="justify-between items-center mb-6">
                   <VStack className="flex-1">
                     <Text style={{ color: '#B0B0B0', fontSize: 14, fontWeight: '600' }}>
-                      Step 2 of 4
+                      Optional Setup
                     </Text>
                     <Heading 
                       size="2xl" 
@@ -603,9 +666,33 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
                       marginTop: 4,
                       lineHeight: 20,
                     }}>
-                      Tell us about yourself to personalize your experience
+                      Share details now or skip and complete later in settings
                     </Text>
                   </VStack>
+                  
+                  {/* Skip Button */}
+                  <TouchableOpacity
+                    onPress={handleSkip}
+                    disabled={isSubmitting}
+                    style={{
+                      paddingHorizontal: 16,
+                      paddingVertical: 8,
+                      borderRadius: 20,
+                      backgroundColor: isSubmitting ? 'rgba(176, 176, 176, 0.05)' : 'rgba(176, 176, 176, 0.1)',
+                      borderWidth: 1,
+                      borderColor: isSubmitting ? 'rgba(176, 176, 176, 0.1)' : 'rgba(176, 176, 176, 0.3)',
+                      opacity: isSubmitting ? 0.5 : 1,
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={{ 
+                      color: isSubmitting ? '#888' : '#B0B0B0', 
+                      fontSize: 14, 
+                      fontWeight: '600' 
+                    }}>
+                      {isSubmitting ? 'Please wait...' : 'Skip for now'}
+                    </Text>
+                  </TouchableOpacity>
                 </HStack>
 
                 {/* Enhanced Progress Bar */}
@@ -813,14 +900,14 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
                           marginRight: 8,
                           letterSpacing: 0.2,
                         }}>
-                          Continue to Next Step
+                          Enter ManiFit
                         </Text>
                         <Ionicons name="chevron-forward" size={22} color="#1E1E1E" />
                       </>
                     )}
                   </HStack>
                 </LinearGradient>
-      </TouchableOpacity>
+              </TouchableOpacity>
 
               {/* Form validation hint */}
               {Object.keys(errors).length > 0 && !isSubmitting && (
@@ -844,7 +931,7 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
               )}
             </Box>
           </Animated.View>
-    </SafeAreaView>
+        </SafeAreaView>
       </Animated.View>
     </View>
   );

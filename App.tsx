@@ -55,11 +55,12 @@ function AppContent() {
           const userDetails = await getUser(user.uid);
           if (userDetails) {
             console.log('✅ User details found, updating Redux state:', userDetails.fullName);
+            console.log('🏠 Will show main app (BOTTOM_TABS) since user is authenticated with complete profile');
             dispatch(setUser(userDetails));
             setHasCompletedProfile(true);
           } else {
             console.log('❌ No user details found in Firestore - user needs to complete registration');
-            console.log('🔄 This will show AUTH_TABS with WELCOME_ONBOARDING as initial route');
+            console.log('🔄 Will show AUTH_TABS with USER_DETAILS_FORM as initial route');
             // Don't clear Redux state, just mark as incomplete profile
             setHasCompletedProfile(false);
           }
@@ -79,6 +80,17 @@ function AppContent() {
 
     return unsubscribe; // unsubscribe on unmount
   }, [dispatch, initializing]);
+
+  // Watch for Redux userInfo changes to update profile completion status
+  useEffect(() => {
+    if (user && userInfo) {
+      console.log('📝 Redux userInfo updated, profile is now complete:', userInfo.fullName);
+      setHasCompletedProfile(true);
+    } else if (user && !userInfo) {
+      console.log('📝 User authenticated but no userInfo in Redux, profile incomplete');
+      setHasCompletedProfile(false);
+    }
+  }, [user, userInfo]);
 
   useEffect(() => {
     // Set an initial delay before starting transition
