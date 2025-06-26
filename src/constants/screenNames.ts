@@ -6,6 +6,7 @@ export const PASSWORD_RESET = 'PASSWORD_RESET';
 export const HOME = 'HOME';
 export const WELCOME = 'WELCOME';
 export const FAVORITE = 'FAVORITE';
+export const CLIENT_LIST = 'CLIENT_LIST';
 export const PROFILE = 'PROFILE';
 export const USER_DETAILS_FORM = 'USER_DETAILS_FORM';
 export const TRAINER_ONBOARDING = 'TRAINER_ONBOARDING';

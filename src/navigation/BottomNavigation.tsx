@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons'; 
 
-import { EXERCISE_TABS, FAVORITE, HOME, PROFILE_TABS } from '../constants/screenNames';
+import { EXERCISE_TABS, FAVORITE, HOME, PROFILE_TABS, CLIENT_LIST } from '../constants/screenNames';
 
 // Screens
 import Home from '../screens/BottomNavScreens/Home';
@@ -9,7 +9,7 @@ import FavoriteScreen from '../screens/BottomNavScreens/FavoriteScreen';
 import ProfileNavigation from './ProfileNavigation';
 import ExerciseNavigation from './ExerciseNavigation';
 import CompleteExerciseList from '../screens/RoutineScreens/CompleteExerciseList';
-import AssignRoutineScreen from '../screens/RoutineScreens/AssignRoutineScreen';
+import ClientListScreen from '../screens/ClientScreens/ClientListScreen';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/reduxStore';
 
@@ -37,10 +37,10 @@ export default function BottomNavigation() {
                         <Ionicons name="albums-outline" size={size} color={color} />
                     ),
                 }}/>
-                { userInfo?.isTrainer === true && <BottomTabs.Screen name={FAVORITE} component={AssignRoutineScreen}
+                { userInfo?.isTrainer === true && <BottomTabs.Screen name={FAVORITE} component={ClientListScreen}
                     options={{
                         tabBarIcon: ({color, size}) => (
-                        <Ionicons name="bookmarks-outline" size={size} color={color} />
+                        <Ionicons name="people-outline" size={size} color={color} />
                     ),
                 }}/>}
                 <BottomTabs.Screen name={PROFILE_TABS} component={ProfileNavigation} 
