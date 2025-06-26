@@ -1,16 +1,310 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Animated, Alert } from 'react-native';
+import { View, TextInput, TouchableOpacity, ScrollView, Animated, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import { BOTTOM_TABS, HOME, LOGIN, USER_DETAILS_FORM } from '../../constants/screenNames';
+import { LOGIN } from '../../constants/screenNames';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { getUser } from '../../utils/controllers/userController';
-import Constants from 'expo-constants'
+import Constants from 'expo-constants';
+
+// Gluestack UI Components
+import { Box } from '@/components/ui/box';
+import { VStack } from '@/components/ui/vstack';
+import { HStack } from '@/components/ui/hstack';
+import { Heading } from '@/components/ui/heading';
+import { Text } from '@/components/ui/text';
+import { Card } from '@/components/ui/card';
 
 WebBrowser.maybeCompleteAuthSession();
+
+const { width, height } = Dimensions.get('window');
+
+// Compact Form Field Component
+const FormField = ({ 
+  label,
+  value, 
+  onChangeText, 
+  placeholder, 
+  icon,
+  secureTextEntry = false,
+  showPasswordToggle = false,
+  onTogglePassword,
+  showPassword = false,
+  keyboardType = 'default',
+  autoCapitalize = 'none',
+  focused,
+  onFocus,
+  onBlur,
+  error = false,
+  animatedValue,
+  index = 0
+}: {
+  label: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder: string;
+  icon: string;
+  secureTextEntry?: boolean;
+  showPasswordToggle?: boolean;
+  onTogglePassword?: () => void;
+  showPassword?: boolean;
+  keyboardType?: any;
+  autoCapitalize?: any;
+  focused: boolean;
+  onFocus: () => void;
+  onBlur: () => void;
+  error?: boolean;
+  animatedValue: Animated.Value;
+  index?: number;
+}) => (
+  <Animated.View
+    style={{
+      opacity: animatedValue,
+      transform: [{ 
+        translateY: animatedValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [20 + (index * 5), 0]
+        })
+      }]
+    }}
+  >
+    <Card 
+      className="mb-3 p-0" 
+      style={{
+        backgroundColor: focused ? '#333333' : '#2A2A2A',
+        borderRadius: 16,
+        borderWidth: 1.5,
+        borderColor: error ? '#FF6B6B' : focused ? '#FFD20A' : 'transparent',
+        shadowColor: focused ? '#FFD20A' : '#000',
+        shadowOffset: { width: 0, height: focused ? 4 : 2 },
+        shadowOpacity: focused ? 0.2 : 0.1,
+        shadowRadius: focused ? 8 : 4,
+        elevation: focused ? 4 : 2,
+      }}
+    >
+      <Box className="p-4">
+        <HStack className="items-center mb-2">
+          <Box
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              backgroundColor: focused ? 'rgba(255, 210, 10, 0.2)' : 'rgba(255, 210, 10, 0.1)',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: 8,
+            }}
+          >
+            <Ionicons 
+              name={icon as any} 
+              size={12} 
+              color={focused ? "#FFD20A" : "#888"} 
+            />
+          </Box>
+          <Text style={{ 
+            color: focused ? '#FFD20A' : '#888', 
+            fontSize: 12, 
+            fontWeight: '600',
+            flex: 1,
+          }}>
+            {label}
+          </Text>
+          {showPasswordToggle && (
+            <TouchableOpacity
+              onPress={onTogglePassword}
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: 12,
+                backgroundColor: 'rgba(255, 210, 10, 0.1)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons
+                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                size={12}
+                color={focused ? "#FFD20A" : "#888"}
+              />
+            </TouchableOpacity>
+          )}
+        </HStack>
+        
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          placeholder={placeholder}
+          secureTextEntry={secureTextEntry}
+          keyboardType={keyboardType}
+          autoCapitalize={autoCapitalize}
+          autoCorrect={false}
+          style={{
+            backgroundColor: 'rgba(30, 30, 30, 0.5)',
+            borderColor: 'rgba(255, 210, 10, 0.1)',
+            borderWidth: 1,
+            borderRadius: 12,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            color: '#FFFFFF',
+            fontSize: 15,
+            fontWeight: '500',
+          }}
+          placeholderTextColor="#666"
+        />
+      </Box>
+    </Card>
+  </Animated.View>
+);
+
+// Compact Error Message Component
+const ErrorMessage = ({ 
+  message, 
+  animatedValue 
+}: {
+  message: string;
+  animatedValue: Animated.Value;
+}) => (
+  <Animated.View
+    style={{
+      opacity: animatedValue,
+      transform: [{ 
+        translateY: animatedValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [10, 0]
+        })
+      }]
+    }}
+  >
+    <LinearGradient
+      colors={['rgba(255, 107, 107, 0.15)', 'rgba(255, 107, 107, 0.05)']}
+      style={{
+        borderRadius: 12,
+        padding: 12,
+        marginBottom: 16,
+        borderLeftWidth: 3,
+        borderLeftColor: '#FF6B6B',
+      }}
+    >
+      <HStack className="items-center">
+        <Box
+          style={{
+            width: 20,
+            height: 20,
+            borderRadius: 10,
+            backgroundColor: 'rgba(255, 107, 107, 0.2)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 8,
+          }}
+        >
+          <Ionicons name="alert-circle" size={12} color="#FF6B6B" />
+        </Box>
+        <Text style={{ color: '#FF6B6B', fontSize: 13, fontWeight: '500', flex: 1 }}>
+          {message}
+        </Text>
+      </HStack>
+    </LinearGradient>
+  </Animated.View>
+);
+
+// Compact Action Button Component
+const ActionButton = ({ 
+  title, 
+  onPress, 
+  isLoading = false, 
+  loadingText = 'Loading...', 
+  variant = 'primary',
+  animatedValue,
+  disabled = false 
+}: {
+  title: string;
+  onPress: () => void;
+  isLoading?: boolean;
+  loadingText?: string;
+  variant?: 'primary' | 'secondary';
+  animatedValue: Animated.Value;
+  disabled?: boolean;
+}) => (
+  <Animated.View
+    style={{
+      opacity: animatedValue,
+      transform: [{ 
+        scale: animatedValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.95, 1]
+        })
+      }]
+    }}
+  >
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={isLoading || disabled}
+      style={{
+        borderRadius: 16,
+        overflow: 'hidden',
+        shadowColor: variant === 'primary' ? '#FFD20A' : '#666',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: variant === 'primary' ? 0.2 : 0.1,
+        shadowRadius: 8,
+        elevation: 4,
+        opacity: (isLoading || disabled) ? 0.7 : 1,
+        marginBottom: 12,
+      }}
+      activeOpacity={0.9}
+    >
+      {variant === 'primary' ? (
+        <LinearGradient
+          colors={['#FFD20A', '#FFA500']}
+          style={{
+            padding: 16,
+            alignItems: 'center',
+          }}
+        >
+          <HStack className="items-center">
+            {isLoading && (
+              <Animated.View 
+                style={{ 
+                  marginRight: 8,
+                  transform: [{ rotate: '360deg' }] 
+                }}
+              >
+                <Ionicons name="refresh" size={16} color="#1E1E1E" />
+              </Animated.View>
+            )}
+            <Text style={{ color: '#1E1E1E', fontSize: 15, fontWeight: '700' }}>
+              {isLoading ? loadingText : title}
+            </Text>
+          </HStack>
+        </LinearGradient>
+      ) : (
+        <View
+          style={{
+            backgroundColor: '#2A2A2A',
+            borderWidth: 1,
+            borderColor: '#444',
+            padding: 16,
+            alignItems: 'center',
+          }}
+        >
+          <HStack className="items-center">
+            <Ionicons name="logo-google" size={16} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>
+              {title}
+            </Text>
+          </HStack>
+        </View>
+      )}
+    </TouchableOpacity>
+  </Animated.View>
+);
 
 export default function SignUp({ navigation }: { navigation: any }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,28 +314,34 @@ export default function SignUp({ navigation }: { navigation: any }) {
   const [isLoading, setIsLoading] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const insets = useSafeAreaInsets();
 
-  // Animation values
+  // Enhanced Animation values
   const fadeAnim = new Animated.Value(0);
-  const slideAnim = new Animated.Value(50);
+  const errorAnim = new Animated.Value(0);
 
   useEffect(() => {
-    // Entrance animation
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    // Simple fade in animation
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
   }, []);
 
-  // Updated code: clientId removed from the configuration
+  useEffect(() => {
+    if (error) {
+      Animated.timing(errorAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      errorAnim.setValue(0);
+    }
+  }, [error]);
+
+  // Google Auth configuration
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     clientId: Constants.expoConfig?.extra?.googleWebClientId,
     iosClientId: Constants.expoConfig?.extra?.firebaseIosClientId,
@@ -58,15 +358,12 @@ export default function SignUp({ navigation }: { navigation: any }) {
             const user = userCredential.user;
             const userInfo = await getUser(user.uid);
             if (!userInfo) {
-              // User doesn't exist in Firestore, auth state change will handle navigation
-              console.log('Google sign-in complete, user needs to complete profile - auth flow will handle navigation');
-              // No need to navigate manually - App.tsx auth listener will handle this
+              console.log('Google sign-up complete, user needs to complete profile - auth flow will handle navigation');
             }
-            // If user exists, authentication state will be handled by App.tsx
           })
           .catch((error) => {
             console.error('Error during Firebase sign-in:', error);
-            setError('Google Sign-In failed. Try again later.');
+            setError('Google Sign-Up failed. Try again later.');
           });
       }
     }
@@ -82,10 +379,8 @@ export default function SignUp({ navigation }: { navigation: any }) {
   };
 
   const handleSignUp = async () => {
-    // Clear previous errors
     setError('');
 
-    // Validation
     if (!userEmail.trim()) {
       setError('Email is required');
       return;
@@ -112,8 +407,6 @@ export default function SignUp({ navigation }: { navigation: any }) {
       const userCredential = await createUserWithEmailAndPassword(auth, userEmail, userPassword);
       const user = userCredential.user;
       console.log('Account created successfully, auth state change will handle navigation');
-      // No need to navigate manually - App.tsx auth listener will handle this
-      // The user will be automatically taken to USER_DETAILS_FORM via AuthNavigation
     } catch (error: any) {
       const errorCode = error.code;
       let errorMessage = 'An error occurred. Please try again.';
@@ -144,8 +437,8 @@ export default function SignUp({ navigation }: { navigation: any }) {
       setIsLoading(true);
       await promptAsync();
     } catch (error) {
-      console.error('Error during Google sign-in:', error);
-      setError('Google Sign-In failed. Try again later.');
+      console.error('Error during Google sign-up:', error);
+      setError('Google Sign-Up failed. Try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -153,335 +446,239 @@ export default function SignUp({ navigation }: { navigation: any }) {
 
   return (
     <KeyboardAvoidingView 
-      style={styles.container} 
+      style={{ 
+        flex: 1, 
+        backgroundColor: '#1E1E1E',
+      }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       <StatusBar style="light" />
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+      
+      {/* Compact Header Section */}
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+        }}
       >
-        <Animated.View 
-          style={[
-            styles.content,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }]
-            }
-          ]}
+        <LinearGradient
+          colors={['rgba(255, 210, 10, 0.12)', 'rgba(255, 210, 10, 0.04)', 'transparent']}
+          style={{ 
+            paddingTop: insets.top + 20,
+            paddingBottom: 20,
+          }}
         >
-          {/* Header Section */}
-          <View style={styles.headerSection}>
-            <Text style={styles.header}>Create Your Account</Text>
-            <Text style={styles.subheader}>
-              Sign up now to get access to personalized workouts and achieve your fitness goals.
-            </Text>
-          </View>
-
-          {/* Form Section */}
-          <View style={styles.formSection}>
-            {/* Email Input */}
-            <View style={[
-              styles.inputContainer,
-              emailFocused && styles.inputContainerFocused,
-              error && (userEmail === '' || !validateEmail(userEmail)) && styles.inputContainerError
-            ]}>
-              <Ionicons 
-                name="mail-outline" 
-                size={20} 
-                color={emailFocused ? "#FFD20A" : "#666"} 
-                style={styles.inputIcon} 
-              />
-              <TextInput
-                placeholder="Enter your email"
-                value={userEmail}
-                onChangeText={(text) => {
-                  setUserEmail(text);
-                  if (error) setError(''); // Clear error on input
+          <Box className="px-6">
+            <VStack className="items-center">
+              {/* Compact Logo */}
+              <Box
+                style={{
+                  width: 70,
+                  height: 70,
+                  borderRadius: 35,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginBottom: 16,
+                  shadowColor: '#FFD20A',
+                  shadowOffset: { width: 0, height: 6 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 12,
+                  elevation: 8,
                 }}
-                onFocus={() => setEmailFocused(true)}
-                onBlur={() => setEmailFocused(false)}
-                style={styles.input}
-                placeholderTextColor="#888"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+              >
+                <LinearGradient
+                  colors={['#FFD20A', '#FFA500']}
+                  style={{
+                    width: 70,
+                    height: 70,
+                    borderRadius: 35,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Ionicons name="person-add" size={30} color="#1E1E1E" />
+                </LinearGradient>
+              </Box>
+
+              <Heading 
+                size="xl" 
+                className="font-bold text-center mb-2" 
+                style={{ 
+                  color: '#FFFFFF', 
+                  fontSize: 28,
+                  letterSpacing: -0.5,
+                }}
+              >
+                Create Account
+              </Heading>
+              <Text 
+                size="sm" 
+                className="text-center" 
+                style={{ 
+                  color: '#B0B0B0', 
+                  lineHeight: 20,
+                  paddingHorizontal: 20,
+                  fontSize: 14,
+                }}
+              >
+                Join us and start your fitness transformation
+              </Text>
+            </VStack>
+          </Box>
+        </LinearGradient>
+      </Animated.View>
+
+      <Animated.View
+        style={{
+          flex: 1,
+          opacity: fadeAnim,
+        }}
+      >
+        <ScrollView 
+          style={{ backgroundColor: '#1E1E1E' }}
+          contentContainerStyle={{ 
+            backgroundColor: '#1E1E1E',
+            paddingHorizontal: 20,
+            paddingBottom: insets.bottom + 10,
+          }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Compact Form Section */}
+          <Box className="py-4">
+            <View>
+              <HStack className="items-center mb-4">
+                <Box
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    backgroundColor: 'rgba(255, 210, 10, 0.1)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 8,
+                  }}
+                >
+                  <Ionicons name="person-add" size={12} color="#FFD20A" />
+                </Box>
+                <Heading size="md" className="font-bold" style={{ color: '#FFFFFF' }}>
+                  Create Your Account
+                </Heading>
+              </HStack>
             </View>
+
+            {/* Email Input */}
+            <FormField
+              label="Email Address"
+              value={userEmail}
+              onChangeText={(text) => {
+                setUserEmail(text);
+                if (error) setError('');
+              }}
+              placeholder="Enter your email address"
+              icon="mail"
+              keyboardType="email-address"
+              focused={emailFocused}
+              onFocus={() => setEmailFocused(true)}
+              onBlur={() => setEmailFocused(false)}
+              error={Boolean(error && (userEmail === '' || !validateEmail(userEmail)))}
+              animatedValue={fadeAnim}
+              index={0}
+            />
 
             {/* Password Input */}
-            <View style={[
-              styles.inputContainer,
-              passwordFocused && styles.inputContainerFocused,
-              error && (userPassword === '' || !validatePassword(userPassword)) && styles.inputContainerError
-            ]}>
-              <Ionicons 
-                name="lock-closed-outline" 
-                size={20} 
-                color={passwordFocused ? "#FFD20A" : "#666"} 
-                style={styles.inputIcon} 
-              />
-              <TextInput
-                placeholder="Create a password"
-                value={userPassword}
-                onChangeText={(text) => {
-                  setUserPassword(text);
-                  if (error) setError(''); // Clear error on input
-                }}
-                onFocus={() => setPasswordFocused(true)}
-                onBlur={() => setPasswordFocused(false)}
-                secureTextEntry={!showPassword}
-                style={styles.input}
-                placeholderTextColor="#888"
-                autoCapitalize="none"
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeIcon}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Ionicons
-                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                  size={20}
-                  color={passwordFocused ? "#FFD20A" : "#666"}
-                />
-              </TouchableOpacity>
-            </View>
+            <FormField
+              label="Password"
+              value={userPassword}
+              onChangeText={(text) => {
+                setUserPassword(text);
+                if (error) setError('');
+              }}
+              placeholder="Create a secure password"
+              icon="lock-closed"
+              secureTextEntry={!showPassword}
+              showPasswordToggle={true}
+              onTogglePassword={() => setShowPassword(!showPassword)}
+              showPassword={showPassword}
+              focused={passwordFocused}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
+              error={Boolean(error && (userPassword === '' || !validatePassword(userPassword)))}
+              animatedValue={fadeAnim}
+              index={1}
+            />
 
-            {/* Password Requirements */}
-            <Text style={styles.passwordHint}>
-              Password must be at least 6 characters long
-            </Text>
+
 
             {/* Error Message */}
-            {error ? (
-              <View style={styles.errorContainer}>
-                <Ionicons name="alert-circle-outline" size={16} color="#FF6B6B" />
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
-            ) : null}
+            {error && (
+              <ErrorMessage message={error} animatedValue={errorAnim} />
+            )}
 
             {/* Sign Up Button */}
-            <TouchableOpacity 
-              style={[styles.button, isLoading && styles.buttonDisabled]} 
+            <ActionButton
+              title="Create Account"
               onPress={handleSignUp}
+              isLoading={isLoading}
+              loadingText="Creating Account..."
+              variant="primary"
+              animatedValue={fadeAnim}
               disabled={isLoading}
-              activeOpacity={0.8}
-            >
-              {isLoading ? (
-                <View style={styles.buttonContent}>
-                  <Animated.View style={styles.loadingSpinner}>
-                    <Ionicons name="refresh" size={20} color="#1E1E1E" />
-                  </Animated.View>
-                  <Text style={styles.buttonText}>Creating Account...</Text>
-                </View>
-              ) : (
-                <Text style={styles.buttonText}>Create Account</Text>
-              )}
-            </TouchableOpacity>
+            />
 
             {/* Divider */}
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
+            <View>
+              <HStack className="items-center mb-4">
+                <Box style={{ flex: 1, height: 1, backgroundColor: '#444' }} />
+                <Text style={{ color: '#888', fontSize: 12, paddingHorizontal: 12 }}>
+                  or continue with
+                </Text>
+                <Box style={{ flex: 1, height: 1, backgroundColor: '#444' }} />
+              </HStack>
             </View>
 
             {/* Google Sign Up Button */}
-            <TouchableOpacity 
-              style={styles.socialButton} 
+            <ActionButton
+              title="Continue with Google"
               onPress={handleSignUpWithGoogle}
+              variant="secondary"
+              animatedValue={fadeAnim}
               disabled={isLoading}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="logo-google" size={20} color="#fff" />
-              <Text style={styles.socialButtonText}>Google</Text>
-            </TouchableOpacity>
-          </View>
+            />
 
-          {/* Footer Section */}
-          <View style={styles.footerSection}>
-            <Text style={styles.loginPrompt}>
-              Already have an account?{' '}
-              <Text 
-                style={styles.loginLink} 
-                onPress={() => navigation.navigate(LOGIN)}
-              >
-                Sign In
-              </Text>
-            </Text>
-          </View>
-        </Animated.View>
-      </ScrollView>
+            {/* Compact Footer */}
+            <View>
+              <Box className="py-4">
+                <HStack className="items-center justify-center">
+                  <Text 
+                    style={{ 
+                      color: '#B0B0B0', 
+                      fontSize: 14,
+                      marginRight: 8,
+                    }}
+                  >
+                    Already have an account?
+                  </Text>
+                  <TouchableOpacity 
+                    onPress={() => navigation.navigate(LOGIN)}
+                    style={{
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 12,
+                      borderWidth: 1,
+                      borderColor: '#FFD20A',
+                    }}
+                  >
+                    <Text style={{ color: '#FFD20A', fontWeight: '600', fontSize: 13 }}>
+                      Sign In
+                    </Text>
+                  </TouchableOpacity>
+                </HStack>
+              </Box>
+            </View>
+          </Box>
+        </ScrollView>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1E1E1E',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingVertical: 40,
-  },
-  headerSection: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  header: {
-    fontSize: 32,
-    color: '#FFD20A',
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  subheader: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#B0B0B0',
-    lineHeight: 24,
-    paddingHorizontal: 20,
-  },
-  formSection: {
-    marginBottom: 32,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2A2A2A',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  inputContainerFocused: {
-    borderColor: '#FFD20A',
-    backgroundColor: '#333333',
-  },
-  inputContainerError: {
-    borderColor: '#FF6B6B',
-  },
-  input: {
-    flex: 1,
-    color: '#fff',
-    fontSize: 16,
-    paddingVertical: 16,
-    paddingLeft: 12,
-  },
-  inputIcon: {
-    padding: 4,
-  },
-  eyeIcon: {
-    padding: 8,
-  },
-  passwordHint: {
-    color: '#888',
-    fontSize: 12,
-    marginBottom: 24,
-    marginLeft: 4,
-  },
-  errorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2A2A2A', // Solid background for shadow optimization
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginBottom: 20,
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF6B6B',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 107, 107, 0.3)',
-  },
-  errorText: {
-    color: '#FF6B6B',
-    fontSize: 14,
-    marginLeft: 8,
-    flex: 1,
-  },
-  button: {
-    backgroundColor: '#FFD20A',
-    paddingVertical: 18,
-    borderRadius: 16,
-    alignItems: 'center',
-    marginBottom: 24,
-    shadowColor: '#FFD20A',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  loadingSpinner: {
-    marginRight: 8,
-  },
-  buttonText: {
-    color: '#1E1E1E',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#444',
-  },
-  dividerText: {
-    color: '#888',
-    fontSize: 14,
-    paddingHorizontal: 16,
-  },
-  socialButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#2A2A2A',
-    paddingVertical: 18,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#444',
-  },
-  socialButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '500',
-    marginLeft: 12,
-  },
-  footerSection: {
-    alignItems: 'center',
-    paddingTop: 20,
-  },
-  loginPrompt: {
-    color: '#B0B0B0',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  loginLink: {
-    color: '#FFD20A',
-    fontWeight: '600',
-  },
-});
