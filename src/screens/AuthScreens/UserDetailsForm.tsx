@@ -25,16 +25,6 @@ const { width, height } = Dimensions.get('window');
 
 const userTypes = [
   {
-    id: 'trainer',
-    title: 'Personal Trainer',
-    subtitle: 'I train others',
-    description: 'Share your expertise and help others achieve their fitness goals',
-    icon: 'barbell-outline',
-    isTrainer: true,
-    gradient: ['#FFD20A', '#FFA500'] as [string, string, ...string[]],
-    bgColor: 'rgba(255, 210, 10, 0.1)',
-  },
-  {
     id: 'trainee',
     title: 'Looking for Training',
     subtitle: 'I want to get fit',
@@ -43,6 +33,16 @@ const userTypes = [
     isTrainer: false,
     gradient: ['#4CAF50', '#2E7D32'] as [string, string, ...string[]],
     bgColor: 'rgba(76, 175, 80, 0.1)',
+  },
+  {
+    id: 'trainer',
+    title: 'Personal Trainer',
+    subtitle: 'I train others',
+    description: 'Share your expertise and help others achieve their fitness goals',
+    icon: 'barbell-outline',
+    isTrainer: true,
+    gradient: ['#FFD20A', '#FFA500'] as [string, string, ...string[]],
+    bgColor: 'rgba(255, 210, 10, 0.1)',
   },
 ];
 

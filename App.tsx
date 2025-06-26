@@ -36,6 +36,7 @@ function AppContent() {
   const [user, setUserState] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
   const [hasCompletedProfile, setHasCompletedProfile] = useState<boolean>(false);
+  const [userDataLoading, setUserDataLoading] = useState(false); // NEW: Track user data loading state
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const loadingFadeAnim = useRef(new Animated.Value(1)).current;
@@ -50,6 +51,7 @@ function AppContent() {
       
       if (user) {
         // User is signed in, fetch user details and store in Redux
+        setUserDataLoading(true); // Start loading user data
         try {
           console.log('👤 Checking user details for:', user.uid);
           const userDetails = await getUser(user.uid);
@@ -67,12 +69,15 @@ function AppContent() {
         } catch (error) {
           console.error('💥 Error fetching user details:', error);
           setHasCompletedProfile(false);
+        } finally {
+          setUserDataLoading(false); // Finish loading user data
         }
       } else {
         // User is signed out, clear Redux state
         console.log('🧹 Clearing user state');
         dispatch(clearUser());
         setHasCompletedProfile(false); // Set to false instead of null for signed out users
+        setUserDataLoading(false); // No need to load data for signed out user
       }
       
       if (initializing) setInitializing(false);
@@ -160,9 +165,9 @@ function AppContent() {
     return () => clearTimeout(fallbackTimeout);
   }, []);
 
-  // Show loading screen while checking authentication state
-  if (initializing) {
-    console.log('🔄 Still loading - initializing:', initializing, 'hasCompletedProfile:', hasCompletedProfile);
+  // Show loading screen while checking authentication state OR loading user data
+  if (initializing || userDataLoading) {
+    console.log('🔄 Still loading - initializing:', initializing, 'userDataLoading:', userDataLoading, 'hasCompletedProfile:', hasCompletedProfile);
     return (
       <View style={{ flex: 1 }}>
         <LoadingScreen />
