@@ -530,10 +530,20 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
     setIsSubmitting(true);
     try {
       const selectedType = userTypes.find(type => type.id === selectedUserType);
+      const isTrainerUser = selectedType?.isTrainer || false;
+      
       const finalUserDetails = {
         ...userDetails,
         uid: passedUserData?.uid || currentUser?.uid || '',
-        isTrainer: selectedType?.isTrainer || false,
+        isTrainer: isTrainerUser,
+        // Add trainer/client fields based on user type
+        ...(isTrainerUser && {
+          linkedTrainees: [],
+          linkedTrainer: '',
+        }),
+        ...(!isTrainerUser && {
+          linkedTrainer: '',
+        }),
       };
 
       const currentUserId = currentUser?.uid;
@@ -567,6 +577,7 @@ export default function UserDetailsForm({navigation, route} : {navigation: any, 
         height: 0,
         isTrainer: false,
         profilePhotoName: '',
+        linkedTrainer: '', // Default to trainee
       };
 
       const currentUserId = currentUser?.uid;

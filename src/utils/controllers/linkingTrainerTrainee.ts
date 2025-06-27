@@ -39,7 +39,7 @@ export const unlinkTraineeFromTrainer = async (traineeUid: string, trainerUid: s
     }
 
     await updateDoc(traineeRef, {
-        linkedTrainer: null
+        linkedTrainer: ''
     });
 
     console.log(`Trainee unlinked successfully! Trainer: ${trainerUid}, Trainee: ${traineeUid}`);

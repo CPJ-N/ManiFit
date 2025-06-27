@@ -112,11 +112,14 @@ export default function TrainerRegistrationScreen({navigation}: TrainerRegistrat
     // Navigate to the next step in the trainer registration process
     updateUser(auth.currentUser.uid, { 
         isTrainer: true,
-        linkedTrainees: [], // Array of trainee IDs (applicable only for trainers)
-        linkedTrainer: ''
+        linkedTrainees: userInfo?.linkedTrainees || [], // Only set if doesn't exist
+        linkedTrainer: userInfo?.linkedTrainer || ''    // Only set if doesn't exist
     }).then(() => {
         dispatch(setUser({
-            ...userInfo, isTrainer: true, linkedTrainees: [], linkedTrainer: ''
+            ...userInfo, 
+            isTrainer: true, 
+            linkedTrainees: userInfo?.linkedTrainees || [], 
+            linkedTrainer: userInfo?.linkedTrainer || ''
         } as UserDetails));
         console.log('User updated to be Trainer:', auth.currentUser?.uid);
         Alert.alert(
