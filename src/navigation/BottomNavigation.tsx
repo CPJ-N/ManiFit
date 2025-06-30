@@ -6,6 +6,7 @@ import { EXERCISE_TABS, FAVORITE, HOME, PROFILE_TABS, CLIENT_LIST } from '../con
 // Screens
 import Home from '../screens/BottomNavScreens/Home';
 import FavoriteScreen from '../screens/BottomNavScreens/FavoriteScreen';
+import TraineeWorkoutsScreen from '../screens/BottomNavScreens/TraineeWorkoutsScreen';
 import ProfileNavigation from './ProfileNavigation';
 import ExerciseNavigation from './ExerciseNavigation';
 import CompleteExerciseList from '../screens/RoutineScreens/CompleteExerciseList';
@@ -31,10 +32,12 @@ export default function BottomNavigation() {
                         <Ionicons name="home-outline" size={size} color={color}/>
                     ),
                 }}/>  
-                <BottomTabs.Screen name={EXERCISE_TABS} component={ExerciseNavigation}
+                <BottomTabs.Screen 
+                    name={EXERCISE_TABS} 
+                    component={userInfo?.isTrainer ? ExerciseNavigation : TraineeWorkoutsScreen}
                     options={{
                         tabBarIcon: ({color, size}) => (
-                        <Ionicons name="albums-outline" size={size} color={color} />
+                        <Ionicons name={userInfo?.isTrainer ? "albums-outline" : "fitness-outline"} size={size} color={color} />
                     ),
                 }}/>
                 { userInfo?.isTrainer === true && <BottomTabs.Screen name={FAVORITE} component={ClientListScreen}
