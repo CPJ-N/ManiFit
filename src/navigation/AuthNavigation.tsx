@@ -1,41 +1,37 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { WELCOME_ONBOARDING, REGISTER, LOGIN, USER_DETAILS_FORM, FORGOT_PASSWORD, PASSWORD_RESET } from "../constants/screenNames";
-import { auth } from "../config/firebase";
+import { LOGIN, REGISTER, USER_DETAILS_FORM, FORGOT_PASSWORD } from "../constants/screenNames";
 
-//App Screens & Componets
-import WelcomeOnboardingScreen from "../screens/AuthScreens/WelcomeOnboardingScreen";
-import SignUp from "../screens/AuthScreens/SignupScreen";
+// Simplified Auth Screens
 import Login from "../screens/AuthScreens/LoginScreen";
+import SignUp from "../screens/AuthScreens/SignupScreen";
 import UserDetailsForm from "../screens/AuthScreens/UserDetailsForm";
 import ForgottenPassword from "../screens/AuthScreens/ForgetPasswordScreen";
-import PasswordReset from "../screens/AuthScreens/PasswordResetScreen";
 
 const AuthScreens = createNativeStackNavigator();
 
 export default function AuthNavigation({ user, hasCompletedProfile }: { user?: any, hasCompletedProfile?: boolean }) {
-    // Determine initial route based on user state
-    let initialRoute = WELCOME_ONBOARDING;
+    // Simplified routing logic
+    let initialRoute = LOGIN;
     
     if (user && !hasCompletedProfile) {
-        // User is authenticated but hasn't completed profile setup
-        console.log('🔄 AuthNavigation: User authenticated but profile incomplete, starting with USER_DETAILS_FORM');
+        // User is authenticated but needs to complete profile
+        console.log('🔄 User authenticated, completing profile setup');
         initialRoute = USER_DETAILS_FORM;
-    } else if (!user) {
-        // No user, start with welcome onboarding
-        console.log('🎬 AuthNavigation: No user, starting with WELCOME_ONBOARDING');
-        initialRoute = WELCOME_ONBOARDING;
+    } else {
+        // Default to login screen for simplicity
+        console.log('🔐 Showing login screen');
+        initialRoute = LOGIN;
     }
 
     return (
         <AuthScreens.Navigator 
             screenOptions={{headerShown: false}}
-            initialRouteName={initialRoute}>
-            <AuthScreens.Screen name={WELCOME_ONBOARDING} component={WelcomeOnboardingScreen} />
+            initialRouteName={initialRoute}
+        >
             <AuthScreens.Screen name={LOGIN} component={Login} />
-            <AuthScreens.Screen name={REGISTER} component={SignUp}/>
+            <AuthScreens.Screen name={REGISTER} component={SignUp} />
             <AuthScreens.Screen name={USER_DETAILS_FORM} component={UserDetailsForm} />
             <AuthScreens.Screen name={FORGOT_PASSWORD} component={ForgottenPassword} />
-            <AuthScreens.Screen name={PASSWORD_RESET} component={PasswordReset} />
         </AuthScreens.Navigator>
     );
 }

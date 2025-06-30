@@ -1,16 +1,12 @@
-export const WELCOME_ONBOARDING = 'WELCOME_ONBOARDING';
 export const LOGIN = 'LOGIN';
 export const REGISTER = 'REGISTER';
 export const FORGOT_PASSWORD = 'FORGOT_PASSWORD';
-export const PASSWORD_RESET = 'PASSWORD_RESET';
 export const HOME = 'HOME';
 export const WELCOME = 'WELCOME';
 export const FAVORITE = 'FAVORITE';
 export const CLIENT_LIST = 'CLIENT_LIST';
 export const PROFILE = 'PROFILE';
 export const USER_DETAILS_FORM = 'USER_DETAILS_FORM';
-export const TRAINER_ONBOARDING = 'TRAINER_ONBOARDING';
-export const TRAINEE_ONBOARDING = 'TRAINEE_ONBOARDING';
 export const EDIT_PROFILE = 'EDIT_PROFILE';
 export const SETTINGS = 'SETTINGS';
 export const PRIVACY_POLICY = 'PRIVACY_POLICY';
