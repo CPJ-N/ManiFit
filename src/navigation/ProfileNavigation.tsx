@@ -1,4 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/reduxStore';
+
 import {
     DELETE_ACCOUNT,
     EDIT_PROFILE,
@@ -12,7 +15,7 @@ import {
     SETTINGS
 } from "../constants/screenNames";
 
-//Screens
+// Screens
 import ProfileScreen from "../screens/BottomNavScreens/ProfileScreen";
 import EditProfileScreen from "../screens/ProfileScreens/EditProfileScreen";
 import LinkTraineesScreen from "../screens/ProfileScreens/LinkTraineesScreen";
@@ -24,22 +27,38 @@ import PasswordSettingsScreen from "../screens/ProfileScreens/PasswordSettingsSc
 import TrainerRegistrationScreen from "../screens/ProfileScreens/TrainerRegistrationScreen";
 import CheckoutScreen from "../screens/CheckoutScreen";
 
-
 const ProfileScreens = createNativeStackNavigator();
 
 export default function ProfileNavigation() {
+    const userInfo = useSelector((state: RootState) => state.user.userInfo);
+    const isTrainer = userInfo?.isTrainer === true;
+
     return (
-        <ProfileScreens.Navigator screenOptions={{headerShown: false}} initialRouteName={PROFILE}>
-            <ProfileScreens.Screen name={PROFILE} component={ProfileScreen}  />
+        <ProfileScreens.Navigator 
+            screenOptions={{headerShown: false}} 
+            initialRouteName={PROFILE}
+        >
+            {/* Core Profile Screens - Available to all users */}
+            <ProfileScreens.Screen name={PROFILE} component={ProfileScreen} />
             <ProfileScreens.Screen name={EDIT_PROFILE} component={EditProfileScreen} />
-            <ProfileScreens.Screen name={LINK_TRAINEE} component={LinkTraineesScreen} />
-            <ProfileScreens.Screen name={LINK_TRAINER} component={LinkedTrainerScreen} />
             <ProfileScreens.Screen name={PRIVACY_POLICY} component={PrivacyPolicyScreen} />
             <ProfileScreens.Screen name={SETTINGS} component={SettingsScreen} />
-            <ProfileScreens.Screen name={CHECKOUT} component={CheckoutScreen} />
             <ProfileScreens.Screen name={DELETE_ACCOUNT} component={DeleteAccountScreen} />
             <ProfileScreens.Screen name={PASSWORD_SETTINGS} component={PasswordSettingsScreen} />
-            <ProfileScreens.Screen name={REGISTER_TRAINER} component={TrainerRegistrationScreen} />
+            
+            {/* Trainer-specific screens */}
+            {isTrainer && (
+                <>
+                    <ProfileScreens.Screen name={LINK_TRAINEE} component={LinkTraineesScreen} />
+                    <ProfileScreens.Screen name={CHECKOUT} component={CheckoutScreen} />
+                    <ProfileScreens.Screen name={REGISTER_TRAINER} component={TrainerRegistrationScreen} />
+                </>
+            )}
+            
+            {/* Trainee-specific screens */}
+            {!isTrainer && (
+                <ProfileScreens.Screen name={LINK_TRAINER} component={LinkedTrainerScreen} />
+            )}
         </ProfileScreens.Navigator>
     );
 }
