@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { loginUser, getAuthErrorMessage } from '../../utils/authController';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 import { ROUTES } from '../../constants/navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -29,25 +30,70 @@ export default function LoginScreen({ navigation }: Props) {
   const [passwordFocused, setPasswordFocused] = useState(false);
   const insets = useSafeAreaInsets();
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleLogin = async () => {
     console.log('🚀 Login process started');
     console.log('📧 Raw email input:', JSON.stringify(email));
     console.log('🔐 Password length:', password.length);
     
-    if (!email.trim() || !password.trim()) {
-      console.log('❌ Validation failed: empty fields');
-      Alert.alert('Error', 'Please fill in all fields');
+    if (!email.trim()) {
+      Alert.alert('Error', 'Email is required');
+      return;
+    }
+
+    if (!validateEmail(email.trim())) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    if (!password.trim()) {
+      Alert.alert('Error', 'Password is required');
       return;
     }
 
     setLoading(true);
     try {
-      await loginUser(email, password);
-      console.log('🏁 Login process completed successfully');
+      console.log('📡 Calling Firebase signInWithEmailAndPassword...');
+      await signInWithEmailAndPassword(auth, email.trim(), password.trim());
+      console.log('✅ Login successful!');
     } catch (error: any) {
-      const errorMessage = getAuthErrorMessage(error);
+      console.log('💥 Login failed with error code:', error.code);
+      console.log('💥 Error message:', error.message);
+      
+      const errorCode = error.code;
+      let errorMessage = 'An error occurred. Please try again.';
+      
+      switch (errorCode) {
+        case 'auth/user-not-found':
+          errorMessage = 'No account found with this email address.';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Incorrect password. Please try again.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Please enter a valid email address.';
+          break;
+        case 'auth/user-disabled':
+          errorMessage = 'This account has been disabled.';
+          break;
+        case 'auth/invalid-credential':
+          errorMessage = 'Invalid credentials. Please check your email and password.';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many failed attempts. Please try again later.';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your internet connection.';
+          break;
+        default:
+          errorMessage = 'Failed to sign in. Please check your credentials.';
+      }
+      
       Alert.alert('Login Failed', errorMessage);
-      console.log('🏁 Login process completed with error');
     } finally {
       setLoading(false);
     }

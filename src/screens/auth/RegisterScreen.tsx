@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { registerUser, getAuthErrorMessage } from '../../utils/authController';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebase';
+import { createUser } from '../../utils/controllers/userController';
 import { ROUTES } from '../../constants/navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -60,11 +62,44 @@ export default function RegisterScreen({ navigation }: Props) {
 
     setLoading(true);
     try {
-      await registerUser(email, password, fullName);
+      console.log('📝 Creating user with Firebase...');
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      
+      // Create user profile
+      const userDetails = {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email || '',
+        fullName: fullName.trim(),
+        isTrainer: false, // Default to trainee
+        isSubscribed: false,
+        createdAt: new Date().toISOString(),
+      };
+
+      await createUser(userDetails, userCredential.user.uid);
       console.log('✅ User registered and profile created successfully');
     } catch (error: any) {
       console.error('❌ Registration error:', error);
-      const errorMessage = getAuthErrorMessage(error);
+      
+      const errorCode = error.code;
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      switch (errorCode) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'An account with this email already exists.';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Password is too weak. Please choose a stronger password.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Please enter a valid email address.';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your internet connection.';
+          break;
+        default:
+          errorMessage = 'Registration failed. Please try again.';
+      }
+      
       Alert.alert('Registration Failed', errorMessage);
     } finally {
       setLoading(false);
