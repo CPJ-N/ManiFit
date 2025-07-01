@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only access their own user details
+    match /UsersDetails/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read exercises
+    match /Exercises/{exerciseId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null; // Adjust based on your needs
+    }
+    
+    // Allow authenticated users to manage their own routines
+    match /Routines/{routineId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Users can only access their own transactions
+    match /TransactionDetails/{transactionId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    // Users can only access their own subscriptions
+    match /Subscriptions/{subscriptionId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+  }
+}
