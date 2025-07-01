@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, TouchableOpacity, TextInput, Dimensions, Animated, SafeAreaView, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { createUser } from '../../utils/controllers/userController';
 import { ROUTES } from '../../constants/navigation';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Gluestack UI Components
 import { Box } from '../../../components/ui/box';
 import { VStack } from '../../../components/ui/vstack';
 import { HStack } from '../../../components/ui/hstack';
 import { Heading } from '../../../components/ui/heading';
-import { Card } from '../../../components/ui/card';
+import { Text } from '../../../components/ui/text';
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,61 +22,200 @@ interface Props {
   navigation: any;
 }
 
-export default function RegisterScreen({ navigation }: Props) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
-  const [nameFocused, setNameFocused] = useState(false);
-  const insets = useSafeAreaInsets();
+interface Question {
+  id: string;
+  title: string;
+  subtitle: string;
+  placeholder: string;
+  keyboardType?: any;
+  secureTextEntry?: boolean;
+  required: boolean;
+  options?: { label: string; value: string; icon?: string }[];
+}
 
-  const validateForm = () => {
-    if (!fullName.trim()) {
-      Alert.alert('Error', 'Please enter your full name');
-      return false;
-    }
-    if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email address');
-      return false;
-    }
-    if (!email.includes('@')) {
-      Alert.alert('Error', 'Please enter a valid email address');
-      return false;
-    }
-    if (!password.trim()) {
-      Alert.alert('Error', 'Please enter a password');
-      return false;
-    }
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long');
-      return false;
-    }
-    return true;
+const questions: Question[] = [
+  {
+    id: 'fullName',
+    title: 'What\'s your name?',
+    subtitle: 'We\'d love to know what to call you',
+    placeholder: 'Enter your full name',
+    required: true,
+  },
+  {
+    id: 'gender',
+    title: 'Choose your Gender',
+    subtitle: 'This will be used to calibrate your custom plan',
+    placeholder: '',
+    required: false,
+    options: [
+      { label: 'Male', value: 'male', icon: 'man' },
+      { label: 'Female', value: 'female', icon: 'woman' },
+      { label: 'Other', value: 'other', icon: 'people' },
+    ],
+  },
+  {
+    id: 'age',
+    title: 'How old are you?',
+    subtitle: 'This helps us create a personalized experience',
+    placeholder: 'Enter your age',
+    keyboardType: 'numeric',
+    required: false,
+  },
+  {
+    id: 'height',
+    title: 'What\'s your height?',
+    subtitle: 'In centimeters (e.g., 175)',
+    placeholder: 'Enter your height in cm',
+    keyboardType: 'numeric',
+    required: false,
+  },
+  {
+    id: 'weight',
+    title: 'What\'s your weight?',
+    subtitle: 'In kilograms (e.g., 70)',
+    placeholder: 'Enter your weight in kg',
+    keyboardType: 'numeric',
+    required: false,
+  },
+  {
+    id: 'email',
+    title: 'What\'s your email?',
+    subtitle: 'We\'ll use this to create your account',
+    placeholder: 'Enter your email address',
+    keyboardType: 'email-address',
+    required: true,
+  },
+  {
+    id: 'password',
+    title: 'Create a password',
+    subtitle: 'Choose a secure password (minimum 6 characters)',
+    placeholder: 'Enter your password',
+    secureTextEntry: true,
+    required: true,
+  },
+];
+
+export default function RegisterScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<{[key: string]: string}>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const progressAnim = useRef(new Animated.Value(0)).current;
+
+  const currentQuestion = questions[currentIndex];
+  const progress = (currentIndex + 1) / questions.length;
+
+  useEffect(() => {
+    // Animate progress bar
+    Animated.timing(progressAnim, {
+      toValue: progress,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [currentIndex]);
+
+  const animateTransition = (callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 30,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      callback();
+      slideAnim.setValue(-30);
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    });
   };
 
-  const handleRegister = async () => {
-    if (!validateForm()) return;
+  const handleNext = () => {
+    setError('');
+    
+    // Validate required fields
+    if (currentQuestion.required && !answers[currentQuestion.id]?.trim()) {
+      setError('This field is required');
+      return;
+    }
 
-    setLoading(true);
+    // Email validation
+    if (currentQuestion.id === 'email' && answers.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(answers.email)) {
+        setError('Please enter a valid email address');
+        return;
+      }
+    }
+
+    // Password validation
+    if (currentQuestion.id === 'password' && answers.password && answers.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
+    if (currentIndex < questions.length - 1) {
+      animateTransition(() => {
+        setCurrentIndex(currentIndex + 1);
+      });
+    } else {
+      handleSubmit();
+    }
+  };
+
+  const handleBack = () => {
+    if (currentIndex > 0) {
+      animateTransition(() => {
+        setCurrentIndex(currentIndex - 1);
+        setError('');
+      });
+    } else {
+      navigation.goBack();
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setError('');
+    
     try {
-      console.log('📝 Creating user with Firebase...');
-      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      const userCredential = await createUserWithEmailAndPassword(auth, answers.email.trim(), answers.password);
       
-      // Create user profile
-      const userDetails = {
+      const userProfile = {
         uid: userCredential.user.uid,
         email: userCredential.user.email || '',
-        fullName: fullName.trim(),
-        isTrainer: false, // Default to trainee
+        fullName: answers.fullName?.trim() || '',
+        gender: answers.gender || undefined,
+        age: answers.age ? parseInt(answers.age) : undefined,
+        height: answers.height ? parseInt(answers.height) : undefined,
+        weight: answers.weight ? parseInt(answers.weight) : undefined,
+        isTrainer: false,
         isSubscribed: false,
         createdAt: new Date().toISOString(),
       };
 
-      await createUser(userDetails, userCredential.user.uid);
-      console.log('✅ User registered and profile created successfully');
+      await createUser(userProfile, userCredential.user.uid);
+      console.log('✅ User registered successfully');
     } catch (error: any) {
       console.error('❌ Registration error:', error);
       
@@ -100,410 +239,262 @@ export default function RegisterScreen({ navigation }: Props) {
           errorMessage = 'Registration failed. Please try again.';
       }
       
-      Alert.alert('Registration Failed', errorMessage);
-    } finally {
-      setLoading(false);
+      setError(errorMessage);
+      setIsSubmitting(false);
     }
   };
 
+  const updateAnswer = (value: string) => {
+    setAnswers(prev => ({ ...prev, [currentQuestion.id]: value }));
+    if (error) setError('');
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: '#1E1E1E' }}>
       <StatusBar style="light" />
       
       {/* Background Gradient */}
       <LinearGradient
         colors={['rgba(255, 210, 10, 0.05)', 'transparent', 'rgba(255, 210, 10, 0.02)']}
-        style={StyleSheet.absoluteFillObject}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
       />
+      
+      <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
+        {/* Header */}
+        <Box style={{ paddingHorizontal: 24, paddingVertical: 20 }}>
+          <HStack style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <TouchableOpacity
+              onPress={handleBack}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: 'rgba(255, 210, 10, 0.1)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons name="chevron-back" size={24} color="#FFD20A" />
+            </TouchableOpacity>
+            
+            <Text style={{ color: '#B0B0B0', fontSize: 16, fontWeight: '600' }}>
+              Step {currentIndex + 1} of {questions.length}
+            </Text>
+          </HStack>
 
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardContainer}
-      >
-        <ScrollView 
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {/* Header Section */}
-          <Box style={[styles.header, { paddingTop: insets.top + 20 }]}>
-            <VStack space="md" style={styles.headerContent}>
-              {/* Back Button */}
-              <TouchableOpacity 
-                style={styles.backButton}
-                onPress={() => navigation.goBack()}
-              >
-                <Ionicons name="chevron-back" size={24} color="#FFD20A" />
-              </TouchableOpacity>
-
-              {/* Welcome Icon */}
-              <View style={styles.iconContainer}>
-                <LinearGradient
-                  colors={['#FFD20A', '#FFA500']}
-                  style={styles.iconGradient}
-                >
-                  <Ionicons name="person-add" size={32} color="#1E1E1E" />
-                </LinearGradient>
-              </View>
-
-              <VStack space="xs" style={styles.titleContainer}>
-                <Heading size="2xl" style={styles.title}>
-                  Join ManiFit
-                </Heading>
-                <Text style={styles.subtitle}>
-                  Create your account and start your fitness journey
-                </Text>
-              </VStack>
-            </VStack>
+          {/* Progress Bar */}
+          <Box style={{
+            height: 6,
+            backgroundColor: '#333333',
+            borderRadius: 3,
+            overflow: 'hidden',
+          }}>
+            <Animated.View
+              style={{
+                height: 6,
+                borderRadius: 3,
+                width: progressAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0%', '100%'],
+                }),
+              }}
+            >
+              <LinearGradient
+                colors={['#FFD20A', '#FFA500']}
+                style={{ flex: 1, borderRadius: 3 }}
+              />
+            </Animated.View>
           </Box>
+        </Box>
 
-          {/* Form Section */}
-          <Box style={styles.formSection}>
-            <Card style={styles.formCard}>
-              <VStack space="lg" style={styles.formContent}>
-                {/* Full Name Input */}
-                <VStack space="xs">
-                  <Text style={styles.inputLabel}>Full Name</Text>
-                  <View style={[
-                    styles.inputContainer,
-                    nameFocused && styles.inputContainerFocused
-                  ]}>
-                    <Ionicons 
-                      name="person" 
-                      size={20} 
-                      color={nameFocused ? "#FFD20A" : "#666"} 
-                      style={styles.inputIcon}
-                    />
-                    <TextInput
-                      style={styles.input}
-                      value={fullName}
-                      onChangeText={setFullName}
-                      placeholder="Enter your full name"
-                      placeholderTextColor="#888"
-                      onFocus={() => setNameFocused(true)}
-                      onBlur={() => setNameFocused(false)}
-                    />
-                  </View>
-                </VStack>
+        {/* Content */}
+        <Animated.View
+          style={{
+            flex: 1,
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+            paddingHorizontal: 24,
+          }}
+        >
+          <VStack style={{ flex: 1, justifyContent: 'space-between' }}>
+            {/* Question Section */}
+            <VStack style={{ flex: 1, justifyContent: 'center', paddingVertical: 40 }}>
+              <Heading
+                size="3xl"
+                style={{
+                  color: '#FFFFFF',
+                  fontSize: 32,
+                  fontWeight: '700',
+                  lineHeight: 40,
+                  marginBottom: 12,
+                }}
+              >
+                {currentQuestion.title}
+              </Heading>
+              
+              <Text style={{
+                color: '#B0B0B0',
+                fontSize: 18,
+                lineHeight: 24,
+                marginBottom: 40,
+              }}>
+                {currentQuestion.subtitle}
+              </Text>
 
-                {/* Email Input */}
-                <VStack space="xs">
-                  <Text style={styles.inputLabel}>Email Address</Text>
-                  <View style={[
-                    styles.inputContainer,
-                    emailFocused && styles.inputContainerFocused
-                  ]}>
-                    <Ionicons 
-                      name="mail" 
-                      size={20} 
-                      color={emailFocused ? "#FFD20A" : "#666"} 
-                      style={styles.inputIcon}
-                    />
-                    <TextInput
-                      style={styles.input}
-                      value={email}
-                      onChangeText={setEmail}
-                      placeholder="Enter your email"
-                      placeholderTextColor="#888"
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      onFocus={() => setEmailFocused(true)}
-                      onBlur={() => setEmailFocused(false)}
-                    />
-                  </View>
+              {/* Input/Options */}
+              {currentQuestion.options ? (
+                // Multiple choice options
+                <VStack space="md">
+                  {currentQuestion.options.map((option, index) => (
+                    <TouchableOpacity
+                      key={option.value}
+                      onPress={() => updateAnswer(option.value)}
+                      style={{
+                        backgroundColor: answers[currentQuestion.id] === option.value ? 'rgba(255, 210, 10, 0.15)' : '#2A2A2A',
+                        borderRadius: 16,
+                        padding: 24,
+                        borderWidth: 2,
+                        borderColor: answers[currentQuestion.id] === option.value ? '#FFD20A' : 'rgba(255, 210, 10, 0.1)',
+                        marginBottom: 16,
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <HStack style={{ alignItems: 'center', justifyContent: 'center' }}>
+                        {option.icon && (
+                          <Ionicons
+                            name={option.icon as any}
+                            size={28}
+                            color={answers[currentQuestion.id] === option.value ? '#FFD20A' : '#B0B0B0'}
+                            style={{ marginRight: 16 }}
+                          />
+                        )}
+                        <Text style={{
+                          fontSize: 20,
+                          fontWeight: '600',
+                          color: answers[currentQuestion.id] === option.value ? '#FFD20A' : '#FFFFFF',
+                        }}>
+                          {option.label}
+                        </Text>
+                      </HStack>
+                    </TouchableOpacity>
+                  ))}
                 </VStack>
-                
-                {/* Password Input */}
-                <VStack space="xs">
-                  <Text style={styles.inputLabel}>Password</Text>
-                  <View style={[
-                    styles.inputContainer,
-                    passwordFocused && styles.inputContainerFocused
-                  ]}>
-                    <Ionicons 
-                      name="lock-closed" 
-                      size={20} 
-                      color={passwordFocused ? "#FFD20A" : "#666"} 
-                      style={styles.inputIcon}
-                    />
-                    <TextInput
-                      style={[styles.input, styles.passwordInput]}
-                      value={password}
-                      onChangeText={setPassword}
-                      placeholder="Min 6 characters"
-                      placeholderTextColor="#888"
-                      secureTextEntry={!showPassword}
-                      onFocus={() => setPasswordFocused(true)}
-                      onBlur={() => setPasswordFocused(false)}
-                    />
+              ) : (
+                // Text input
+                <View style={{ position: 'relative' }}>
+                  <TextInput
+                    value={answers[currentQuestion.id] || ''}
+                    onChangeText={updateAnswer}
+                    placeholder={currentQuestion.placeholder}
+                    keyboardType={currentQuestion.keyboardType || 'default'}
+                    secureTextEntry={currentQuestion.secureTextEntry && !showPassword}
+                    autoCapitalize={currentQuestion.keyboardType === 'email-address' ? 'none' : 'words'}
+                    style={{
+                      backgroundColor: '#2A2A2A',
+                      borderRadius: 16,
+                      padding: 20,
+                      fontSize: 18,
+                      color: '#FFFFFF',
+                      borderWidth: 2,
+                      borderColor: error ? 'rgba(255, 107, 107, 0.5)' : 'rgba(255, 210, 10, 0.2)',
+                      paddingRight: currentQuestion.secureTextEntry ? 60 : 20,
+                    }}
+                    placeholderTextColor="#666"
+                  />
+                  
+                  {currentQuestion.secureTextEntry && (
                     <TouchableOpacity
                       onPress={() => setShowPassword(!showPassword)}
-                      style={styles.passwordToggle}
+                      style={{
+                        position: 'absolute',
+                        right: 20,
+                        top: 20,
+                        padding: 4,
+                      }}
                     >
-                      <Ionicons 
-                        name={showPassword ? "eye-off" : "eye"} 
-                        size={20} 
-                        color="#666" 
+                      <Ionicons
+                        name={showPassword ? "eye-off" : "eye"}
+                        size={24}
+                        color="#B0B0B0"
                       />
                     </TouchableOpacity>
-                  </View>
-                  <Text style={styles.passwordHint}>
-                    Must be at least 6 characters long
-                  </Text>
-                </VStack>
+                  )}
+                </View>
+              )}
 
-                {/* Register Button */}
-                <TouchableOpacity 
-                  style={[styles.registerButton, loading && styles.buttonDisabled]}
-                  onPress={handleRegister}
-                  disabled={loading}
-                  activeOpacity={0.8}
+              {/* Error Message */}
+              {error ? (
+                <Box style={{
+                  backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                  borderRadius: 12,
+                  padding: 16,
+                  marginTop: 20,
+                  borderLeftWidth: 4,
+                  borderLeftColor: '#FF6B6B',
+                }}>
+                  <HStack style={{ alignItems: 'center' }}>
+                    <Ionicons name="alert-circle-outline" size={20} color="#FF6B6B" style={{ marginRight: 8 }} />
+                    <Text style={{ color: '#FF6B6B', fontSize: 16, fontWeight: '500', flex: 1 }}>
+                      {error}
+                    </Text>
+                  </HStack>
+                </Box>
+              ) : null}
+            </VStack>
+
+            {/* Bottom Section */}
+            <VStack style={{ paddingBottom: 20 }}>
+              {/* Continue Button */}
+              <TouchableOpacity
+                onPress={handleNext}
+                disabled={isSubmitting}
+                style={{
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  opacity: isSubmitting ? 0.8 : 1,
+                }}
+                activeOpacity={0.9}
+              >
+                <LinearGradient
+                  colors={isSubmitting ? ['#999', '#777'] : ['#FFD20A', '#FFA500']}
+                  style={{
+                    paddingVertical: 18,
+                    alignItems: 'center',
+                  }}
                 >
-                  <LinearGradient
-                    colors={loading ? ['#999', '#777'] : ['#FFD20A', '#FFA500']}
-                    style={styles.buttonGradient}
-                  >
-                    <HStack space="sm" style={styles.buttonContent}>
-                      {loading && (
-                        <Ionicons name="refresh" size={20} color="#1E1E1E" />
-                      )}
-                      <Text style={styles.registerButtonText}>
-                        {loading ? 'Creating Account...' : 'Create Account'}
+                  {isSubmitting ? (
+                    <HStack style={{ alignItems: 'center' }}>
+                      <ActivityIndicator size="small" color="#1E1E1E" style={{ marginRight: 8 }} />
+                      <Text style={{ color: '#1E1E1E', fontSize: 18, fontWeight: '700' }}>
+                        Creating Account...
                       </Text>
                     </HStack>
-                  </LinearGradient>
+                  ) : (
+                    <Text style={{ color: '#1E1E1E', fontSize: 18, fontWeight: '700' }}>
+                      {currentIndex === questions.length - 1 ? 'Create Account' : 'Continue'}
+                    </Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+
+              {/* Sign In Link */}
+              {currentIndex === 0 && (
+                <TouchableOpacity
+                  onPress={() => navigation.navigate(ROUTES.LOGIN)}
+                  style={{ marginTop: 20, alignItems: 'center' }}
+                >
+                  <Text style={{ color: '#B0B0B0', fontSize: 16 }}>
+                    Already have an account?{' '}
+                    <Text style={{ color: '#FFD20A', fontWeight: '600' }}>
+                      Sign In
+                    </Text>
+                  </Text>
                 </TouchableOpacity>
-
-                {/* Terms Text */}
-                <Text style={styles.termsText}>
-                  By creating an account, you agree to our{' '}
-                  <Text style={styles.linkText}>Terms of Service</Text> and{' '}
-                  <Text style={styles.linkText}>Privacy Policy</Text>
-                </Text>
-              </VStack>
-            </Card>
-          </Box>
-
-          {/* Bottom Section */}
-          <Box style={styles.bottomSection}>
-            {/* Divider */}
-            <HStack style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or</Text>
-              <View style={styles.dividerLine} />
-            </HStack>
-
-            {/* Login Link */}
-            <TouchableOpacity 
-              style={styles.loginButton}
-              onPress={() => navigation.navigate(ROUTES.LOGIN)}
-              activeOpacity={0.8}
-            >
-              <Card style={styles.loginCard}>
-                <HStack space="sm" style={styles.loginContent}>
-                  <Ionicons name="log-in" size={20} color="#FFD20A" />
-                  <VStack space="xs">
-                    <Text style={styles.loginMainText}>
-                      Already have an account?
-                    </Text>
-                    <Text style={styles.loginSubText}>
-                      Sign in to your existing account
-                    </Text>
-                  </VStack>
-                  <Ionicons name="chevron-forward" size={20} color="#666" />
-                </HStack>
-              </Card>
-            </TouchableOpacity>
-          </Box>
-        </ScrollView>
-      </KeyboardAvoidingView>
+              )}
+            </VStack>
+          </VStack>
+        </Animated.View>
+      </SafeAreaView>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1E1E1E',
-  },
-  keyboardContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingBottom: 20,
-  },
-  headerContent: {
-    alignItems: 'center',
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 210, 10, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#FFD20A',
-    marginBottom: 24,
-  },
-  iconGradient: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  titleContainer: {
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#B0B0B0',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  formSection: {
-    paddingHorizontal: 24,
-    marginBottom: 20,
-  },
-  formCard: {
-    backgroundColor: '#2A2A2A',
-    borderRadius: 20,
-    shadowColor: '#FFD20A',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  formContent: {
-    padding: 24,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#333',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: 'transparent',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  inputContainerFocused: {
-    borderColor: '#FFD20A',
-    backgroundColor: '#3A3A3A',
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  passwordInput: {
-    paddingRight: 40,
-  },
-  passwordToggle: {
-    position: 'absolute',
-    right: 16,
-    padding: 4,
-  },
-  passwordHint: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 4,
-  },
-  registerButton: {
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  buttonGradient: {
-    paddingVertical: 16,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  registerButtonText: {
-    color: '#1E1E1E',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  termsText: {
-    fontSize: 12,
-    color: '#888',
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  linkText: {
-    color: '#FFD20A',
-    fontWeight: '500',
-  },
-  bottomSection: {
-    paddingHorizontal: 24,
-    paddingBottom: 20,
-  },
-  dividerContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#333',
-  },
-  dividerText: {
-    color: '#666',
-    fontSize: 14,
-    marginHorizontal: 16,
-  },
-  loginButton: {
-    borderRadius: 12,
-  },
-  loginCard: {
-    backgroundColor: 'rgba(255, 210, 10, 0.05)',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 210, 10, 0.2)',
-  },
-  loginContent: {
-    padding: 16,
-    alignItems: 'center',
-  },
-  loginMainText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  loginSubText: {
-    color: '#B0B0B0',
-    fontSize: 13,
-  },
-}); 
+} 

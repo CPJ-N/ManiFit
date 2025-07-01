@@ -2,6 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { ROUTES } from '../constants/navigation';
 
 // Navigators and Screens
@@ -17,8 +18,8 @@ type MainTabParamList = {
 };
 
 type MainStackParamList = {
-  MainTabs: undefined;
-  Checkout: undefined;
+  [ROUTES.MAIN_TABS]: undefined;
+  [ROUTES.CHECKOUT]: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -48,18 +49,66 @@ function MainTabs() {
       <Tab.Screen
         name={ROUTES.HOME}
         component={HomeScreen}
-        options={{ tabBarLabel: 'Home' }}
+        options={{ 
+          tabBarLabel: 'Home',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
       />
       <Tab.Screen
         name={ROUTES.WORKOUTS}
         component={WorkoutsNavigator}
-        options={{ tabBarLabel: 'Workouts' }}
+        options={{ 
+          tabBarLabel: 'Workouts',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="fitness" size={size} color={color} />
+          ),
+        }}
       />
       <Tab.Screen
         name={ROUTES.PROFILE}
         component={ProfileScreen}
-        options={{ tabBarLabel: 'Profile' }}
+        options={{ 
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
+          ),
+        }}
       />
     </Tab.Navigator>
+  );
+}
+
+export default function MainNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        presentation: 'modal',
+      }}
+    >
+      <Stack.Screen 
+        name={ROUTES.MAIN_TABS}
+        component={MainTabs} 
+      />
+      <Stack.Screen 
+        name={ROUTES.CHECKOUT}
+        component={CheckoutScreen}
+        options={{
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#1E1E1E',
+          },
+          headerTintColor: '#FFD20A',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            color: '#FFFFFF',
+          },
+          headerBackTitleVisible: false,
+          title: 'Subscription',
+        }}
+      />
+    </Stack.Navigator>
   );
 } 

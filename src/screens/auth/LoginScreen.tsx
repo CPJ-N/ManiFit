@@ -28,6 +28,7 @@ export default function LoginScreen({ navigation }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [error, setError] = useState('');
   const insets = useSafeAreaInsets();
 
   const validateEmail = (email: string) => {
@@ -41,28 +42,29 @@ export default function LoginScreen({ navigation }: Props) {
     console.log('🔐 Password length:', password.length);
     
     if (!email.trim()) {
-      Alert.alert('Error', 'Email is required');
+      setError('Email is required');
       return;
     }
 
     if (!validateEmail(email.trim())) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      setError('Please enter a valid email address');
       return;
     }
 
     if (!password.trim()) {
-      Alert.alert('Error', 'Password is required');
+      setError('Password is required');
       return;
     }
 
     setLoading(true);
+    setError('');
     try {
       console.log('📡 Calling Firebase signInWithEmailAndPassword...');
       await signInWithEmailAndPassword(auth, email.trim(), password.trim());
       console.log('✅ Login successful!');
     } catch (error: any) {
-      console.log('💥 Login failed with error code:', error.code);
-      console.log('💥 Error message:', error.message);
+      console.error('💥 Login failed with error code:', error.code);
+      console.error('💥 Error message:', error.message);
       
       const errorCode = error.code;
       let errorMessage = 'An error occurred. Please try again.';
@@ -93,7 +95,7 @@ export default function LoginScreen({ navigation }: Props) {
           errorMessage = 'Failed to sign in. Please check your credentials.';
       }
       
-      Alert.alert('Login Failed', errorMessage);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -163,7 +165,10 @@ export default function LoginScreen({ navigation }: Props) {
                     <TextInput
                       style={styles.input}
                       value={email}
-                      onChangeText={setEmail}
+                      onChangeText={(text) => {
+                        setEmail(text);
+                        setError('');
+                      }}
                       placeholder="Enter your email"
                       placeholderTextColor="#888"
                       keyboardType="email-address"
@@ -190,7 +195,10 @@ export default function LoginScreen({ navigation }: Props) {
                     <TextInput
                       style={[styles.input, styles.passwordInput]}
                       value={password}
-                      onChangeText={setPassword}
+                      onChangeText={(text) => {
+                        setPassword(text);
+                        setError('');
+                      }}
                       placeholder="Enter your password"
                       placeholderTextColor="#888"
                       secureTextEntry={!showPassword}
@@ -209,6 +217,15 @@ export default function LoginScreen({ navigation }: Props) {
                     </TouchableOpacity>
                   </View>
                 </VStack>
+
+                {error ? (
+                  <Box style={styles.errorContainer}>
+                    <HStack space="sm" style={{ alignItems: 'center' }}>
+                      <Ionicons name="alert-circle-outline" size={20} color="#FF6B6B" />
+                      <Text style={styles.errorText}>{error}</Text>
+                    </HStack>
+                  </Box>
+                ) : null}
 
                 {/* Login Button */}
                 <TouchableOpacity 
@@ -383,6 +400,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
     padding: 4,
+  },
+  errorContainer: {
+    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  errorText: {
+    color: '#FF6B6B',
+    fontSize: 14,
+    flex: 1,
   },
   loginButton: {
     borderRadius: 12,

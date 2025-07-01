@@ -2,6 +2,7 @@ export const ROUTES = {
   // Root
   AUTH: 'Auth',
   MAIN: 'Main',
+  MAIN_TABS: 'MainTabs',
   
   // Auth Stack  
   LOGIN: 'Login',
