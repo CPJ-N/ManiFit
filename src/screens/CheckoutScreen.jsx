@@ -3,9 +3,8 @@ import { View, Alert, StyleSheet, TouchableOpacity, Text, ActivityIndicator } fr
 import Constants from 'expo-constants';
 import RazorpayCheckout from 'react-native-razorpay';
 import { auth } from '../config/firebase';
-import { generateOrderId, verifyPayment, recordPaymentInFirestore } from '../utils/controllers/paymentController';
+import { generateOrderId, verifyPayment, recordPaymentInFirestore, addSubscription, updateSubscription } from '../utils/controllers/billingController';
 import { scheduleTestNotification, requestNotificationPermissions, configureNotifications, scheduleMonthlyNotification } from '../utils/notificationHandler';
-import { addSubscription, updateSubscription } from '../utils/controllers/subscriptionController';
 import RadioForm from 'react-native-simple-radio-button';
 import { useSelector } from 'react-redux';
 

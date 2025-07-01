@@ -2,19 +2,13 @@ import React from 'react';
 import "@/global.css";
 import { GluestackUIProvider } from "./components/ui/gluestack-ui-provider";
 import { StatusBar } from 'expo-status-bar';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider } from 'react-redux';
 import { store } from './src/store/reduxStore';
 import { enableScreens } from 'react-native-screens';
-import { Animated, View } from 'react-native';
+import { Animated, View, Text } from 'react-native';
 
 //App Screens & Componets
-import { AUTH_TABS, BOTTOM_TABS, PROFILE_TABS } from './src/constants/screenNames';
-import BottomNavigation from './src/navigation/BottomNavigation';
-import LoadingScreen from './src/screens/AuthScreens/LoadingScreen';
-import AuthNavigation from './src/navigation/AuthNavigation';
-import ProfileNavigation from './src/navigation/ProfileNavigation';
+import LoadingScreen from './src/screens/LoadingScreen';
 import { useEffect, useState, useRef } from 'react';
 import { requestNotificationPermissions } from './src/config/permissions';
 import { auth } from './src/config/firebase';
@@ -27,8 +21,6 @@ import { RootState } from './src/store/reduxStore';
 
 enableScreens();
 
-const Stack = createNativeStackNavigator();
-
 // Main App Component wrapped with Redux Provider
 function AppContent() {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +28,7 @@ function AppContent() {
   const [user, setUserState] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
   const [hasCompletedProfile, setHasCompletedProfile] = useState<boolean>(false);
-  const [userDataLoading, setUserDataLoading] = useState(false); // NEW: Track user data loading state
+  const [userDataLoading, setUserDataLoading] = useState(false);
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const loadingFadeAnim = useRef(new Animated.Value(1)).current;
@@ -51,39 +43,36 @@ function AppContent() {
       
       if (user) {
         // User is signed in, fetch user details and store in Redux
-        setUserDataLoading(true); // Start loading user data
+        setUserDataLoading(true);
         try {
           console.log('👤 Checking user details for:', user.uid);
           const userDetails = await getUser(user.uid);
           if (userDetails) {
             console.log('✅ User details found, updating Redux state:', userDetails.fullName);
-            console.log('🏠 Will show main app (BOTTOM_TABS) since user is authenticated with complete profile');
             dispatch(setUser(userDetails));
             setHasCompletedProfile(true);
           } else {
             console.log('❌ No user details found in Firestore - user needs to complete registration');
-            console.log('🔄 Will show AUTH_TABS with USER_DETAILS_FORM as initial route');
-            // Don't clear Redux state, just mark as incomplete profile
             setHasCompletedProfile(false);
           }
         } catch (error) {
           console.error('💥 Error fetching user details:', error);
           setHasCompletedProfile(false);
         } finally {
-          setUserDataLoading(false); // Finish loading user data
+          setUserDataLoading(false);
         }
       } else {
         // User is signed out, clear Redux state
         console.log('🧹 Clearing user state');
         dispatch(clearUser());
-        setHasCompletedProfile(false); // Set to false instead of null for signed out users
-        setUserDataLoading(false); // No need to load data for signed out user
+        setHasCompletedProfile(false);
+        setUserDataLoading(false);
       }
       
       if (initializing) setInitializing(false);
     });
 
-    return unsubscribe; // unsubscribe on unmount
+    return unsubscribe;
   }, [dispatch, initializing]);
 
   // Watch for Redux userInfo changes to update profile completion status
@@ -99,7 +88,7 @@ function AppContent() {
 
   useEffect(() => {
     // Set an initial delay before starting transition
-    const delay = 1500; // Reduced delay since we're handling auth state properly
+    const delay = 1500;
 
     const timeoutId = setTimeout(() => {
       if (!initializing) {
@@ -158,9 +147,9 @@ function AppContent() {
       if (initializing) {
         console.log('⚠️ Fallback timeout triggered - forcing auth state resolution');
         setInitializing(false);
-        setHasCompletedProfile(false); // Default to showing auth screens
+        setHasCompletedProfile(false);
       }
-    }, 5000); // 5 second fallback
+    }, 5000);
 
     return () => clearTimeout(fallbackTimeout);
   }, []);
@@ -180,32 +169,42 @@ function AppContent() {
       style={{ 
         flex: 1, 
         opacity: appFadeAnim,
-        transform: [{ scale: appScaleAnim }]
+        transform: [{ scale: appScaleAnim }],
+        backgroundColor: '#1E1E1E',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
-        <NavigationContainer>
-          <StatusBar style="auto" />
-          <Stack.Navigator screenOptions={{headerShown: false}}>
-          {(() => {
-            if (user && hasCompletedProfile && userInfo) {
-              console.log('🏠 Showing main app - user is fully authenticated and has complete profile');
-              return (
-            <>
-              <Stack.Screen name={BOTTOM_TABS} component={BottomNavigation}/>
-              <Stack.Screen name={PROFILE_TABS} component={ProfileNavigation} />
-            </>
-              );
-            } else {
-              console.log('🔐 Showing auth screens - user:', user ? 'authenticated' : 'not authenticated', 'profile:', hasCompletedProfile ? 'complete' : 'incomplete');
-              return (
-                <Stack.Screen name={AUTH_TABS}>
-                  {() => <AuthNavigation user={user} hasCompletedProfile={hasCompletedProfile} />}
-                </Stack.Screen>
-              );
-            }
-          })()}
-          </Stack.Navigator>
-        </NavigationContainer>
+      <StatusBar style="light" />
+      <View style={{ padding: 20, alignItems: 'center' }}>
+        <Text style={{ 
+          color: '#FFD20A', 
+          fontSize: 24, 
+          fontWeight: 'bold', 
+          marginBottom: 16,
+          textAlign: 'center',
+        }}>
+          ManiFit
+        </Text>
+        <Text style={{ 
+          color: '#FFFFFF', 
+          fontSize: 16, 
+          textAlign: 'center', 
+          marginBottom: 20,
+        }}>
+          Navigation components have been removed
+        </Text>
+        {user ? (
+          <Text style={{ color: '#B0B0B0', fontSize: 14, textAlign: 'center' }}>
+            User: {user.email}
+            {userInfo && `\nProfile: ${userInfo.fullName}`}
+          </Text>
+        ) : (
+          <Text style={{ color: '#B0B0B0', fontSize: 14, textAlign: 'center' }}>
+            No user signed in
+          </Text>
+        )}
+      </View>
     </Animated.View>
   );
 
