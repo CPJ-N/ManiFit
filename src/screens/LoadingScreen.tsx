@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Image, Animated, Dimensions } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,36 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get('window');
 
 const LoadingScreen: React.FC = () => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.8)).current;
-
-  useEffect(() => {
-    // Start animations sequence
-    const startAnimations = () => {
-      // Logo and content fade in
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    };
-
-    startAnimations();
-
-    // Cleanup function
-    return () => {
-      fadeAnim.stopAnimation();
-      scaleAnim.stopAnimation();
-    };
-  }, [fadeAnim, scaleAnim]);
-
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -54,15 +24,7 @@ const LoadingScreen: React.FC = () => {
       />
 
       {/* Main Content */}
-      <Animated.View 
-        style={[
-          styles.content,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
-      >
+      <View style={styles.content}>
         {/* Logo Container */}
         <View style={styles.logoContainer}>
           <View style={styles.logoWrapper}>
@@ -107,20 +69,15 @@ const LoadingScreen: React.FC = () => {
             <View style={[styles.decorativeDot, { backgroundColor: 'rgba(30, 30, 30, 0.3)' }]} />
           </View>
         </View>
-      </Animated.View>
+      </View>
 
       {/* Footer */}
-      <Animated.View 
-        style={[
-          styles.footer,
-          { opacity: fadeAnim },
-        ]}
-      >
+      <View style={styles.footer}>
         <Text style={styles.footerText}>
           Powered by ManiFit Team
         </Text>
         <Text style={styles.versionText}>v1.0.0</Text>
-      </Animated.View>
+      </View>
     </View>
   );
 };
