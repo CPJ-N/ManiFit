@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../config/firebase';
+import { loginUser, getAuthErrorMessage } from '../../utils/authController';
 import { ROUTES } from '../../constants/navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -31,38 +30,24 @@ export default function LoginScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
 
   const handleLogin = async () => {
+    console.log('🚀 Login process started');
+    console.log('📧 Raw email input:', JSON.stringify(email));
+    console.log('🔐 Password length:', password.length);
+    
     if (!email.trim() || !password.trim()) {
+      console.log('❌ Validation failed: empty fields');
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     setLoading(true);
     try {
-      const processedEmail = email.toLowerCase(); // Only lowercase, no trimming
-      const trimmedPassword = password.trim(); // Still trim password for security
-      
-      console.log('🔑 Attempting login with email:', `"${processedEmail}"`);
-      console.log('🔑 Original email input:', `"${email}"`);
-      await signInWithEmailAndPassword(auth, processedEmail, trimmedPassword);
-      console.log('✅ User signed in successfully');
+      await loginUser(email, password);
+      console.log('🏁 Login process completed successfully');
     } catch (error: any) {
-      console.error('❌ Login error:', error);
-      
-      // More specific error messages
-      let errorMessage = 'Login failed. Please try again.';
-      if (error.code === 'auth/invalid-credential') {
-        errorMessage = 'Invalid email or password. Please check your credentials.';
-      } else if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No account found with this email address.';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Incorrect password. Please try again.';
-      } else if (error.code === 'auth/user-disabled') {
-        errorMessage = 'This account has been disabled.';
-      } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'Too many failed attempts. Please try again later.';
-      }
-      
+      const errorMessage = getAuthErrorMessage(error);
       Alert.alert('Login Failed', errorMessage);
+      console.log('🏁 Login process completed with error');
     } finally {
       setLoading(false);
     }
@@ -82,160 +67,167 @@ export default function LoginScreen({ navigation }: Props) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardContainer}
       >
-        {/* Header Section */}
-        <Box style={[styles.header, { paddingTop: insets.top + 20 }]}>
-          <VStack space="md" style={styles.headerContent}>
-            {/* Welcome Icon */}
-            <View style={styles.iconContainer}>
-              <LinearGradient
-                colors={['#FFD20A', '#FFA500']}
-                style={styles.iconGradient}
-              >
-                <Ionicons name="fitness" size={32} color="#1E1E1E" />
-              </LinearGradient>
-            </View>
-
-            <VStack space="xs" style={styles.titleContainer}>
-              <Heading size="2xl" style={styles.title}>
-                Welcome Back
-              </Heading>
-              <Text style={styles.subtitle}>
-                Sign in to continue your fitness journey
-              </Text>
-            </VStack>
-          </VStack>
-        </Box>
-
-        {/* Form Section */}
-        <Box style={styles.formSection}>
-          <Card style={styles.formCard}>
-            <VStack space="lg" style={styles.formContent}>
-              {/* Email Input */}
-              <VStack space="xs">
-                <Text style={styles.inputLabel}>Email Address</Text>
-                <View style={[
-                  styles.inputContainer,
-                  emailFocused && styles.inputContainerFocused
-                ]}>
-                  <Ionicons 
-                    name="mail" 
-                    size={20} 
-                    color={emailFocused ? "#FFD20A" : "#666"} 
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    style={styles.input}
-                    value={email}
-                    onChangeText={setEmail}
-                    placeholder="Enter your email"
-                    placeholderTextColor="#888"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    onFocus={() => setEmailFocused(true)}
-                    onBlur={() => setEmailFocused(false)}
-                  />
-                </View>
-              </VStack>
-              
-              {/* Password Input */}
-              <VStack space="xs">
-                <Text style={styles.inputLabel}>Password</Text>
-                <View style={[
-                  styles.inputContainer,
-                  passwordFocused && styles.inputContainerFocused
-                ]}>
-                  <Ionicons 
-                    name="lock-closed" 
-                    size={20} 
-                    color={passwordFocused ? "#FFD20A" : "#666"} 
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    style={[styles.input, styles.passwordInput]}
-                    value={password}
-                    onChangeText={setPassword}
-                    placeholder="Enter your password"
-                    placeholderTextColor="#888"
-                    secureTextEntry={!showPassword}
-                    onFocus={() => setPasswordFocused(true)}
-                    onBlur={() => setPasswordFocused(false)}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={styles.passwordToggle}
-                  >
-                    <Ionicons 
-                      name={showPassword ? "eye-off" : "eye"} 
-                      size={20} 
-                      color="#666" 
-                    />
-                  </TouchableOpacity>
-                </View>
-              </VStack>
-
-              {/* Login Button */}
-              <TouchableOpacity 
-                style={[styles.loginButton, loading && styles.buttonDisabled]}
-                onPress={handleLogin}
-                disabled={loading}
-                activeOpacity={0.8}
-              >
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Header Section */}
+          <Box style={[styles.header, { paddingTop: insets.top + 20 }]}>
+            <VStack space="md" style={styles.headerContent}>
+              {/* Welcome Icon */}
+              <View style={styles.iconContainer}>
                 <LinearGradient
-                  colors={loading ? ['#999', '#777'] : ['#FFD20A', '#FFA500']}
-                  style={styles.buttonGradient}
+                  colors={['#FFD20A', '#FFA500']}
+                  style={styles.iconGradient}
                 >
-                  <HStack space="sm" style={styles.buttonContent}>
-                    {loading && (
-                      <Ionicons name="refresh" size={20} color="#1E1E1E" />
-                    )}
-                    <Text style={styles.loginButtonText}>
-                      {loading ? 'Signing In...' : 'Sign In'}
-                    </Text>
-                  </HStack>
+                  <Ionicons name="fitness" size={32} color="#1E1E1E" />
                 </LinearGradient>
-              </TouchableOpacity>
+              </View>
 
-              {/* Forgot Password Link */}
-              <TouchableOpacity style={styles.forgotPasswordLink}>
-                <Text style={styles.forgotPasswordText}>
-                  Forgot your password?
+              <VStack space="xs" style={styles.titleContainer}>
+                <Heading size="2xl" style={styles.title}>
+                  Welcome Back
+                </Heading>
+                <Text style={styles.subtitle}>
+                  Sign in to continue your fitness journey
                 </Text>
-              </TouchableOpacity>
+              </VStack>
             </VStack>
-          </Card>
-        </Box>
+          </Box>
 
-        {/* Bottom Section */}
-        <Box style={styles.bottomSection}>
-          {/* Divider */}
-          <HStack style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
-          </HStack>
-
-          {/* Register Link */}
-          <TouchableOpacity 
-            style={styles.registerButton}
-            onPress={() => navigation.navigate(ROUTES.REGISTER)}
-            activeOpacity={0.8}
-          >
-            <Card style={styles.registerCard}>
-              <HStack space="sm" style={styles.registerContent}>
-                <Ionicons name="person-add" size={20} color="#FFD20A" />
+          {/* Form Section */}
+          <Box style={styles.formSection}>
+            <Card style={styles.formCard}>
+              <VStack space="lg" style={styles.formContent}>
+                {/* Email Input */}
                 <VStack space="xs">
-                  <Text style={styles.registerMainText}>
-                    New to ManiFit?
-                  </Text>
-                  <Text style={styles.registerSubText}>
-                    Create your account and start your journey
-                  </Text>
+                  <Text style={styles.inputLabel}>Email Address</Text>
+                  <View style={[
+                    styles.inputContainer,
+                    emailFocused && styles.inputContainerFocused
+                  ]}>
+                    <Ionicons 
+                      name="mail" 
+                      size={20} 
+                      color={emailFocused ? "#FFD20A" : "#666"} 
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      value={email}
+                      onChangeText={setEmail}
+                      placeholder="Enter your email"
+                      placeholderTextColor="#888"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      onFocus={() => setEmailFocused(true)}
+                      onBlur={() => setEmailFocused(false)}
+                    />
+                  </View>
                 </VStack>
-                <Ionicons name="chevron-forward" size={20} color="#666" />
-              </HStack>
+                
+                {/* Password Input */}
+                <VStack space="xs">
+                  <Text style={styles.inputLabel}>Password</Text>
+                  <View style={[
+                    styles.inputContainer,
+                    passwordFocused && styles.inputContainerFocused
+                  ]}>
+                    <Ionicons 
+                      name="lock-closed" 
+                      size={20} 
+                      color={passwordFocused ? "#FFD20A" : "#666"} 
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={[styles.input, styles.passwordInput]}
+                      value={password}
+                      onChangeText={setPassword}
+                      placeholder="Enter your password"
+                      placeholderTextColor="#888"
+                      secureTextEntry={!showPassword}
+                      onFocus={() => setPasswordFocused(true)}
+                      onBlur={() => setPasswordFocused(false)}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={styles.passwordToggle}
+                    >
+                      <Ionicons 
+                        name={showPassword ? "eye-off" : "eye"} 
+                        size={20} 
+                        color="#666" 
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </VStack>
+
+                {/* Login Button */}
+                <TouchableOpacity 
+                  style={[styles.loginButton, loading && styles.buttonDisabled]}
+                  onPress={handleLogin}
+                  disabled={loading}
+                  activeOpacity={0.8}
+                >
+                  <LinearGradient
+                    colors={loading ? ['#999', '#777'] : ['#FFD20A', '#FFA500']}
+                    style={styles.buttonGradient}
+                  >
+                    <HStack space="sm" style={styles.buttonContent}>
+                      {loading && (
+                        <Ionicons name="refresh" size={20} color="#1E1E1E" />
+                      )}
+                      <Text style={styles.loginButtonText}>
+                        {loading ? 'Signing In...' : 'Sign In'}
+                      </Text>
+                    </HStack>
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                {/* Forgot Password Link */}
+                <TouchableOpacity style={styles.forgotPasswordLink}>
+                  <Text style={styles.forgotPasswordText}>
+                    Forgot your password?
+                  </Text>
+                </TouchableOpacity>
+              </VStack>
             </Card>
-          </TouchableOpacity>
-        </Box>
+          </Box>
+
+          {/* Bottom Section */}
+          <Box style={styles.bottomSection}>
+            {/* Divider */}
+            <HStack style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.dividerLine} />
+            </HStack>
+
+            {/* Register Link */}
+            <TouchableOpacity 
+              style={styles.registerButton}
+              onPress={() => navigation.navigate(ROUTES.REGISTER)}
+              activeOpacity={0.8}
+            >
+              <Card style={styles.registerCard}>
+                <HStack space="sm" style={styles.registerContent}>
+                  <Ionicons name="person-add" size={20} color="#FFD20A" />
+                  <VStack space="xs">
+                    <Text style={styles.registerMainText}>
+                      New to ManiFit?
+                    </Text>
+                    <Text style={styles.registerSubText}>
+                      Create your account and start your journey
+                    </Text>
+                  </VStack>
+                  <Ionicons name="chevron-forward" size={20} color="#666" />
+                </HStack>
+              </Card>
+            </TouchableOpacity>
+          </Box>
+        </ScrollView>
       </KeyboardAvoidingView>
     </View>
   );
@@ -249,8 +241,15 @@ const styles = StyleSheet.create({
   keyboardContainer: {
     flex: 1,
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    minHeight: height,
+  },
   header: {
-    flex: 0.35,
+    minHeight: height * 0.35,
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
@@ -287,7 +286,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   formSection: {
-    flex: 0.45,
+    minHeight: height * 0.45,
     paddingHorizontal: 24,
     justifyContent: 'center',
   },
@@ -371,8 +370,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   bottomSection: {
-    flex: 0.2,
+    minHeight: height * 0.2,
     paddingHorizontal: 24,
+    paddingBottom: 24,
     justifyContent: 'center',
   },
   dividerContainer: {

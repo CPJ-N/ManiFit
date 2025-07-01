@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../config/firebase';
-import { createUser } from '../../utils/controllers/userController';
+import { registerUser, getAuthErrorMessage } from '../../utils/authController';
 import { ROUTES } from '../../constants/navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -62,23 +60,12 @@ export default function RegisterScreen({ navigation }: Props) {
 
     setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      
-      // Create user profile
-      const userDetails = {
-        uid: userCredential.user.uid,
-        email: userCredential.user.email || '',
-        fullName: fullName.trim(),
-        isTrainer: false, // Default to trainee
-        isSubscribed: false,
-        createdAt: new Date().toISOString(),
-      };
-
-      await createUser(userDetails, userCredential.user.uid);
+      await registerUser(email, password, fullName);
       console.log('✅ User registered and profile created successfully');
     } catch (error: any) {
       console.error('❌ Registration error:', error);
-      Alert.alert('Registration Failed', error.message);
+      const errorMessage = getAuthErrorMessage(error);
+      Alert.alert('Registration Failed', errorMessage);
     } finally {
       setLoading(false);
     }

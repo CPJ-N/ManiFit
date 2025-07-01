@@ -1,12 +1,18 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { loginUser, getAuthErrorMessage } from '../../../utils/authController';
 import LoginScreen from '../LoginScreen';
 import { Provider } from 'react-redux';
 import { store } from '../../../store/reduxStore';
 import { GluestackUIProvider } from '../../../../components/ui/gluestack-ui-provider';
 import { ROUTES } from '../../../constants/navigation';
+
+// Mock authController
+jest.mock('../../../utils/authController', () => ({
+  loginUser: jest.fn(),
+  getAuthErrorMessage: jest.fn(),
+}));
 
 // Mock navigation
 const mockNavigate = jest.fn();
@@ -102,8 +108,8 @@ describe('LoginScreen', () => {
 
   describe('Authentication', () => {
     it('successfully logs in with valid credentials', async () => {
-      const mockSignIn = signInWithEmailAndPassword as jest.Mock;
-      mockSignIn.mockResolvedValueOnce({ user: { uid: '123' } });
+      const mockLoginUser = loginUser as jest.Mock;
+      mockLoginUser.mockResolvedValueOnce({ uid: '123' });
 
       const { getByText, getByPlaceholderText } = renderLoginScreen();
       
@@ -119,13 +125,13 @@ describe('LoginScreen', () => {
       });
       
       await waitFor(() => {
-        expect(mockSignIn).toHaveBeenCalledWith({}, 'user@email.com', 'password');
+        expect(mockLoginUser).toHaveBeenCalledWith('user@email.com', 'password');
       });
     });
 
     it('successfully logs in with sample credentials', async () => {
-      const mockSignIn = signInWithEmailAndPassword as jest.Mock;
-      mockSignIn.mockResolvedValueOnce({ user: { uid: 'sample-user-123' } });
+      const mockLoginUser = loginUser as jest.Mock;
+      mockLoginUser.mockResolvedValueOnce({ uid: 'sample-user-123' });
 
       const { getByText, getByPlaceholderText } = renderLoginScreen();
       
@@ -142,14 +148,17 @@ describe('LoginScreen', () => {
       });
       
       await waitFor(() => {
-        expect(mockSignIn).toHaveBeenCalledWith({}, 'user@email.com', 'password');
+        expect(mockLoginUser).toHaveBeenCalledWith('user@email.com', 'password');
       });
     });
 
     it('handles authentication errors', async () => {
-      const mockSignIn = signInWithEmailAndPassword as jest.Mock;
+      const mockLoginUser = loginUser as jest.Mock;
+      const mockGetAuthErrorMessage = getAuthErrorMessage as jest.Mock;
       const errorMessage = 'Invalid email or password';
-      mockSignIn.mockRejectedValueOnce(new Error(errorMessage));
+      
+      mockLoginUser.mockRejectedValueOnce(new Error('auth/invalid-credential'));
+      mockGetAuthErrorMessage.mockReturnValueOnce(errorMessage);
 
       const { getByText, getByPlaceholderText } = renderLoginScreen();
       
@@ -172,13 +181,13 @@ describe('LoginScreen', () => {
 
   describe('Loading States', () => {
     it('shows loading state during authentication', async () => {
-      const mockSignIn = signInWithEmailAndPassword as jest.Mock;
+      const mockLoginUser = loginUser as jest.Mock;
       // Create a promise that doesn't resolve immediately
       let resolvePromise: (value: any) => void;
       const pendingPromise = new Promise((resolve) => {
         resolvePromise = resolve;
       });
-      mockSignIn.mockReturnValueOnce(pendingPromise);
+      mockLoginUser.mockReturnValueOnce(pendingPromise);
 
       const { getByText, getByPlaceholderText } = renderLoginScreen();
       
@@ -197,16 +206,16 @@ describe('LoginScreen', () => {
       expect(getByText('Signing In...')).toBeTruthy();
       
       // Resolve the promise to complete the test
-      resolvePromise!({ user: { uid: '123' } });
+      resolvePromise!({ uid: '123' });
     });
 
     it('disables button during loading', async () => {
-      const mockSignIn = signInWithEmailAndPassword as jest.Mock;
+      const mockLoginUser = loginUser as jest.Mock;
       let resolvePromise: (value: any) => void;
       const pendingPromise = new Promise((resolve) => {
         resolvePromise = resolve;
       });
-      mockSignIn.mockReturnValueOnce(pendingPromise);
+      mockLoginUser.mockReturnValueOnce(pendingPromise);
 
       const { getByText, getByPlaceholderText } = renderLoginScreen();
       
@@ -226,7 +235,7 @@ describe('LoginScreen', () => {
       expect(loadingButton).toBeTruthy();
       
       // Resolve the promise
-      resolvePromise!({ user: { uid: '123' } });
+      resolvePromise!({ uid: '123' });
     });
   });
 
@@ -274,9 +283,9 @@ describe('LoginScreen', () => {
       expect(passwordInput.props.value).toBe('testpassword');
     });
 
-    it('trims email whitespace before authentication', async () => {
-      const mockSignIn = signInWithEmailAndPassword as jest.Mock;
-      mockSignIn.mockResolvedValueOnce({ user: { uid: '123' } });
+    it('processes email correctly before authentication', async () => {
+      const mockLoginUser = loginUser as jest.Mock;
+      mockLoginUser.mockResolvedValueOnce({ uid: '123' });
 
       const { getByText, getByPlaceholderText } = renderLoginScreen();
       
@@ -293,8 +302,8 @@ describe('LoginScreen', () => {
       });
       
       await waitFor(() => {
-        // Email should be trimmed
-        expect(mockSignIn).toHaveBeenCalledWith({}, 'user@email.com', 'password');
+        // Email and password should be passed as-is to the controller
+        expect(mockLoginUser).toHaveBeenCalledWith('  user@email.com  ', 'password');
       });
     });
   });
