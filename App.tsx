@@ -5,10 +5,11 @@ import { StatusBar } from 'expo-status-bar';
 import { Provider } from 'react-redux';
 import { store } from './src/store/reduxStore';
 import { enableScreens } from 'react-native-screens';
-import { Animated, View, Text } from 'react-native';
+import { Animated, View } from 'react-native';
 
-//App Screens & Componets
+//App Screens & Components
 import LoadingScreen from './src/screens/LoadingScreen';
+import RootNavigator from './src/navigation/RootNavigator';
 import { useEffect, useState, useRef } from 'react';
 import { requestNotificationPermissions } from './src/config/permissions';
 import { auth } from './src/config/firebase';
@@ -31,9 +32,10 @@ function AppContent() {
   const [userDataLoading, setUserDataLoading] = useState(false);
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
-  const loadingFadeAnim = useRef(new Animated.Value(1)).current;
-  const appFadeAnim = useRef(new Animated.Value(0)).current;
-  const appScaleAnim = useRef(new Animated.Value(0.95)).current;
+  
+  // Simplified animations
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
 
   useEffect(() => {
     // Authentication state listener
@@ -101,8 +103,10 @@ function AppContent() {
     // Clean up the timeout when component unmounts
     return () => {
       clearTimeout(timeoutId);
+      fadeAnim.stopAnimation();
+      scaleAnim.stopAnimation();
     };
-  }, [initializing]);
+  }, [initializing, fadeAnim, scaleAnim]);
 
   useEffect(() => {
     // Request notification permissions (safe for Expo Go)
@@ -110,35 +114,25 @@ function AppContent() {
   }, []);
 
   const startTransition = () => {
-    // Start coordinated transition animations
-    Animated.parallel([
-      // Fade out loading screen
-      Animated.timing(loadingFadeAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      // Fade in main app
-      Animated.timing(appFadeAnim, {
-        toValue: 1,
-        duration: 800,
-        delay: 200,
-        useNativeDriver: true,
-      }),
-      // Scale in main app for a subtle zoom effect
-      Animated.spring(appScaleAnim, {
-        toValue: 1,
-        tension: 50,
-        friction: 8,
-        delay: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
+    // Simplified transition animation
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 800,
+      useNativeDriver: true,
+    }).start(() => {
       // Hide loading screen completely after animation
       setTimeout(() => {
         setShowLoadingScreen(false);
       }, 100);
     });
+
+    // Separate scale animation for main app
+    Animated.timing(scaleAnim, {
+      toValue: 1,
+      duration: 600,
+      delay: 200,
+      useNativeDriver: true,
+    }).start();
   };
 
   // Add a fallback timeout to prevent infinite loading
@@ -167,50 +161,22 @@ function AppContent() {
   const MainApp = () => (
     <Animated.View 
       style={{ 
-        flex: 1, 
-        opacity: appFadeAnim,
-        transform: [{ scale: appScaleAnim }],
-        backgroundColor: '#1E1E1E',
-        justifyContent: 'center',
-        alignItems: 'center',
+        flex: 1,
+        opacity: 1,
+        transform: [{ scale: scaleAnim }],
       }}
     >
-      <StatusBar style="light" />
-      <View style={{ padding: 20, alignItems: 'center' }}>
-        <Text style={{ 
-          color: '#FFD20A', 
-          fontSize: 24, 
-          fontWeight: 'bold', 
-          marginBottom: 16,
-          textAlign: 'center',
-        }}>
-          ManiFit
-        </Text>
-        <Text style={{ 
-          color: '#FFFFFF', 
-          fontSize: 16, 
-          textAlign: 'center', 
-          marginBottom: 20,
-        }}>
-          Navigation components have been removed
-        </Text>
-        {user ? (
-          <Text style={{ color: '#B0B0B0', fontSize: 14, textAlign: 'center' }}>
-            User: {user.email}
-            {userInfo && `\nProfile: ${userInfo.fullName}`}
-          </Text>
-        ) : (
-          <Text style={{ color: '#B0B0B0', fontSize: 14, textAlign: 'center' }}>
-            No user signed in
-          </Text>
-        )}
-      </View>
+      <RootNavigator
+        user={user}
+        hasCompletedProfile={hasCompletedProfile}
+        isLoading={false}
+      />
     </Animated.View>
   );
 
   return (
     <View style={{ flex: 1 }}>
-        {/* Main App - Always rendered but initially transparent */}
+        {/* Main App - Always rendered */}
         <MainApp />
         {/* Loading Screen Overlay */}
         {showLoadingScreen && (
@@ -221,7 +187,7 @@ function AppContent() {
               left: 0,
               right: 0,
               bottom: 0,
-              opacity: loadingFadeAnim,
+              opacity: fadeAnim,
               zIndex: 1000,
             }}
           >
@@ -234,10 +200,11 @@ function AppContent() {
 
 export default function App() {
   return (
-    <GluestackUIProvider mode="light">
-      <Provider store={store}>
+    <Provider store={store}>
+      <GluestackUIProvider mode="light">
+        <StatusBar style="auto" />
         <AppContent />
-      </Provider>
-    </GluestackUIProvider>
+      </GluestackUIProvider>
+    </Provider>
   );
 }

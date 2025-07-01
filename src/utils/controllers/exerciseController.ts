@@ -125,3 +125,27 @@ export const getAllExercisesFromUrl = async (): Promise<Exercise[]> => {
     throw new Error("Failed to get exercises");
   }
 };
+
+// Get exercises filtered by body part/category
+export const getExercisesByBodyPart = async (bodyPart: string): Promise<Exercise[]> => {
+  try {
+    const allExercises = await getAllExercisesFromUrl();
+    const filteredExercises = allExercises.filter((exercise: any) => 
+      exercise.bodyPart?.toLowerCase() === bodyPart.toLowerCase() ||
+      exercise.primaryMuscles?.some((muscle: string) => 
+        muscle.toLowerCase().includes(bodyPart.toLowerCase())
+      )
+    );
+    return filteredExercises;
+  } catch (error) {
+    console.error("Error filtering exercises by body part: ", error);
+    throw new Error("Failed to get exercises by body part");
+  }
+};
+
+// Get exercise image URL with GitHub prefix
+export const getExerciseImageUrl = (exerciseName: string): string => {
+  const baseUrl = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises";
+  const sanitizedName = exerciseName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+  return `${baseUrl}/${sanitizedName}/0.jpg`;
+};
