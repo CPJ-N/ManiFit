@@ -1,5 +1,8 @@
 import 'react-native-gesture-handler/jestSetup';
 
+// Load environment variables for tests
+import 'dotenv/config';
+
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -25,13 +28,13 @@ jest.mock('expo-constants', () => ({
   default: {
     expoConfig: {
       extra: {
-        firebaseApiKey: 'test-api-key',
-        firebaseAuthDomain: 'test.firebaseapp.com',
-        firebaseProjectId: 'test-project',
-        firebaseStorageBucket: 'test-project.appspot.com',
-        firebaseMessagingSenderId: '123456789',
-        firebaseAppId: '1:123456789:test',
-        firebaseMeasurementId: 'G-TEST123',
+        firebaseApiKey: process.env.FIREBASE_API_KEY,
+        firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
+        firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
+        firebaseStorageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+        firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+        firebaseAppId: process.env.FIREBASE_APP_ID,
+        firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
       },
     },
   },

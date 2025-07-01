@@ -38,11 +38,31 @@ export default function LoginScreen({ navigation }: Props) {
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      const processedEmail = email.toLowerCase(); // Only lowercase, no trimming
+      const trimmedPassword = password.trim(); // Still trim password for security
+      
+      console.log('🔑 Attempting login with email:', `"${processedEmail}"`);
+      console.log('🔑 Original email input:', `"${email}"`);
+      await signInWithEmailAndPassword(auth, processedEmail, trimmedPassword);
       console.log('✅ User signed in successfully');
     } catch (error: any) {
       console.error('❌ Login error:', error);
-      Alert.alert('Login Failed', error.message);
+      
+      // More specific error messages
+      let errorMessage = 'Login failed. Please try again.';
+      if (error.code === 'auth/invalid-credential') {
+        errorMessage = 'Invalid email or password. Please check your credentials.';
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email address.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = 'This account has been disabled.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed attempts. Please try again later.';
+      }
+      
+      Alert.alert('Login Failed', errorMessage);
     } finally {
       setLoading(false);
     }
