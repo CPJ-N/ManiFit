@@ -352,22 +352,52 @@ export default function SignUp({ navigation }: { navigation: any }) {
     if (response?.type === 'success') {
       const { id_token } = response.params;
       if (id_token) {
+        setIsLoading(true);
         const credential = GoogleAuthProvider.credential(id_token);
         signInWithCredential(auth, credential)
           .then(async (userCredential) => {
             const user = userCredential.user;
+            console.log('✅ Google sign-in successful:', user.email);
+            
+            // Check if user profile exists
             const userInfo = await getUser(user.uid);
             if (!userInfo) {
-              console.log('Google sign-up complete, user needs to complete profile - auth flow will handle navigation');
+              console.log('📝 User needs to complete profile - auth flow will handle navigation');
+              // The auth state change in App.tsx will handle navigation to UserDetailsForm
+            } else {
+              console.log('✅ User profile found, navigation will be handled by auth state change');
             }
           })
-          .catch((error) => {
-            console.error('Error during Firebase sign-in:', error);
-            setError('Google Sign-Up failed. Try again later.');
+          .catch((error: any) => {
+            console.error('💥 Error during Google sign-in:', error);
+            let errorMessage = 'Google Sign-Up failed. Try again later.';
+            
+            switch (error.code) {
+              case 'auth/account-exists-with-different-credential':
+                errorMessage = 'An account already exists with this email using a different sign-in method.';
+                break;
+              case 'auth/invalid-credential':
+                errorMessage = 'Invalid Google credentials. Please try again.';
+                break;
+              case 'auth/operation-not-allowed':
+                errorMessage = 'Google sign-in is not enabled. Please contact support.';
+                break;
+              default:
+                errorMessage = 'Google Sign-Up failed. Please try again.';
+            }
+            
+            setError(errorMessage);
+          })
+          .finally(() => {
+            setIsLoading(false);
           });
       }
+    } else if (response?.type === 'error') {
+      console.error('❌ Google sign-in error:', response.error);
+      setError('Google Sign-Up was cancelled or failed. Please try again.');
+      setIsLoading(false);
     }
-  }, [response, navigation]);
+  }, [response]);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

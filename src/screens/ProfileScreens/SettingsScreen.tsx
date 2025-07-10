@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Dimensions, RefreshControl } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Dimensions, RefreshControl, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { DELETE_ACCOUNT, LINK_TRAINEE, LINK_TRAINER, PASSWORD_SETTINGS, CHECKOUT, REGISTER_TRAINER } from '../../constants/screenNames';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/reduxStore';
+import { logout } from '../../store/userSlice';
+import { AuthService } from '../../utils/services/authService';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -16,6 +18,18 @@ import { Heading } from '@/components/ui/heading';
 import { Card } from '@/components/ui/card';
 
 const { width } = Dimensions.get('window');
+
+// Type for settings items
+type SettingItem = {
+  icon: string;
+  title: string;
+  description?: string;
+  onPress: () => void | Promise<void>;
+  isDangerous?: boolean;
+  showBadge?: boolean;
+  badgeText?: string;
+  gradient?: [string, string, ...string[]];
+};
 
 // Enhanced Setting Item Component
 const SettingItemCard = ({ 
@@ -31,7 +45,7 @@ const SettingItemCard = ({
   icon: string;
   title: string;
   description?: string;
-  onPress: () => void;
+  onPress: () => void | Promise<void>;
   isDangerous?: boolean;
   showBadge?: boolean;
   badgeText?: string;
@@ -157,8 +171,10 @@ const SectionHeader = ({ title, icon }: { title: string; icon: string }) => (
 
 export default function SettingsScreen({ navigation }: { navigation: any }) {
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     console.log(userInfo);
@@ -170,20 +186,60 @@ export default function SettingsScreen({ navigation }: { navigation: any }) {
     setTimeout(() => setRefreshing(false), 1000);
   };
 
-  const accountSettings = [
+  const handleLogout = async () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            setIsLoggingOut(true);
+            try {
+              await AuthService.logout();
+              dispatch(logout());
+              console.log('✅ User logged out successfully');
+            } catch (error) {
+              console.error('💥 Error during logout:', error);
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+            } finally {
+              setIsLoggingOut(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const accountSettings: SettingItem[] = [
     {
       icon: 'notifications',
       title: 'Notifications',
       description: 'Manage your notification preferences',
       onPress: () => {/* Handle press */},
-      gradient: ['#6366F1', '#4F46E5'] as [string, string, ...string[]]
+      gradient: ['#6366F1', '#4F46E5'] as [string, string, ...string[]],
+      isDangerous: false
     },
     {
       icon: 'key',
       title: 'Password Settings',
       description: 'Change your account password',
       onPress: () => navigation.navigate(PASSWORD_SETTINGS),
-      gradient: ['#4CAF50', '#2E7D32'] as [string, string, ...string[]]
+      gradient: ['#4CAF50', '#2E7D32'] as [string, string, ...string[]],
+      isDangerous: false
+    },
+    {
+      icon: 'log-out',
+      title: 'Sign Out',
+      description: 'Sign out of your account',
+      onPress: handleLogout,
+      gradient: ['#FF6B6B', '#E53E3E'] as [string, string, ...string[]],
+      isDangerous: true
     },
   ];
 
@@ -305,14 +361,16 @@ export default function SettingsScreen({ navigation }: { navigation: any }) {
           <SectionHeader title="Account Settings" icon="person-circle" />
           <VStack space="sm">
             {accountSettings.map((item, index) => (
-              <SettingItemCard
-                key={index}
-                icon={item.icon}
-                title={item.title}
-                description={item.description}
-                onPress={item.onPress}
-                gradient={item.gradient}
-              />
+              <Box key={`account-${index}`}>
+                <SettingItemCard
+                  icon={item.icon}
+                  title={item.title}
+                  description={item.description}
+                  onPress={item.onPress}
+                  gradient={item.gradient}
+                  isDangerous={item.isDangerous}
+                />
+              </Box>
             ))}
           </VStack>
         </Box>

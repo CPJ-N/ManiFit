@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, TouchableOpacity, ScrollView, Animated, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { FORGOT_PASSWORD, REGISTER } from '../../constants/screenNames';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
+import { getUser } from '../../utils/controllers/userController';
+import Constants from 'expo-constants';
+
+WebBrowser.maybeCompleteAuthSession();
 
 // Gluestack UI Components
 import { Box } from '@/components/ui/box';
@@ -368,6 +374,64 @@ export default function Login({navigation} : {navigation: any}) {
     }
   }, [error]);
 
+  // Google Auth configuration
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: Constants.expoConfig?.extra?.googleWebClientId,
+    iosClientId: Constants.expoConfig?.extra?.firebaseIosClientId,
+    androidClientId: Constants.expoConfig?.extra?.firebaseAndroidClientId,
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      if (id_token) {
+        setIsLoading(true);
+        const credential = GoogleAuthProvider.credential(id_token);
+        signInWithCredential(auth, credential)
+          .then(async (userCredential) => {
+            const user = userCredential.user;
+            console.log('✅ Google sign-in successful:', user.email);
+            
+            // Check if user profile exists
+            const userInfo = await getUser(user.uid);
+            if (!userInfo) {
+              console.log('📝 User needs to complete profile - auth flow will handle navigation');
+              // The auth state change in App.tsx will handle navigation to UserDetailsForm
+            } else {
+              console.log('✅ User profile found, navigation will be handled by auth state change');
+            }
+          })
+          .catch((error: any) => {
+            console.error('💥 Error during Google sign-in:', error);
+            let errorMessage = 'Google Sign-In failed. Try again later.';
+            
+            switch (error.code) {
+              case 'auth/account-exists-with-different-credential':
+                errorMessage = 'An account already exists with this email using a different sign-in method.';
+                break;
+              case 'auth/invalid-credential':
+                errorMessage = 'Invalid Google credentials. Please try again.';
+                break;
+              case 'auth/operation-not-allowed':
+                errorMessage = 'Google sign-in is not enabled. Please contact support.';
+                break;
+              default:
+                errorMessage = 'Google Sign-In failed. Please try again.';
+            }
+            
+            setError(errorMessage);
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      }
+    } else if (response?.type === 'error') {
+      console.error('❌ Google sign-in error:', response.error);
+      setError('Google Sign-In was cancelled or failed. Please try again.');
+      setIsLoading(false);
+    }
+  }, [response]);
+
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -421,6 +485,18 @@ export default function Login({navigation} : {navigation: any}) {
       
       setError(errorMessage);
       console.log(errorCode, error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      await promptAsync();
+    } catch (error) {
+      console.error('Error during Google sign-in:', error);
+      setError('Google Sign-In failed. Try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -673,7 +749,7 @@ export default function Login({navigation} : {navigation: any}) {
             {/* Google Sign In Button */}
             <ActionButton
               title="Continue with Google"
-              onPress={() => {}}
+              onPress={handleGoogleSignIn}
               variant="secondary"
               animatedValue={buttonAnim}
               disabled={isLoading}

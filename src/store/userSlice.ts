@@ -20,19 +20,42 @@ export const userSlice = createSlice({
   reducers: {
     setUser: (state, action: PayloadAction<UserDetails>) => {
       state.userInfo = action.payload;
+      state.status = 'idle';
     },
     clearUser: (state) => {
       state.userInfo = null;
+      state.userImageUrl = '';
+      state.status = 'idle';
     },
     setUserImageUrl: (state, action: PayloadAction<string>) => {
       state.userImageUrl = action.payload;
     },
     clearUserImageUrl: (state) => {
       state.userImageUrl = '';
+    },
+    setLoading: (state: UserState) => {
+      state.status = 'loading';
+    },
+    setFailed: (state: UserState) => {
+      state.status = 'failed';
+    },
+    logout: (state: UserState) => {
+      // Complete logout - clear all user data
+      state.userInfo = null;
+      state.userImageUrl = '';
+      state.status = 'idle';
     }
   },
 });
 
-export const { setUser, clearUser, setUserImageUrl, clearUserImageUrl } = userSlice.actions;
+export const { 
+  setUser, 
+  clearUser, 
+  setUserImageUrl, 
+  clearUserImageUrl, 
+  setLoading, 
+  setFailed, 
+  logout 
+} = userSlice.actions;
 
 export default userSlice.reducer;
