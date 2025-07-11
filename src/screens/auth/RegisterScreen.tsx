@@ -165,7 +165,7 @@ export default function RegisterScreen({ navigation }: Props) {
       if (!emailRegex.test(answers.email)) {
         setError('Please enter a valid email address');
         return;
-      }
+    }
     }
 
     // Password validation
@@ -263,7 +263,7 @@ export default function RegisterScreen({ navigation }: Props) {
         {/* Header */}
         <Box style={{ paddingHorizontal: 24, paddingVertical: 20 }}>
           <HStack style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <TouchableOpacity
+              <TouchableOpacity 
               onPress={handleBack}
               style={{
                 width: 44,
@@ -273,10 +273,10 @@ export default function RegisterScreen({ navigation }: Props) {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
-            >
-              <Ionicons name="chevron-back" size={24} color="#FFD20A" />
-            </TouchableOpacity>
-            
+              >
+                <Ionicons name="chevron-back" size={24} color="#FFD20A" />
+              </TouchableOpacity>
+
             <Text style={{ color: '#B0B0B0', fontSize: 16, fontWeight: '600' }}>
               Step {currentIndex + 1} of {questions.length}
             </Text>
@@ -299,8 +299,8 @@ export default function RegisterScreen({ navigation }: Props) {
                 }),
               }}
             >
-              <LinearGradient
-                colors={['#FFD20A', '#FFA500']}
+                <LinearGradient
+                  colors={['#FFD20A', '#FFA500']}
                 style={{ flex: 1, borderRadius: 3 }}
               />
             </Animated.View>
@@ -361,12 +361,12 @@ export default function RegisterScreen({ navigation }: Props) {
                     >
                       <HStack style={{ alignItems: 'center', justifyContent: 'center' }}>
                         {option.icon && (
-                          <Ionicons
+                    <Ionicons 
                             name={option.icon as any}
                             size={28}
                             color={answers[currentQuestion.id] === option.value ? '#FFD20A' : '#B0B0B0'}
                             style={{ marginRight: 16 }}
-                          />
+                    />
                         )}
                         <Text style={{
                           fontSize: 20,
@@ -382,7 +382,7 @@ export default function RegisterScreen({ navigation }: Props) {
               ) : (
                 // Text input
                 <View style={{ position: 'relative' }}>
-                  <TextInput
+                    <TextInput
                     value={answers[currentQuestion.id] || ''}
                     onChangeText={updateAnswer}
                     placeholder={currentQuestion.placeholder}
@@ -412,14 +412,14 @@ export default function RegisterScreen({ navigation }: Props) {
                         padding: 4,
                       }}
                     >
-                      <Ionicons
-                        name={showPassword ? "eye-off" : "eye"}
+                      <Ionicons 
+                        name={showPassword ? "eye-off" : "eye"} 
                         size={24}
                         color="#B0B0B0"
                       />
                     </TouchableOpacity>
                   )}
-                </View>
+                  </View>
               )}
 
               {/* Error Message */}
@@ -436,16 +436,16 @@ export default function RegisterScreen({ navigation }: Props) {
                     <Ionicons name="alert-circle-outline" size={20} color="#FF6B6B" style={{ marginRight: 8 }} />
                     <Text style={{ color: '#FF6B6B', fontSize: 16, fontWeight: '500', flex: 1 }}>
                       {error}
-                    </Text>
+                  </Text>
                   </HStack>
                 </Box>
               ) : null}
-            </VStack>
+                </VStack>
 
             {/* Bottom Section */}
             <VStack style={{ paddingBottom: 20 }}>
               {/* Continue Button */}
-              <TouchableOpacity
+                <TouchableOpacity 
                 onPress={handleNext}
                 disabled={isSubmitting}
                 style={{
@@ -454,14 +454,14 @@ export default function RegisterScreen({ navigation }: Props) {
                   opacity: isSubmitting ? 0.8 : 1,
                 }}
                 activeOpacity={0.9}
-              >
-                <LinearGradient
+                >
+                  <LinearGradient
                   colors={isSubmitting ? ['#999', '#777'] : ['#FFD20A', '#FFA500']}
                   style={{
                     paddingVertical: 18,
                     alignItems: 'center',
                   }}
-                >
+                  >
                   {isSubmitting ? (
                     <HStack style={{ alignItems: 'center' }}>
                       <ActivityIndicator size="small" color="#1E1E1E" style={{ marginRight: 8 }} />
@@ -474,13 +474,13 @@ export default function RegisterScreen({ navigation }: Props) {
                       {currentIndex === questions.length - 1 ? 'Create Account' : 'Continue'}
                     </Text>
                   )}
-                </LinearGradient>
-              </TouchableOpacity>
+                  </LinearGradient>
+                </TouchableOpacity>
 
               {/* Sign In Link */}
               {currentIndex === 0 && (
-                <TouchableOpacity
-                  onPress={() => navigation.navigate(ROUTES.LOGIN)}
+            <TouchableOpacity 
+              onPress={() => navigation.navigate(ROUTES.LOGIN)}
                   style={{ marginTop: 20, alignItems: 'center' }}
                 >
                   <Text style={{ color: '#B0B0B0', fontSize: 16 }}>
@@ -488,13 +488,13 @@ export default function RegisterScreen({ navigation }: Props) {
                     <Text style={{ color: '#FFD20A', fontWeight: '600' }}>
                       Sign In
                     </Text>
-                  </Text>
+                    </Text>
                 </TouchableOpacity>
               )}
             </VStack>
-          </VStack>
+                  </VStack>
         </Animated.View>
       </SafeAreaView>
     </View>
   );
-} 
+}

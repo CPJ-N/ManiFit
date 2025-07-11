@@ -8,12 +8,12 @@ import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 
 // Screens
-import LoadingScreen from '../screens/LoadingScreen';
+import WelcomeScreen from '../screens/WelcomeScreen';
 
-type RootStackParamList = {
-  [ROUTES.AUTH]: undefined;
+export type RootStackParamList = {
+  [ROUTES.WELCOME]: undefined;
+  [ROUTES.AUTH]: { screen: string } | undefined;
   [ROUTES.MAIN]: undefined;
-  Loading: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -33,8 +33,10 @@ export default function RootNavigator({
   if (isLoading) {
     return (
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Loading" component={LoadingScreen} />
+        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={ user && hasCompletedProfile ? ROUTES.MAIN : user ? ROUTES.AUTH : ROUTES.WELCOME }>
+          <Stack.Screen name={ROUTES.WELCOME} component={WelcomeScreen} />
+          <Stack.Screen name={ROUTES.AUTH} component={AuthNavigator} />
+          <Stack.Screen name={ROUTES.MAIN} component={MainNavigator} />
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -42,12 +44,10 @@ export default function RootNavigator({
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user && hasCompletedProfile ? (
-          <Stack.Screen name={ROUTES.MAIN} component={MainNavigator} />
-        ) : (
-          <Stack.Screen name={ROUTES.AUTH} component={AuthNavigator} />
-        )}
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={ user && hasCompletedProfile ? ROUTES.MAIN : user ? ROUTES.AUTH : ROUTES.WELCOME }>
+        <Stack.Screen name={ROUTES.WELCOME} component={WelcomeScreen} />
+        <Stack.Screen name={ROUTES.AUTH} component={AuthNavigator} />
+        <Stack.Screen name={ROUTES.MAIN} component={MainNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );

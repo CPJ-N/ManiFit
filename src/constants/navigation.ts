@@ -22,4 +22,5 @@ export const ROUTES = {
   CHECKOUT: 'Checkout',
   SETTINGS: 'Settings',
   PROGRESS: 'Progress',
+  WELCOME: 'Welcome',
 } as const; 
