@@ -12,7 +12,6 @@ import { Box } from '../../components/ui/box';
 import { VStack } from '../../components/ui/vstack';
 import { HStack } from '../../components/ui/hstack';
 import { Heading } from '../../components/ui/heading';
-import { Card } from '../../components/ui/card';
 
 const { width, height } = Dimensions.get('window');
 
@@ -20,7 +19,7 @@ interface Props {
   navigation: any;
 }
 
-// Enhanced Quick Action Card Component with better animations
+// Modern Quick Action Card Component with enhanced design
 const QuickActionCard = ({ 
   icon, 
   title, 
@@ -48,12 +47,12 @@ const QuickActionCard = ({
         Animated.spring(scaleAnim, {
           toValue: 1,
           useNativeDriver: true,
-          tension: 50,
-          friction: 8,
+          tension: 60,
+          friction: 9,
         }),
         Animated.timing(opacityAnim, {
           toValue: 1,
-          duration: 600,
+          duration: 500,
           useNativeDriver: true,
         })
       ])
@@ -63,13 +62,13 @@ const QuickActionCard = ({
   const handlePress = () => {
     Animated.sequence([
       Animated.timing(scaleAnim, {
-        toValue: 0.95,
-        duration: 100,
+        toValue: 0.96,
+        duration: 80,
         useNativeDriver: true,
       }),
       Animated.timing(scaleAnim, {
         toValue: 1,
-        duration: 100,
+        duration: 120,
         useNativeDriver: true,
       })
     ]).start();
@@ -86,37 +85,35 @@ const QuickActionCard = ({
         }
       ]}
     >
-      <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
-    <Card style={styles.actionCard}>
-      <LinearGradient
-            colors={['rgba(42, 42, 42, 0.95)', 'rgba(51, 51, 51, 0.95)']}
-        style={styles.actionCardGradient}
-      >
-            <HStack space="lg" style={styles.actionCardContent}>
-          <View style={styles.actionIconContainer}>
-            <LinearGradient
-              colors={gradient}
-              style={styles.actionIconGradient}
-            >
-                  <Ionicons name={icon as any} size={28} color={iconColor} />
-            </LinearGradient>
-          </View>
-          <VStack space="xs" style={styles.actionTextContainer}>
-            <Text style={styles.actionTitle}>{title}</Text>
-            <Text style={styles.actionSubtitle}>{subtitle}</Text>
-          </VStack>
-              <View style={styles.actionArrowContainer}>
-                <Ionicons name="chevron-forward" size={24} color="#FFD20A" />
-              </View>
-        </HStack>
-      </LinearGradient>
-    </Card>
-  </TouchableOpacity>
+      <TouchableOpacity onPress={handlePress} activeOpacity={0.8}>
+        <LinearGradient
+          colors={['rgba(30, 30, 30, 0.98)', 'rgba(42, 42, 42, 0.95)']}
+          style={styles.actionCardGradient}
+        >
+          <HStack space="lg" style={styles.actionCardContent}>
+            <View style={styles.actionIconContainer}>
+              <LinearGradient
+                colors={gradient}
+                style={styles.actionIconGradient}
+              >
+                <Ionicons name={icon as any} size={26} color={iconColor} />
+              </LinearGradient>
+            </View>
+            <VStack space="xs" style={styles.actionTextContainer}>
+              <Text style={styles.actionTitle}>{title}</Text>
+              <Text style={styles.actionSubtitle}>{subtitle}</Text>
+            </VStack>
+            <View style={styles.actionArrowContainer}>
+              <Ionicons name="chevron-forward" size={20} color="#FFD20A" />
+            </View>
+          </HStack>
+        </LinearGradient>
+      </TouchableOpacity>
     </Animated.View>
-);
+  );
 };
 
-// Enhanced Stat Card Component with animations
+// Modern Stat Card Component with refined animations
 const StatCard = ({ 
   icon, 
   number, 
@@ -140,12 +137,12 @@ const StatCard = ({
         Animated.spring(scaleAnim, {
           toValue: 1,
           useNativeDriver: true,
-          tension: 50,
-          friction: 8,
+          tension: 60,
+          friction: 9,
         }),
         Animated.timing(opacityAnim, {
           toValue: 1,
-          duration: 600,
+          duration: 500,
           useNativeDriver: true,
         })
       ])
@@ -162,30 +159,28 @@ const StatCard = ({
         }
       ]}
     >
-  <Card style={styles.statCard}>
-    <LinearGradient
-          colors={['rgba(42, 42, 42, 0.95)', 'rgba(51, 51, 51, 0.95)']}
-      style={styles.statCardGradient}
-    >
-      <VStack space="sm" style={styles.statCardContent}>
-        <View style={styles.statIconContainer}>
-          <LinearGradient
-            colors={gradient}
-            style={styles.statIconGradient}
-          >
-                <Ionicons name={icon as any} size={20} color="#1E1E1E" />
-          </LinearGradient>
-        </View>
-        <Text style={styles.statNumber}>{number}</Text>
-        <Text style={styles.statLabel}>{label}</Text>
-      </VStack>
-    </LinearGradient>
-  </Card>
+      <LinearGradient
+        colors={['rgba(30, 30, 30, 0.98)', 'rgba(42, 42, 42, 0.95)']}
+        style={styles.statCardGradient}
+      >
+        <VStack space="sm" style={styles.statCardContent}>
+          <View style={styles.statIconContainer}>
+            <LinearGradient
+              colors={gradient}
+              style={styles.statIconGradient}
+            >
+              <Ionicons name={icon as any} size={18} color="#1E1E1E" />
+            </LinearGradient>
+          </View>
+          <Text style={styles.statNumber}>{number}</Text>
+          <Text style={styles.statLabel}>{label}</Text>
+        </VStack>
+      </LinearGradient>
     </Animated.View>
   );
 };
 
-// Header component with improved design
+// Modern Header component with enhanced design
 const Header = ({ userInfo, insets }: { userInfo: any; insets: any }) => {
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -202,9 +197,9 @@ const Header = ({ userInfo, insets }: { userInfo: any; insets: any }) => {
   };
 
   return (
-    <Box style={[styles.header, { paddingTop: insets.top + 20 }]}>
+    <Box style={[styles.header, { paddingTop: insets.top + 8 }]}>
       <LinearGradient
-        colors={['rgba(255, 210, 10, 0.15)', 'rgba(255, 210, 10, 0.05)', 'transparent']}
+        colors={['rgba(255, 210, 10, 0.12)', 'rgba(255, 210, 10, 0.04)', 'transparent']}
         style={styles.headerGradient}
       >
         <HStack style={styles.headerTop}>
@@ -212,21 +207,21 @@ const Header = ({ userInfo, insets }: { userInfo: any; insets: any }) => {
             <Text style={styles.greeting}>
               {getGreeting()}, {getUserName()}! 👋
             </Text>
-            <Text style={styles.subtitle}>Ready to dominate your goals?</Text>
+            <Text style={styles.subtitle}>Let's crush your fitness goals today</Text>
           </VStack>
           <TouchableOpacity style={styles.profileButton} activeOpacity={0.8}>
             <LinearGradient
               colors={['#FFD20A', '#FFA500']}
               style={styles.profileButtonGradient}
             >
-              <Ionicons name="person" size={22} color="#1E1E1E" />
+              <Ionicons name="person" size={20} color="#1E1E1E" />
             </LinearGradient>
           </TouchableOpacity>
         </HStack>
       </LinearGradient>
     </Box>
   );
-  };
+};
 
 export default function HomeScreen({ navigation }: Props) {
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
@@ -236,15 +231,16 @@ export default function HomeScreen({ navigation }: Props) {
     <View style={styles.container}>
       <StatusBar style="light" />
       
-      {/* Enhanced Background */}
+      {/* Modern Background */}
       <LinearGradient
-        colors={['#1E1E1E', '#2A2A2A', '#1E1E1E']}
+        colors={['#161616', '#1E1E1E', '#242424']}
         style={StyleSheet.absoluteFillObject}
       />
       
-      {/* Floating Background Elements */}
+      {/* Subtle Background Elements */}
       <View style={styles.backgroundElement1} />
       <View style={styles.backgroundElement2} />
+      <View style={styles.backgroundElement3} />
 
       {/* Header */}
       <Header userInfo={userInfo} insets={insets} />
@@ -298,7 +294,7 @@ export default function HomeScreen({ navigation }: Props) {
           </VStack>
         </Box>
 
-        {/* Enhanced Progress Section */}
+        {/* Progress Overview Section */}
         <Box style={styles.section}>
           <HStack style={styles.sectionHeader}>
             <View style={styles.sectionIconContainer}>
@@ -337,34 +333,32 @@ export default function HomeScreen({ navigation }: Props) {
           </HStack>
         </Box>
 
-        {/* Enhanced Motivational Quote Card */}
+        {/* Daily Motivation Card */}
         <Box style={styles.section}>
-          <Card style={styles.motivationCard}>
-            <LinearGradient
-              colors={['rgba(255, 210, 10, 0.12)', 'rgba(255, 210, 10, 0.08)']}
-              style={styles.motivationGradient}
-            >
-              <VStack space="lg" style={styles.motivationContent}>
-                <View style={styles.motivationIconContainer}>
-                  <LinearGradient
-                    colors={['rgba(255, 210, 10, 0.3)', 'rgba(255, 210, 10, 0.2)']}
-                    style={styles.motivationIconGradient}
-                  >
-                    <Ionicons name="bulb" size={28} color="#FFD20A" />
-                  </LinearGradient>
-                </View>
-                <Text style={styles.motivationText}>
-                  "The body achieves what the mind believes."
-                </Text>
-                <Text style={styles.motivationAuthor}>
-                  Start your journey today! 💪
-                </Text>
-              </VStack>
-            </LinearGradient>
-          </Card>
+          <LinearGradient
+            colors={['rgba(30, 30, 30, 0.95)', 'rgba(42, 42, 42, 0.9)']}
+            style={styles.motivationGradient}
+          >
+            <VStack space="lg" style={styles.motivationContent}>
+              <View style={styles.motivationIconContainer}>
+                <LinearGradient
+                  colors={['#FFD20A', '#FFA500']}
+                  style={styles.motivationIconGradient}
+                >
+                  <Ionicons name="trophy" size={26} color="#1E1E1E" />
+                </LinearGradient>
+              </View>
+              <Text style={styles.motivationText}>
+                "Success is the sum of small efforts repeated daily."
+              </Text>
+              <Text style={styles.motivationAuthor}>
+                Your fitness journey starts now! 🚀
+              </Text>
+            </VStack>
+          </LinearGradient>
         </Box>
 
-        {/* Enhanced Recent Activity Section */}
+        {/* Recent Activity Section */}
         <Box style={styles.section}>
           <HStack style={styles.sectionHeader}>
             <View style={styles.sectionIconContainer}>
@@ -378,44 +372,42 @@ export default function HomeScreen({ navigation }: Props) {
             <Heading size="lg" style={styles.sectionTitle}>Recent Activity</Heading>
           </HStack>
           
-          <Card style={styles.emptyStateCard}>
-            <LinearGradient
-              colors={['rgba(42, 42, 42, 0.95)', 'rgba(51, 51, 51, 0.95)']}
-              style={styles.emptyStateGradient}
-            >
-              <VStack space="lg" style={styles.emptyStateContent}>
-                <View style={styles.emptyIconContainer}>
-                  <LinearGradient
-                    colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
-                    style={styles.emptyIconGradient}
-                  >
-                    <Ionicons name="fitness-outline" size={36} color="#FFD20A" />
-                  </LinearGradient>
-                </View>
-                <VStack space="sm" style={styles.emptyTextContainer}>
-                <Text style={styles.emptyText}>No recent workouts</Text>
+          <LinearGradient
+            colors={['rgba(30, 30, 30, 0.95)', 'rgba(42, 42, 42, 0.9)']}
+            style={styles.emptyStateGradient}
+          >
+            <VStack space="lg" style={styles.emptyStateContent}>
+              <View style={styles.emptyIconContainer}>
+                <LinearGradient
+                  colors={['rgba(255, 210, 10, 0.15)', 'rgba(255, 165, 0, 0.1)']}
+                  style={styles.emptyIconGradient}
+                >
+                  <Ionicons name="fitness-outline" size={32} color="#FFD20A" />
+                </LinearGradient>
+              </View>
+              <VStack space="sm" style={styles.emptyTextContainer}>
+                <Text style={styles.emptyText}>No workouts yet</Text>
                 <Text style={styles.emptySubtext}>
-                  Start your fitness journey today and see your progress here!
+                  Ready to start your fitness journey? Your first workout is just a tap away!
                 </Text>
-                </VStack>
-                <TouchableOpacity style={styles.emptyActionButton} activeOpacity={0.8}>
-                  <LinearGradient
-                    colors={['#FFD20A', '#FFA500']}
-                    style={styles.emptyActionGradient}
-                  >
-                    <HStack space="sm" style={styles.emptyActionContent}>
-                      <Ionicons name="add" size={20} color="#1E1E1E" />
-                    <Text style={styles.emptyActionText}>Get Started</Text>
-                    </HStack>
-                  </LinearGradient>
-                </TouchableOpacity>
               </VStack>
-            </LinearGradient>
-          </Card>
+              <TouchableOpacity style={styles.emptyActionButton} activeOpacity={0.8}>
+                <LinearGradient
+                  colors={['#FFD20A', '#FFA500']}
+                  style={styles.emptyActionGradient}
+                >
+                  <HStack space="sm" style={styles.emptyActionContent}>
+                    <Ionicons name="play" size={18} color="#1E1E1E" />
+                    <Text style={styles.emptyActionText}>Start First Workout</Text>
+                  </HStack>
+                </LinearGradient>
+              </TouchableOpacity>
+            </VStack>
+          </LinearGradient>
         </Box>
 
         {/* Bottom Spacing */}
-        <View style={{ height: 120 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
@@ -424,34 +416,43 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E1E1E',
+    backgroundColor: '#161616',
   },
   backgroundElement1: {
     position: 'absolute',
-    top: height * 0.1,
-    right: -50,
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: 'rgba(255, 210, 10, 0.03)',
+    top: height * 0.12,
+    right: -60,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(255, 210, 10, 0.02)',
   },
   backgroundElement2: {
     position: 'absolute',
-    bottom: height * 0.3,
-    left: -30,
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(255, 210, 10, 0.05)',
+    bottom: height * 0.25,
+    left: -40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 165, 0, 0.03)',
+  },
+  backgroundElement3: {
+    position: 'absolute',
+    top: height * 0.6,
+    right: width * 0.2,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255, 210, 10, 0.015)',
   },
   header: {
     zIndex: 10,
   },
   headerGradient: {
-    paddingHorizontal: 24,
-    paddingVertical: 28,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
   headerTop: {
     justifyContent: 'space-between',
@@ -462,31 +463,33 @@ const styles = StyleSheet.create({
     paddingRight: 16,
   },
   greeting: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 26,
+    fontWeight: '700',
     color: '#FFFFFF',
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
+    lineHeight: 32,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#B0B0B0',
-    lineHeight: 24,
-    marginTop: 4,
+    fontSize: 15,
+    color: '#A0A0A0',
+    lineHeight: 22,
+    marginTop: 2,
+    fontWeight: '500',
   },
   profileButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     shadowColor: '#FFD20A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 6,
   },
   profileButtonGradient: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -494,11 +497,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
+    paddingHorizontal: 20,
+    paddingTop: 12,
   },
   section: {
-    marginBottom: 40,
+    marginBottom: 32,
   },
   sectionHeader: {
     alignItems: 'center',
@@ -518,44 +521,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 19,
+    fontWeight: '600',
     color: '#FFFFFF',
-    letterSpacing: -0.3,
+    letterSpacing: -0.2,
   },
   actionCardWrapper: {
     marginBottom: 16,
   },
-  actionCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    shadowColor: '#FFD20A',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 12,
-  },
   actionCardGradient: {
-    padding: 24,
-    borderRadius: 20,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 210, 10, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
   },
   actionCardContent: {
     alignItems: 'center',
   },
   actionIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   actionIconGradient: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -563,22 +564,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '600',
     color: '#FFFFFF',
-    letterSpacing: -0.3,
-    marginBottom: 2,
+    letterSpacing: -0.2,
+    marginBottom: 3,
   },
   actionSubtitle: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    lineHeight: 20,
+    fontSize: 13,
+    color: '#A0A0A0',
+    lineHeight: 18,
+    fontWeight: '400',
   },
   actionArrowContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 210, 10, 0.1)',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 210, 10, 0.08)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -589,122 +591,116 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 6,
   },
-  statCard: {
-    borderRadius: 18,
-    overflow: 'hidden',
-    shadowColor: '#FFD20A',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 8,
-  },
   statCardGradient: {
-    padding: 20,
-    borderRadius: 18,
+    padding: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 210, 10, 0.08)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 4,
   },
   statCardContent: {
     alignItems: 'center',
   },
   statIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginBottom: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginBottom: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+    elevation: 2,
   },
   statIconGradient: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 24,
+    fontWeight: '700',
     color: '#FFFFFF',
-    letterSpacing: -0.5,
-    marginBottom: 4,
+    letterSpacing: -0.3,
+    marginBottom: 6,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#B0B0B0',
+    fontSize: 11,
+    color: '#A0A0A0',
     textAlign: 'center',
-    lineHeight: 16,
+    lineHeight: 14,
     fontWeight: '500',
   },
-  motivationCard: {
-    borderRadius: 24,
-    overflow: 'hidden',
-    shadowColor: '#FFD20A',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 12,
-  },
   motivationGradient: {
-    padding: 32,
-    borderRadius: 24,
+    padding: 24,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 210, 10, 0.12)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
   },
   motivationContent: {
     alignItems: 'center',
   },
   motivationIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
   },
   motivationIconGradient: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
   },
   motivationText: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '600',
     color: '#FFFFFF',
     textAlign: 'center',
-    lineHeight: 30,
-    letterSpacing: -0.3,
+    lineHeight: 26,
+    letterSpacing: -0.2,
   },
   motivationAuthor: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#FFD20A',
-    fontWeight: '600',
+    fontWeight: '500',
     textAlign: 'center',
   },
-  emptyStateCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-  },
   emptyStateGradient: {
-    padding: 40,
-    borderRadius: 20,
+    padding: 28,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 210, 10, 0.06)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 4,
   },
   emptyStateContent: {
     alignItems: 'center',
   },
   emptyIconContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    marginBottom: 24,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 20,
   },
   emptyIconGradient: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -713,39 +709,40 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyText: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '600',
     color: '#FFFFFF',
-    letterSpacing: -0.3,
+    letterSpacing: -0.2,
     textAlign: 'center',
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#B0B0B0',
+    fontSize: 13,
+    color: '#A0A0A0',
     textAlign: 'center',
-    lineHeight: 22,
-    maxWidth: 280,
+    lineHeight: 20,
+    maxWidth: 260,
+    fontWeight: '400',
   },
   emptyActionButton: {
-    borderRadius: 16,
+    borderRadius: 12,
     shadowColor: '#FFD20A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   emptyActionGradient: {
-    paddingHorizontal: 28,
-    paddingVertical: 16,
-    borderRadius: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
   },
   emptyActionContent: {
     alignItems: 'center',
   },
   emptyActionText: {
     color: '#1E1E1E',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: -0.1,
   },
 }); 
