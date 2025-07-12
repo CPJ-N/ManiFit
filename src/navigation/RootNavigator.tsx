@@ -44,13 +44,23 @@ export default function RootNavigator({
   }
 
   const getInitialRoute = () => {
-    if (isAuthenticated && hasCompletedProfile) {
-      return ROUTES.MAIN;
-    }
-    if (isAuthenticated && !hasCompletedProfile) {
-      return ROUTES.AUTH;
-    }
-    return ROUTES.WELCOME;
+    const route = (() => {
+      if (isAuthenticated && hasCompletedProfile) {
+        return ROUTES.MAIN;
+      }
+      if (isAuthenticated && !hasCompletedProfile) {
+        return ROUTES.AUTH;
+      }
+      return ROUTES.WELCOME;
+    })();
+    
+    console.log('🧭 Navigation decision:', {
+      isAuthenticated,
+      hasCompletedProfile,
+      selectedRoute: route
+    });
+    
+    return route;
   };
 
   return (

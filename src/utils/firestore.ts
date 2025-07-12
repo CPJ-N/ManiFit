@@ -29,27 +29,36 @@ export const getDocument = async <T>(
   id: string
 ): Promise<T | null> => {
   if (!id?.trim()) {
+    console.warn('⚠️ Empty document ID provided');
     return null;
   }
+
+  console.log(`📥 Fetching document: ${collection}/${id}`);
 
   try {
     const docRef = doc(db, collection, id);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
+      console.log(`✅ Document found: ${collection}/${id}`);
       return { ...docSnap.data(), id } as T;
+    } else {
+      console.log(`❌ Document not found: ${collection}/${id}`);
+      return null;
     }
-    
-    return null;
   } catch (error: any) {
-    console.error(`Firestore error for ${collection}/${id}:`, error.code, error.message);
+    console.error(`💥 Firestore error for ${collection}/${id}:`, {
+      code: error.code,
+      message: error.message
+    });
     
     if (isOfflineError(error)) {
+      console.warn('🌐 App is offline');
       return null;
     }
     
     if (error.code === 'permission-denied') {
-      console.warn('Permission denied - user may not be authenticated');
+      console.warn('🚫 Permission denied - user may not be authenticated');
       return null;
     }
     

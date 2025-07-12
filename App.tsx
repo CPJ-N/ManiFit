@@ -34,14 +34,15 @@ function AppContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Debug logging (remove for production)
+  // Enhanced logging for debugging
   if (__DEV__) {
-    console.log('App state:', {
+    console.log('📱 App state update:', {
       showLoadingScreen,
       authLoading,
       isAuthenticated,
       userLoading,
-      hasCompletedProfile
+      hasCompletedProfile,
+      userInfo: userInfo ? { fullName: userInfo.fullName, email: userInfo.email } : null
     });
   }
 

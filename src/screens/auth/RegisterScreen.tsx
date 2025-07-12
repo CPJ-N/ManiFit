@@ -210,11 +210,16 @@ export default function RegisterScreen({ navigation }: Props) {
   };
 
   const handleSubmit = async () => {
+    console.log('🚀 Starting registration process for:', answers.email?.trim());
     setIsSubmitting(true);
     setError('');
     
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, answers.email.trim(), answers.password);
+      console.log('✅ Firebase user created:', {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email
+      });
       
       const userProfile = {
         uid: userCredential.user.uid,
@@ -229,8 +234,14 @@ export default function RegisterScreen({ navigation }: Props) {
         createdAt: new Date().toISOString(),
       };
 
+      console.log('📥 Creating user profile in Firestore...');
       await createUser(userProfile, userCredential.user.uid);
+      console.log('✅ Registration completed successfully');
     } catch (error: any) {
+      console.error('💥 Registration failed:', {
+        code: error.code,
+        message: error.message
+      });
       setError(getErrorMessage(error.code));
       setIsSubmitting(false);
     }

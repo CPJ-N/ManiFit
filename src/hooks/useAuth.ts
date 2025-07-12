@@ -10,12 +10,30 @@ export const useAuth = () => {
   const { isAuthenticated, authLoading, userInfo } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
+    console.log('🔐 Setting up auth state listener...');
+    
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
-      dispatch(setAuthenticated(!!firebaseUser));
+      if (firebaseUser) {
+        console.log('✅ User authenticated:', {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          emailVerified: firebaseUser.emailVerified,
+          displayName: firebaseUser.displayName
+        });
+        dispatch(setAuthenticated(true));
+      } else {
+        console.log('❌ User not authenticated');
+        dispatch(setAuthenticated(false));
+      }
+      
+      console.log('🏁 Auth loading complete');
       dispatch(setAuthLoading(false));
     });
 
-    return unsubscribe;
+    return () => {
+      console.log('🔄 Cleaning up auth listener');
+      unsubscribe();
+    };
   }, [dispatch]);
 
   return { isAuthenticated, authLoading, userInfo };

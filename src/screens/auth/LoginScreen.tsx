@@ -77,15 +77,25 @@ export default function LoginScreen({ navigation }: Props) {
       return;
     }
 
+    console.log('🚀 Starting login process for:', email.trim());
     setLoading(true);
     setError('');
     
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password.trim());
+      const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password.trim());
+      console.log('✅ Login successful for:', {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email
+      });
     } catch (error: any) {
+      console.error('💥 Login failed:', {
+        code: error.code,
+        message: error.message
+      });
       setError(getErrorMessage(error.code));
     } finally {
       setLoading(false);
+      console.log('🏁 Login process complete');
     }
   };
 
