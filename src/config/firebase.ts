@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -13,21 +12,13 @@ const firebaseConfig = {
   storageBucket: Constants.expoConfig?.extra?.firebaseStorageBucket,
   messagingSenderId: Constants.expoConfig?.extra?.firebaseMessagingSenderId,
   appId: Constants.expoConfig?.extra?.firebaseAppId,
-  measurementId: Constants.expoConfig?.extra?.firebaseMeasurementId,
 };
 
-// Initialize Firebase App
-const firebaseApp = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Auth with persistence
-const auth = initializeAuth(firebaseApp, {
+export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
-// Initialize Firestore
-const db = getFirestore(firebaseApp);
-
-// Initialize Storage
-const storage = getStorage(firebaseApp);
-
-export { auth, db, storage };
+export const db = getFirestore(app);
+export const storage = getStorage(app);

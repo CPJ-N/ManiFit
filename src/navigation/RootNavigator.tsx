@@ -1,7 +1,9 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useSelector } from 'react-redux';
 import { ROUTES } from '../constants/navigation';
+import { RootState } from '../store/reduxStore';
 
 // Navigators
 import AuthNavigator from './AuthNavigator';
@@ -19,21 +21,20 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 interface RootNavigatorProps {
-  user: any;
   hasCompletedProfile: boolean;
   isLoading: boolean;
 }
 
 export default function RootNavigator({ 
-  user, 
   hasCompletedProfile, 
   isLoading 
 }: RootNavigatorProps) {
+  const { isAuthenticated } = useSelector((state: RootState) => state.user);
   
   if (isLoading) {
     return (
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={ user && hasCompletedProfile ? ROUTES.MAIN : user ? ROUTES.AUTH : ROUTES.WELCOME }>
+        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={ROUTES.WELCOME}>
           <Stack.Screen name={ROUTES.WELCOME} component={WelcomeScreen} />
           <Stack.Screen name={ROUTES.AUTH} component={AuthNavigator} />
           <Stack.Screen name={ROUTES.MAIN} component={MainNavigator} />
@@ -42,9 +43,19 @@ export default function RootNavigator({
     );
   }
 
+  const getInitialRoute = () => {
+    if (isAuthenticated && hasCompletedProfile) {
+      return ROUTES.MAIN;
+    }
+    if (isAuthenticated && !hasCompletedProfile) {
+      return ROUTES.AUTH;
+    }
+    return ROUTES.WELCOME;
+  };
+
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={ user && hasCompletedProfile ? ROUTES.MAIN : user ? ROUTES.AUTH : ROUTES.WELCOME }>
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={getInitialRoute()}>
         <Stack.Screen name={ROUTES.WELCOME} component={WelcomeScreen} />
         <Stack.Screen name={ROUTES.AUTH} component={AuthNavigator} />
         <Stack.Screen name={ROUTES.MAIN} component={MainNavigator} />

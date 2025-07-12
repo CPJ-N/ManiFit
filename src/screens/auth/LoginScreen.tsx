@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
@@ -36,11 +36,32 @@ export default function LoginScreen({ navigation }: Props) {
     return emailRegex.test(email);
   };
 
+  const getErrorMessage = (errorCode: string) => {
+    switch (errorCode) {
+      case 'auth/invalid-credential':
+        return 'Invalid email or password. Please check your credentials.';
+      case 'auth/user-not-found':
+        return 'No account found with this email address.';
+      case 'auth/wrong-password':
+        return 'Incorrect password. Please try again.';
+      case 'auth/user-disabled':
+        return 'This account has been disabled.';
+      case 'auth/too-many-requests':
+        return 'Too many failed attempts. Please try again later.';
+      case 'auth/network-request-failed':
+        return 'Network error. Please check your internet connection.';
+      case 'auth/email-already-in-use':
+        return 'An account with this email already exists.';
+      case 'auth/weak-password':
+        return 'Password is too weak. Please choose a stronger password.';
+      case 'auth/invalid-email':
+        return 'Please enter a valid email address.';
+      default:
+        return 'Authentication failed. Please try again.';
+    }
+  };
+
   const handleLogin = async () => {
-    console.log('🚀 Login process started');
-    console.log('📧 Raw email input:', JSON.stringify(email));
-    console.log('🔐 Password length:', password.length);
-    
     if (!email.trim()) {
       setError('Email is required');
       return;
@@ -58,44 +79,11 @@ export default function LoginScreen({ navigation }: Props) {
 
     setLoading(true);
     setError('');
+    
     try {
-      console.log('📡 Calling Firebase signInWithEmailAndPassword...');
       await signInWithEmailAndPassword(auth, email.trim(), password.trim());
-      console.log('✅ Login successful!');
     } catch (error: any) {
-      console.error('💥 Login failed with error code:', error.code);
-      console.error('💥 Error message:', error.message);
-      
-      const errorCode = error.code;
-      let errorMessage = 'An error occurred. Please try again.';
-      
-      switch (errorCode) {
-        case 'auth/user-not-found':
-          errorMessage = 'No account found with this email address.';
-          break;
-        case 'auth/wrong-password':
-          errorMessage = 'Incorrect password. Please try again.';
-          break;
-        case 'auth/invalid-email':
-          errorMessage = 'Please enter a valid email address.';
-          break;
-        case 'auth/user-disabled':
-          errorMessage = 'This account has been disabled.';
-          break;
-        case 'auth/invalid-credential':
-          errorMessage = 'Invalid credentials. Please check your email and password.';
-          break;
-        case 'auth/too-many-requests':
-          errorMessage = 'Too many failed attempts. Please try again later.';
-          break;
-        case 'auth/network-request-failed':
-          errorMessage = 'Network error. Please check your internet connection.';
-          break;
-        default:
-          errorMessage = 'Failed to sign in. Please check your credentials.';
-      }
-      
-      setError(errorMessage);
+      setError(getErrorMessage(error.code));
     } finally {
       setLoading(false);
     }

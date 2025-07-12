@@ -194,6 +194,21 @@ export default function RegisterScreen({ navigation }: Props) {
     }
   };
 
+  const getErrorMessage = (errorCode: string) => {
+    switch (errorCode) {
+      case 'auth/email-already-in-use':
+        return 'An account with this email already exists.';
+      case 'auth/weak-password':
+        return 'Password is too weak. Please choose a stronger password.';
+      case 'auth/invalid-email':
+        return 'Please enter a valid email address.';
+      case 'auth/network-request-failed':
+        return 'Network error. Please check your internet connection.';
+      default:
+        return 'Registration failed. Please try again.';
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setError('');
@@ -215,31 +230,8 @@ export default function RegisterScreen({ navigation }: Props) {
       };
 
       await createUser(userProfile, userCredential.user.uid);
-      console.log('✅ User registered successfully');
     } catch (error: any) {
-      console.error('❌ Registration error:', error);
-      
-      const errorCode = error.code;
-      let errorMessage = 'Registration failed. Please try again.';
-      
-      switch (errorCode) {
-        case 'auth/email-already-in-use':
-          errorMessage = 'An account with this email already exists.';
-          break;
-        case 'auth/weak-password':
-          errorMessage = 'Password is too weak. Please choose a stronger password.';
-          break;
-        case 'auth/invalid-email':
-          errorMessage = 'Please enter a valid email address.';
-          break;
-        case 'auth/network-request-failed':
-          errorMessage = 'Network error. Please check your internet connection.';
-          break;
-        default:
-          errorMessage = 'Registration failed. Please try again.';
-      }
-      
-      setError(errorMessage);
+      setError(getErrorMessage(error.code));
       setIsSubmitting(false);
     }
   };
