@@ -138,7 +138,79 @@ Firebase Integration
 Firebase: Provides backend services for authentication, data storage, and file uploads, configured in firebase.ts.
 
 ## Firebase Setup
-Place the google-services.json and GoogleService-Info.plist files in the root directory, matching the paths defined in your .env.
+
+### 🔐 Security Notice
+**IMPORTANT:** The Google API keys were previously exposed in this repository. If you're setting up this project, you MUST rotate the API keys before deploying.
+
+### Required Configuration Files
+
+This project requires Firebase configuration files that are **NOT** included in version control for security reasons:
+
+1. **`google-services.json`** (Android)
+2. **`GoogleService-Info.plist`** (iOS)
+
+### How to Get These Files
+
+1. **Go to Firebase Console:**
+   - Visit: https://console.firebase.google.com/
+   - Select the ManiFit project (or create a new one)
+
+2. **For Android (`google-services.json`):**
+   - Go to Project Settings (gear icon) → Your apps
+   - Select your Android app or add a new one
+   - Download `google-services.json`
+   - Place it in **two locations**:
+     - `/google-services.json` (project root)
+     - `/android/app/google-services.json`
+
+3. **For iOS (`GoogleService-Info.plist`):**
+   - Go to Project Settings (gear icon) → Your apps
+   - Select your iOS app or add a new one
+   - Download `GoogleService-Info.plist`
+   - Place it in **two locations**:
+     - `/GoogleService-Info.plist` (project root)
+     - `/ios/ManiFit/GoogleService-Info.plist`
+
+### Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# Firebase Configuration
+FIREBASE_API_KEY=your_firebase_api_key
+FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+FIREBASE_APP_ID=your_app_id
+FIREBASE_MEASUREMENT_ID=your_measurement_id
+
+# Google OAuth Client IDs
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_web_client_id
+EXPO_PUBLIC_FIREBASE_IOS_CLIENT_ID=your_ios_client_id
+EXPO_PUBLIC_FIREBASE_ANDROID_CLIENT_ID=your_android_client_id
+
+# Paths to Google Service files
+GOOGLE_SERVICE_JSON=./google-services.json
+GOOGLE_SERVICE_PLIST=./GoogleService-Info.plist
+
+# Razorpay (Payment Gateway)
+RAZORPAY_API_KEY_ID=your_razorpay_key
+RAZORPAY_API_KEY_SECRET=your_razorpay_secret
+RAZORPAY_API_URL=your_razorpay_url
+
+# GitHub (Exercise Data)
+GITHUB_EXERCISE_IMAGE_URL_PREFIX=your_github_url
+GITHUB_EXERCISES_URL=your_exercises_url
+```
+
+### Important Security Notes
+
+- **NEVER** commit these files to version control
+- **NEVER** share API keys in chat, email, or tickets
+- Use API key restrictions in Google Cloud Console
+- Rotate keys immediately if they become exposed
+- Keep `.env` files out of version control (already in `.gitignore`)
 
 Summary
 The app architecture is modular and scalable, with a clear separation of concerns:

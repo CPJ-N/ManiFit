@@ -32,12 +32,11 @@ yarn-error.*
 .env
 .env*.local
 
-# Include Firebase config files and native directories so they are available in builds
-!google-services.json
-!GoogleService-Info.plist
-
-# You may still ignore build outputs inside native folders if desired,
-# but keep source config files committed.
+# Firebase config files (contain sensitive API keys - DO NOT COMMIT)
+google-services.json
+GoogleService-Info.plist
+android/app/google-services.json
+ios/ManiFit/GoogleService-Info.plist
 
 # typescript
 *.tsbuildinfo
