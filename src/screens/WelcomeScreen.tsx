@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ScrollView,
   ImageBackground,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ROUTES } from '../constants/navigation';
@@ -22,15 +23,35 @@ interface FeatureCardProps {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   description: string;
+  image?: any;
 }
 
-const FeatureCard = ({ icon, title, description }: FeatureCardProps) => (
-  <View className="bg-[#2A2A2A] rounded-2xl p-6 mb-4 border-2 border-[#333]">
-    <View className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl items-center justify-center mb-4">
-      <Ionicons name={icon} size={28} color="#1E1E1E" />
+const FeatureCard = ({ icon, title, description, image }: FeatureCardProps) => (
+  <View className="bg-[#2A2A2A] rounded-2xl overflow-hidden mb-4 border-2 border-[#333]">
+    {image && (
+      <View className="relative">
+        <Image
+          source={image}
+          style={{ width: '100%', height: 200 }}
+          resizeMode="cover"
+        />
+        <View className="absolute inset-0 bg-gradient-to-b from-transparent to-[#2A2A2A]" />
+        <View className="absolute bottom-4 left-4">
+          <View className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl items-center justify-center">
+            <Ionicons name={icon} size={24} color="#1E1E1E" />
+          </View>
+        </View>
+      </View>
+    )}
+    <View className="p-6">
+      {!image && (
+        <View className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl items-center justify-center mb-4">
+          <Ionicons name={icon} size={28} color="#1E1E1E" />
+        </View>
+      )}
+      <Text className="text-white text-xl font-bold mb-2">{title}</Text>
+      <Text className="text-gray-400 text-base leading-6">{description}</Text>
     </View>
-    <Text className="text-white text-xl font-bold mb-2">{title}</Text>
-    <Text className="text-gray-400 text-base leading-6">{description}</Text>
   </View>
 );
 
@@ -38,15 +59,35 @@ interface StepCardProps {
   number: string;
   title: string;
   description: string;
+  image?: any;
 }
 
-const StepCard = ({ number, title, description }: StepCardProps) => (
-  <View className="items-center mb-8">
-    <View className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 items-center justify-center mb-4">
-      <Text className="text-[#1E1E1E] text-2xl font-extrabold">{number}</Text>
+const StepCard = ({ number, title, description, image }: StepCardProps) => (
+  <View className="bg-[#2A2A2A] rounded-2xl overflow-hidden mb-6 border-2 border-[#333]">
+    {image && (
+      <View className="relative">
+        <Image
+          source={image}
+          style={{ width: '100%', height: 180 }}
+          resizeMode="cover"
+        />
+        <View className="absolute inset-0 bg-black/50" />
+        <View className="absolute top-4 left-4">
+          <View className="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 items-center justify-center">
+            <Text className="text-[#1E1E1E] text-2xl font-extrabold">{number}</Text>
+          </View>
+        </View>
+      </View>
+    )}
+    <View className="p-6">
+      {!image && (
+        <View className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 items-center justify-center mb-4 self-center">
+          <Text className="text-[#1E1E1E] text-2xl font-extrabold">{number}</Text>
+        </View>
+      )}
+      <Text className="text-white text-lg font-bold mb-2 text-center">{title}</Text>
+      <Text className="text-gray-400 text-sm text-center px-2">{description}</Text>
     </View>
-    <Text className="text-white text-lg font-bold mb-2 text-center">{title}</Text>
-    <Text className="text-gray-400 text-sm text-center px-4">{description}</Text>
   </View>
 );
 
@@ -85,14 +126,13 @@ export const WelcomeScreen = () => {
 
           <SafeAreaView className="flex-1">
             <View className="flex-1 justify-between px-6 py-8">
-              {/* Logo/Brand */}
+              {/* Logo/Brand - Using actual ManiFit logo */}
               <View className="items-center pt-4">
-                <View className="flex-row items-center">
-                  <View className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl items-center justify-center mr-3">
-                    <Ionicons name="fitness" size={24} color="#1E1E1E" />
-                  </View>
-                  <Text className="text-white text-3xl font-extrabold">ManiFit</Text>
-                </View>
+                <Image
+                  source={require('../assets/ManiFit Logo.png')}
+                  style={{ width: 200, height: 60 }}
+                  resizeMode="contain"
+                />
               </View>
 
               {/* Hero Content */}
@@ -156,7 +196,7 @@ export const WelcomeScreen = () => {
           </SafeAreaView>
         </ImageBackground>
 
-        {/* Features Section */}
+        {/* Features Section with Images */}
         <View className="bg-[#1E1E1E] px-6 py-16">
           <View className="items-center mb-12">
             <Text className="text-yellow-400 text-sm font-bold uppercase tracking-wider mb-3">Features</Text>
@@ -172,29 +212,77 @@ export const WelcomeScreen = () => {
             icon="barbell"
             title="Custom Workout Plans"
             description="Get personalized workout routines tailored to your fitness level and goals. Expert-designed programs that adapt as you progress."
+            image={require('../assets/images/slide1.png')}
           />
 
           <FeatureCard
             icon="analytics"
             title="Progress Tracking"
             description="Monitor your achievements with detailed analytics and insights. Visualize your journey with comprehensive charts and stats."
+            image={require('../assets/images/slide2.png')}
           />
 
           <FeatureCard
             icon="people"
             title="Expert Trainers"
             description="Connect with certified fitness professionals. Get guidance, motivation, and accountability from industry experts."
+            image={require('../assets/images/slide3.png')}
           />
 
           <FeatureCard
             icon="nutrition"
             title="Nutrition Guidance"
             description="Access meal plans and nutritional advice to fuel your workouts. Learn what to eat for optimal performance and recovery."
+            image={require('../assets/images/slide4.png')}
           />
         </View>
 
-        {/* How It Works Section */}
+        {/* Visual Showcase Gallery */}
         <View className="bg-gradient-to-b from-[#1E1E1E] to-[#2A2A2A] px-6 py-16">
+          <View className="items-center mb-12">
+            <Text className="text-yellow-400 text-sm font-bold uppercase tracking-wider mb-3">See It In Action</Text>
+            <Text className="text-white text-3xl font-extrabold text-center mb-3">
+              Real Results, Real People
+            </Text>
+            <Text className="text-gray-400 text-base text-center px-4">
+              Join our community of fitness enthusiasts
+            </Text>
+          </View>
+
+          <View className="flex-row flex-wrap justify-between">
+            <View className="w-[48%] mb-4">
+              <Image
+                source={require('../assets/images/slide1.png')}
+                style={{ width: '100%', height: 200, borderRadius: 16 }}
+                resizeMode="cover"
+              />
+            </View>
+            <View className="w-[48%] mb-4">
+              <Image
+                source={require('../assets/images/slide2.png')}
+                style={{ width: '100%', height: 200, borderRadius: 16 }}
+                resizeMode="cover"
+              />
+            </View>
+            <View className="w-[48%] mb-4">
+              <Image
+                source={require('../assets/images/slide3.png')}
+                style={{ width: '100%', height: 200, borderRadius: 16 }}
+                resizeMode="cover"
+              />
+            </View>
+            <View className="w-[48%] mb-4">
+              <Image
+                source={require('../assets/images/slide4.png')}
+                style={{ width: '100%', height: 200, borderRadius: 16 }}
+                resizeMode="cover"
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* How It Works Section with Visual Steps */}
+        <View className="bg-[#1E1E1E] px-6 py-16">
           <View className="items-center mb-12">
             <Text className="text-yellow-400 text-sm font-bold uppercase tracking-wider mb-3">How It Works</Text>
             <Text className="text-white text-3xl font-extrabold text-center mb-3">
@@ -209,23 +297,26 @@ export const WelcomeScreen = () => {
             number="1"
             title="Create Your Account"
             description="Sign up for free in seconds. No credit card required to get started."
+            image={require('../assets/images/slide4.png')}
           />
 
           <StepCard
             number="2"
             title="Set Your Goals"
             description="Tell us about your fitness goals and preferences. We'll customize everything for you."
+            image={require('../assets/images/slide2.png')}
           />
 
           <StepCard
             number="3"
             title="Start Training"
             description="Begin your personalized workout plan and track your progress every step of the way."
+            image={require('../assets/images/slide1.png')}
           />
         </View>
 
         {/* Benefits Section */}
-        <View className="bg-[#1E1E1E] px-6 py-16">
+        <View className="bg-gradient-to-b from-[#1E1E1E] to-[#2A2A2A] px-6 py-16">
           <View className="items-center mb-12">
             <Text className="text-yellow-400 text-sm font-bold uppercase tracking-wider mb-3">Why ManiFit</Text>
             <Text className="text-white text-3xl font-extrabold text-center mb-3">
@@ -246,7 +337,7 @@ export const WelcomeScreen = () => {
         </View>
 
         {/* Final CTA Section */}
-        <View className="bg-gradient-to-b from-[#1E1E1E] to-[#2A2A2A] px-6 py-16">
+        <View className="bg-[#1E1E1E] px-6 py-16">
           <View className="bg-[#2A2A2A] rounded-3xl p-8 border-2 border-yellow-400/30">
             <View className="items-center mb-8">
               <Text className="text-white text-3xl font-extrabold text-center mb-4 leading-tight">
@@ -294,11 +385,12 @@ export const WelcomeScreen = () => {
 
         {/* Footer */}
         <View className="bg-[#1E1E1E] px-6 py-8 border-t border-[#333]">
-          <View className="flex-row items-center justify-center mb-4">
-            <View className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl items-center justify-center mr-2">
-              <Ionicons name="fitness" size={20} color="#1E1E1E" />
-            </View>
-            <Text className="text-white text-xl font-bold">ManiFit</Text>
+          <View className="items-center mb-4">
+            <Image
+              source={require('../assets/ManiFit Logo.png')}
+              style={{ width: 150, height: 45 }}
+              resizeMode="contain"
+            />
           </View>
           <Text className="text-gray-500 text-center text-sm">
             © 2025 ManiFit. All rights reserved.
