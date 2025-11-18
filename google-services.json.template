@@ -1,37 +1,37 @@
 {
   "project_info": {
-    "project_number": "1059490247015",
-    "project_id": "manifit-41d91",
-    "storage_bucket": "manifit-41d91.appspot.com"
+    "project_number": "YOUR_PROJECT_NUMBER",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_PROJECT_ID.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1059490247015:android:a0f2d6821514359ef4bfc2",
+        "mobilesdk_app_id": "YOUR_MOBILE_SDK_APP_ID",
         "android_client_info": {
           "package_name": "com.nodemerge.manifit"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1059490247015-5n2r54pjtjlgc78dsck4rhn0l72edtve.apps.googleusercontent.com",
+          "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCvIgjZH72-t_97-SvAoK2tZp3J6mTHPVo"
+          "current_key": "YOUR_API_KEY_HERE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1059490247015-5n2r54pjtjlgc78dsck4rhn0l72edtve.apps.googleusercontent.com",
+              "client_id": "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "1059490247015-9j1oh2fhkm2v9948c2h7l160lhlv0ft7.apps.googleusercontent.com",
+              "client_id": "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.nodemerge.manifit"
