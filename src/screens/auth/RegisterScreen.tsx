@@ -243,6 +243,7 @@ export default function RegisterScreen({ navigation }: Props) {
         message: error.message
       });
       setError(getErrorMessage(error.code));
+    } finally {
       setIsSubmitting(false);
     }
   };

@@ -269,16 +269,16 @@ export default function HomeScreen({ navigation }: Props) {
               icon="fitness"
               title="Start Quick Workout"
               subtitle="Jump into a 15-min power session"
-              onPress={() => {/* Navigate to quick workout */}}
+              onPress={() => navigation.navigate('Workouts')}
               gradient={['#4CAF50', '#2E7D32']}
               delay={100}
             />
-            
+
             <QuickActionCard
               icon="calendar"
               title="Today's Routine"
               subtitle="Your personalized workout plan"
-              onPress={() => {/* Navigate to today's routine */}}
+              onPress={() => navigation.navigate('Workouts')}
               gradient={['#6366F1', '#4F46E5']}
               delay={200}
             />
@@ -391,7 +391,7 @@ export default function HomeScreen({ navigation }: Props) {
                   Ready to start your fitness journey? Your first workout is just a tap away!
                 </Text>
               </VStack>
-              <TouchableOpacity style={styles.emptyActionButton} activeOpacity={0.8}>
+              <TouchableOpacity style={styles.emptyActionButton} activeOpacity={0.8} onPress={() => navigation.navigate('Workouts')}>
                 <LinearGradient
                   colors={['#FFD20A', '#FFA500']}
                   style={styles.emptyActionGradient}

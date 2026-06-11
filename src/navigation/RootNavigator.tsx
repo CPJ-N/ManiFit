@@ -25,50 +25,38 @@ interface RootNavigatorProps {
   isLoading: boolean;
 }
 
-export default function RootNavigator({ 
-  hasCompletedProfile, 
-  isLoading 
+export default function RootNavigator({
+  hasCompletedProfile,
+  isLoading
 }: RootNavigatorProps) {
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
-  
-  if (isLoading) {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={ROUTES.WELCOME}>
-          <Stack.Screen name={ROUTES.WELCOME} component={WelcomeScreen} />
-          <Stack.Screen name={ROUTES.AUTH} component={AuthNavigator} />
-          <Stack.Screen name={ROUTES.MAIN} component={MainNavigator} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
-  }
 
-  const getInitialRoute = () => {
-    const route = (() => {
-      if (isAuthenticated && hasCompletedProfile) {
-        return ROUTES.MAIN;
-      }
-      if (isAuthenticated && !hasCompletedProfile) {
-        return ROUTES.AUTH;
-      }
-      return ROUTES.WELCOME;
-    })();
-    
-    console.log('🧭 Navigation decision:', {
-      isAuthenticated,
-      hasCompletedProfile,
-      selectedRoute: route
-    });
-    
-    return route;
+  // Derive the screen to show reactively so auth-state changes after mount
+  // re-route correctly. Using initialRouteName would lock the route at mount
+  // time and ignore later changes.
+  const getScreen = () => {
+    if (isLoading) return ROUTES.WELCOME;
+    if (isAuthenticated && hasCompletedProfile) return ROUTES.MAIN;
+    if (isAuthenticated && !hasCompletedProfile) return ROUTES.AUTH;
+    return ROUTES.WELCOME;
   };
+
+  const currentScreen = getScreen();
+
+  console.log('🧭 Navigation decision:', { isAuthenticated, hasCompletedProfile, isLoading, currentScreen });
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={getInitialRoute()}>
-        <Stack.Screen name={ROUTES.WELCOME} component={WelcomeScreen} />
-        <Stack.Screen name={ROUTES.AUTH} component={AuthNavigator} />
-        <Stack.Screen name={ROUTES.MAIN} component={MainNavigator} />
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={currentScreen}>
+        {currentScreen === ROUTES.WELCOME && (
+          <Stack.Screen name={ROUTES.WELCOME} component={WelcomeScreen} />
+        )}
+        {currentScreen === ROUTES.AUTH && (
+          <Stack.Screen name={ROUTES.AUTH} component={AuthNavigator} />
+        )}
+        {currentScreen === ROUTES.MAIN && (
+          <Stack.Screen name={ROUTES.MAIN} component={MainNavigator} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

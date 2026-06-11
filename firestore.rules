@@ -5,26 +5,51 @@ service cloud.firestore {
     match /UsersDetails/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-    
-    // Allow authenticated users to read exercises
+
+    // Allow authenticated users to read exercises; only trainers can write
     match /Exercises/{exerciseId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null; // Adjust based on your needs
+      allow write: if request.auth != null &&
+        get(/databases/$(database)/documents/UsersDetails/$(request.auth.uid)).data.isTrainer == true;
     }
-    
-    // Allow authenticated users to manage their own routines
+
+    // Trainers can only read/write their own routines; trainees can read routines assigned to them
     match /Routines/{routineId} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null && (
+        resource.data.createdBy == request.auth.uid ||
+        resource.data.assignees.hasAny([{'traineeId': request.auth.uid}])
+      );
+      allow create: if request.auth != null &&
+        request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if request.auth != null &&
+        resource.data.createdBy == request.auth.uid;
     }
-    
-    // Users can only access their own transactions
+
+    // Users can read their own transactions; writes are server-only (Phase 1+)
+    // resource.data is null on creates, so use request.resource.data for create checks
     match /TransactionDetails/{transactionId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.clientId == request.auth.uid
+      );
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+      allow delete: if false;
     }
-    
-    // Users can only access their own subscriptions
+
+    // Users can read their own subscriptions; writes are server-only (Phase 1+)
     match /Subscriptions/{subscriptionId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.clientId == request.auth.uid
+      );
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+      allow delete: if false;
     }
   }
 }

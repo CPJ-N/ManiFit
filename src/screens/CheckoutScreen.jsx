@@ -96,31 +96,23 @@ export default function CheckoutScreen() {
         theme: { color: '#FFD20A' }
       };
 
-      RazorpayCheckout.open(options).then(async (data) => {
-        // handle success
-        console.log(`Payment successful!`);
+      try {
+        const data = await RazorpayCheckout.open(options);
+        console.log('Payment successful!');
         Alert.alert('Success', `Payment successful! Payment Amount: ₹${amount/100}`);
         await verifyPayment(data);
         await recordPaymentInFirestore(data, amount, paymentDesc);
-        
-        // Handle subscription
         await handleSubscription();
-        
-        // Schedule payment reminder after successful payment
         await schedulePaymentReminder();
-
-        // Schedule a test notification for 10 seconds from now
-        await scheduleTestNotification('Test Notification', 'This is a test notification.', 10);
-      }).catch((error) => {
+      } catch (error) {
         console.error('Payment failed:', error);
         Alert.alert('Error', 'Payment failed');
-      });
+      }
     } catch (error) {
       console.error('Error initiating payment:', error.message);
       Alert.alert('Error', 'Failed to initiate payment');
     } finally {
       setLoading(false);
-      console.log('Payment initiation process completed.');
     }
   };
 

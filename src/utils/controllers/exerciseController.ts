@@ -78,31 +78,18 @@ export const deleteExercise = async (exerciseId: string) => {
 }
 
 
-export const getExercisesByCategory = async (category: string) => {
+export const getExercisesByCategory = async (category: string): Promise<Exercise[]> => {
   try {
-    // Query for products that have "red" in the colors array
-    const querySnapshot = query(collection(db, firebaseCollection.exercises), where("primaryMuscles", "array-contains", category));
-    const getExercisesByCategory: Exercise[] = [];
-    getDocs(querySnapshot)
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          // console.log(doc.id, " => ", doc.data());
-          const exercise = {
-            ...doc.data(),
-            id: doc.id,
-          } as Exercise;
-          getExercisesByCategory.push(exercise);
-        });
-      })
-      .then(() => {
-        return getExercisesByCategory;
-      })
-      .catch((error) => {
-        console.error("Error getting documents:", error);
-      });
-  }
-  catch (error) {
+    const q = query(collection(db, firebaseCollection.exercises), where("primaryMuscles", "array-contains", category));
+    const querySnapshot = await getDocs(q);
+    const exercises: Exercise[] = [];
+    querySnapshot.forEach((doc) => {
+      exercises.push({ ...doc.data(), id: doc.id } as Exercise);
+    });
+    return exercises;
+  } catch (error) {
     console.error("Error getting documents:", error);
+    throw new Error("Failed to get exercises by category");
   }
 };
 

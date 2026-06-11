@@ -85,10 +85,10 @@ export const assignRoutineToTrainee= async (routineId: string, traineeId: string
       const routineRef = doc(db, firebaseCollection.routines, routineId);
       const routineSnapshot = await getDoc(routineRef);
   
-      if (!routineSnapshot.exists) {
+      if (!routineSnapshot.exists()) {
         throw new Error('Routine not found');
       }
-  
+
       const routineData = routineSnapshot.data() as Routine;
 
       // Ensure assignees is defined
@@ -137,12 +137,12 @@ export const getRoutinesByTrainee = async (traineeId: string) => {
       const routineRef = doc(db, firebaseCollection.routines, routineId);
       const routineSnapshot = await getDoc(routineRef);
   
-      if (!routineSnapshot.exists) {
+      if (!routineSnapshot.exists()) {
         throw new Error('Routine not found');
       }
-  
+
       const routineData = routineSnapshot.data() as Routine;
-  
+
       // Find the assignee and update the status
       const updatedAssignees = routineData.assignees.map(assignee => 
         assignee.traineeId === traineeId && assignee.date === date

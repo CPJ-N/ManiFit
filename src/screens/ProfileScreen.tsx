@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Dimensions, Linking } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSelector } from 'react-redux';
 import { signOut } from 'firebase/auth';
@@ -157,21 +157,21 @@ export default function ProfileScreen({ navigation }: Props) {
       icon: 'trending-up',
       title: 'Progress',
       subtitle: 'View your fitness journey and stats',
-      onPress: () => {}, // TODO: Navigate to progress modal
+      onPress: () => navigation.navigate(ROUTES.WORKOUTS),
       gradient: ['#6366F1', '#4F46E5'] as [string, string, ...string[]],
     },
     {
       icon: 'settings',
       title: 'Settings',
       subtitle: 'App preferences and account settings',
-      onPress: () => {}, // TODO: Navigate to settings modal
+      onPress: () => Alert.alert('Settings', 'Settings screen coming soon.'),
       gradient: ['#FFD20A', '#FFA500'] as [string, string, ...string[]],
     },
     {
       icon: 'help-circle',
       title: 'Help & Support',
       subtitle: 'Get help and contact our support team',
-      onPress: () => {}, // TODO: Navigate to help
+      onPress: () => Linking.openURL('mailto:support@manifitapp.com'),
       gradient: ['#FF6B6B', '#E53E3E'] as [string, string, ...string[]],
     },
   ];
