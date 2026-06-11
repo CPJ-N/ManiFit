@@ -70,7 +70,7 @@ export const getUserByEmail = async (email: string): Promise<UserDetails | null>
         const user = await getDocument<UserDetails>(firebaseCollection.userDetails, email);
         if (user) {
             console.log('✅ User found by email:', user.fullName);
-            return { ...user, uid: user.id };
+            return user;
         } else {
             console.log('❌ User not found by email');
             return null;
@@ -80,5 +80,4 @@ export const getUserByEmail = async (email: string): Promise<UserDetails | null>
         throw error;
     }
 };
-
 

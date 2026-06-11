@@ -45,13 +45,33 @@ describe('assignRoutineToTrainee', () => {
     await assignRoutineToTrainee('routine-1', 'trainee-1', '2026-06-11');
 
     expect(mockUpdateDoc).toHaveBeenCalledTimes(1);
-    const updatedAssignees = mockUpdateDoc.mock.calls[0][1].assignees;
+    const updatePayload = mockUpdateDoc.mock.calls[0][1];
+    const updatedAssignees = updatePayload.assignees;
     expect(updatedAssignees).toHaveLength(1);
     expect(updatedAssignees[0]).toMatchObject({
       traineeId: 'trainee-1',
       date: '2026-06-11',
       status: 'planned',
     });
+    expect(updatePayload.assigneeIds).toEqual(['trainee-1']);
+  });
+
+  it('preserves existing assignee IDs when assigning a trainee', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: jest.fn().mockReturnValue(true),
+      data: () => ({
+        assignees: [
+          { traineeId: 'trainee-1', date: '2026-06-10', status: 'planned' },
+        ],
+        assigneeIds: ['trainee-1'],
+      }),
+    });
+    mockUpdateDoc.mockResolvedValue(undefined);
+
+    await assignRoutineToTrainee('routine-1', 'trainee-2', '2026-06-11');
+
+    const updatePayload = mockUpdateDoc.mock.calls[0][1];
+    expect(updatePayload.assigneeIds).toEqual(['trainee-1', 'trainee-2']);
   });
 });
 

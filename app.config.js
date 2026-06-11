@@ -16,9 +16,12 @@ export default {
     assetBundlePatterns: [
       "**/*"
     ],
+    plugins: [
+      "expo-font"
+    ],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.nodemerge.manifit",
+      bundleIdentifier: "com.manifit.manifitcore",
       googleServicesFile: process.env.GOOGLE_SERVICE_PLIST,
       infoPlist: {
         UIBackgroundModes: ["fetch", "remote-notification"],
@@ -32,7 +35,7 @@ export default {
       }
     },
     android: {
-      package: "com.nodemerge.manifit",
+      package: "com.manifit.manifitcore",
       adaptiveIcon: {
         foregroundImage: "./src/assets/manifit-icon.png",
         backgroundColor: "#ffffff"
@@ -47,8 +50,6 @@ export default {
         projectId: "fd1c93b1-6025-4f34-8bfc-9def1d9ef589"
       },
       razorpayApiKeyId: process.env.RAZORPAY_API_KEY_ID,
-      razorpayApiKeySecret: process.env.RAZORPAY_API_KEY_SECRET,
-      razorpayApiUrl: process.env.RAZORPAY_API_URL,
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
       firebaseProjectId: process.env.FIREBASE_PROJECT_ID,

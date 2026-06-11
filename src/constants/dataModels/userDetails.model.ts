@@ -7,6 +7,7 @@ export interface UserDetails {
     mobileNumber?: string; // Mobile number of the user
     profilePhotoName?: string; // URL of the profile photo
     isTrainer: boolean; // Differentiates between trainer and trainee
+    gender?: 'male' | 'female' | 'other';
     dateOfBirth?: string; // Date of birth of the user
     age?: number; // Age of the user
     weight?: number; // Weight of the user in kilograms

@@ -17,6 +17,7 @@ export interface Routine {
   exercises: ExerciseDetails[]; // Array of exercises with details
   createdBy: string; // Trainer ID
   assignees: Assignee[]; // Array of objects containing trainee IDs and specific session dates
+  assigneeIds?: string[]; // Queryable trainee IDs for Firestore rules and array-contains queries
   
   // ===== Enhanced Workout Structure =====
   muscleGroup: string; // 'Back', 'Chest', 'Legs', 'Full Body', etc.

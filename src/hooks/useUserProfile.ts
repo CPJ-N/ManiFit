@@ -21,9 +21,12 @@ export const useUserProfile = () => {
         hasUserInfo: !!userInfo
       });
       
+      if (isAuthenticated && !userInfo) {
+        setLoading(true);
+      }
+
       if (isAuthenticated && currentUser?.uid && !userInfo) {
         console.log('📥 Loading user profile for:', currentUser.uid);
-        setLoading(true);
         
         try {
           const userProfile = await getUser(currentUser.uid);
@@ -44,9 +47,13 @@ export const useUserProfile = () => {
           console.log('🏁 User profile loading complete');
         }
       } else if (!isAuthenticated) {
+        setLoading(false);
         console.log('🚫 Not authenticated - skipping profile load');
       } else if (userInfo) {
+        setLoading(false);
         console.log('✅ User profile already loaded:', userInfo.fullName);
+      } else {
+        setLoading(false);
       }
     };
 

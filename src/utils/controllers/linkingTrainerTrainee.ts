@@ -1,48 +1,22 @@
-import { doc, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, query, collection, where } from "firebase/firestore";
+import { getDocs, query, collection, where } from "firebase/firestore";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { firebaseCollection } from "../../constants/firebaseContant";
 import { db } from "../../config/firebase";
 
 // Assign a trainee to a trainer
 export const assignTraineeToTrainer = async (traineeUid: string, trainerUid: string) => {
-    const trainerRef = doc(db, firebaseCollection.userDetails, trainerUid);
-    const traineeRef = doc(db, firebaseCollection.userDetails, traineeUid);
-
-    const traineeDoc = await getDoc(traineeRef);
-
-    if (traineeDoc.exists() && !traineeDoc.data().linkedTrainer) {
-        await updateDoc(trainerRef, { 
-            linkedTrainees: arrayUnion(traineeUid)
-        });
-
-        await updateDoc(traineeRef, {
-            linkedTrainer: trainerUid
-        });
-
-        console.log(`Trainee linked successfully! Trainer: ${trainerUid}, Trainee: ${traineeUid}`);
-
-    } else {
-        console.error('Trainee is already linked to another trainer or does not exist.');
-    }
+    const functions = getFunctions();
+    const linkTraineeToTrainer = httpsCallable(functions, 'linkTraineeToTrainer');
+    await linkTraineeToTrainer({ traineeUid, trainerUid });
+    console.log(`Trainee link requested. Trainer: ${trainerUid}, Trainee: ${traineeUid}`);
 };
 
 // Unlink a trainee from a trainer
 export const unlinkTraineeFromTrainer = async (traineeUid: string, trainerUid: string) => {
-    const trainerRef = doc(db, firebaseCollection.userDetails, trainerUid);
-    const traineeRef = doc(db, firebaseCollection.userDetails, traineeUid);
-
-    const trainerDoc = await getDoc(trainerRef);
-
-    if (trainerDoc.exists()) {
-        await updateDoc(trainerRef, {
-            linkedTrainees: arrayRemove(traineeUid)
-        });
-    }
-
-    await updateDoc(traineeRef, {
-        linkedTrainer: ''
-    });
-
-    console.log(`Trainee unlinked successfully! Trainer: ${trainerUid}, Trainee: ${traineeUid}`);
+    const functions = getFunctions();
+    const unlinkTrainee = httpsCallable(functions, 'unlinkTraineeFromTrainer');
+    await unlinkTrainee({ traineeUid, trainerUid });
+    console.log(`Trainee unlink requested. Trainer: ${trainerUid}, Trainee: ${traineeUid}`);
 };
 
 // Get all unlinked trainees

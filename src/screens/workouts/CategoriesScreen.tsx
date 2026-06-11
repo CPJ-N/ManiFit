@@ -78,7 +78,7 @@ export default function CategoriesScreen({ navigation }: Props) {
       {/* Background Gradient */}
       <LinearGradient
         colors={['rgba(255, 210, 10, 0.08)', 'transparent', 'rgba(255, 210, 10, 0.03)']}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
 
       {/* Enhanced Header */}

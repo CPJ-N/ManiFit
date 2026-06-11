@@ -24,7 +24,7 @@ export default function WorkoutScreen({ navigation, route }: Props) {
   
   // Timer effect
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isResting && timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => prev - 1);

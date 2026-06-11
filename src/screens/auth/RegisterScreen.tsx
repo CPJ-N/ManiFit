@@ -8,6 +8,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { createUser } from '../../utils/controllers/userController';
 import { ROUTES } from '../../constants/navigation';
+import type { UserDetails } from '../../constants/dataModels/userDetails.model';
 
 // Gluestack UI Components
 import { Box } from '../../../components/ui/box';
@@ -40,6 +41,17 @@ const questions: Question[] = [
     subtitle: 'We\'d love to know what to call you',
     placeholder: 'Enter your full name',
     required: true,
+  },
+  {
+    id: 'role',
+    title: 'How will you use ManiFit?',
+    subtitle: 'Choose the account type that matches your role',
+    placeholder: '',
+    required: true,
+    options: [
+      { label: 'Trainee', value: 'trainee', icon: 'barbell' },
+      { label: 'Trainer', value: 'trainer', icon: 'people' },
+    ],
   },
   {
     id: 'gender',
@@ -220,18 +232,24 @@ export default function RegisterScreen({ navigation }: Props) {
         uid: userCredential.user.uid,
         email: userCredential.user.email
       });
+
+      const isTrainer = answers.role === 'trainer';
+      const gender = answers.gender === 'male' || answers.gender === 'female' || answers.gender === 'other'
+        ? answers.gender
+        : undefined;
       
-      const userProfile = {
+      const userProfile: UserDetails = {
         uid: userCredential.user.uid,
         email: userCredential.user.email || '',
         fullName: answers.fullName?.trim() || '',
-        gender: answers.gender || undefined,
-        age: answers.age ? parseInt(answers.age) : undefined,
-        height: answers.height ? parseInt(answers.height) : undefined,
-        weight: answers.weight ? parseInt(answers.weight) : undefined,
-        isTrainer: false,
+        isTrainer,
         isSubscribed: false,
         createdAt: new Date().toISOString(),
+        ...(gender ? { gender } : {}),
+        ...(answers.age ? { age: parseInt(answers.age) } : {}),
+        ...(answers.height ? { height: parseInt(answers.height) } : {}),
+        ...(answers.weight ? { weight: parseInt(answers.weight) } : {}),
+        ...(isTrainer ? { linkedTrainees: [] } : { linkedTrainer: '' }),
       };
 
       console.log('📥 Creating user profile in Firestore...');

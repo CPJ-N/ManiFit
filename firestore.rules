@@ -1,55 +1,147 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function requesterIsTrainer() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/UsersDetails/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/UsersDetails/$(request.auth.uid)).data.isTrainer == true;
+    }
+
+    function isSafeUserCreate(userId) {
+      return isOwner(userId) &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.isSubscribed == false &&
+        !request.resource.data.keys().hasAny(['subscriptionId']) &&
+        (
+          (
+            request.resource.data.isTrainer == true &&
+            !request.resource.data.keys().hasAny(['linkedTrainer']) &&
+            (
+              !request.resource.data.keys().hasAny(['linkedTrainees']) ||
+              request.resource.data.linkedTrainees.size() == 0
+            )
+          ) ||
+          (
+            request.resource.data.isTrainer == false &&
+            request.resource.data.linkedTrainer == '' &&
+            !request.resource.data.keys().hasAny(['linkedTrainees'])
+          )
+        );
+    }
+
+    function isSafeUserUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        'fullName',
+        'mobileNumber',
+        'profilePhotoName',
+        'gender',
+        'dateOfBirth',
+        'age',
+        'weight',
+        'height',
+        'fitnessGoals',
+        'preferences',
+        'stats',
+        'notifications',
+        'lastActive'
+      ]);
+    }
+
+    function canReadUserProfile(userId) {
+      return isOwner(userId) ||
+        resource.data.isTrainer == true ||
+        (
+          requesterIsTrainer() &&
+          resource.data.isTrainer == false &&
+          (
+            resource.data.linkedTrainer == '' ||
+            resource.data.linkedTrainer == request.auth.uid
+          )
+        );
+    }
+
     // Users can only access their own user details
     match /UsersDetails/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if signedIn() && canReadUserProfile(userId);
+      allow create: if isSafeUserCreate(userId);
+      allow update: if isOwner(userId) && isSafeUserUpdate();
+      allow delete: if false;
     }
 
     // Allow authenticated users to read exercises; only trainers can write
     match /Exercises/{exerciseId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
+      allow read: if signedIn();
+      allow write: if signedIn() &&
         get(/databases/$(database)/documents/UsersDetails/$(request.auth.uid)).data.isTrainer == true;
     }
 
     // Trainers can only read/write their own routines; trainees can read routines assigned to them
     match /Routines/{routineId} {
-      allow read: if request.auth != null && (
+      allow read: if signedIn() && (
         resource.data.createdBy == request.auth.uid ||
-        resource.data.assignees.hasAny([{'traineeId': request.auth.uid}])
+        request.auth.uid in resource.data.assigneeIds
       );
-      allow create: if request.auth != null &&
+      allow create: if signedIn() &&
         request.resource.data.createdBy == request.auth.uid;
-      allow update, delete: if request.auth != null &&
+      allow update, delete: if signedIn() &&
         resource.data.createdBy == request.auth.uid;
     }
 
-    // Users can read their own transactions; writes are server-only (Phase 1+)
-    // resource.data is null on creates, so use request.resource.data for create checks
+    // Users and trainers can read their own transactions; writes are server-only.
     match /TransactionDetails/{transactionId} {
-      allow read: if request.auth != null && (
+      allow read: if signedIn() && (
         resource.data.userId == request.auth.uid ||
-        resource.data.clientId == request.auth.uid
+        resource.data.clientId == request.auth.uid ||
+        resource.data.trainerId == request.auth.uid
       );
-      allow create: if request.auth != null &&
-        request.resource.data.userId == request.auth.uid;
-      allow update: if request.auth != null &&
-        resource.data.userId == request.auth.uid;
-      allow delete: if false;
+      allow write: if false;
     }
 
-    // Users can read their own subscriptions; writes are server-only (Phase 1+)
+    // Users and trainers can read their own subscriptions; writes are server-only.
     match /Subscriptions/{subscriptionId} {
-      allow read: if request.auth != null && (
+      allow read: if signedIn() && (
         resource.data.userId == request.auth.uid ||
-        resource.data.clientId == request.auth.uid
+        resource.data.clientId == request.auth.uid ||
+        resource.data.trainerId == request.auth.uid
       );
-      allow create: if request.auth != null &&
-        request.resource.data.userId == request.auth.uid;
-      allow update: if request.auth != null &&
-        resource.data.userId == request.auth.uid;
-      allow delete: if false;
+      allow write: if false;
+    }
+
+    match /Plans/{planId} {
+      allow read: if signedIn() && (
+        resource.data.trainerId == request.auth.uid ||
+        resource.data.traineeUid == request.auth.uid
+      );
+      allow create, update: if signedIn() &&
+        request.resource.data.trainerId == request.auth.uid;
+      allow delete: if signedIn() &&
+        resource.data.trainerId == request.auth.uid;
+    }
+
+    match /Charges/{chargeId} {
+      allow read: if signedIn() && (
+        resource.data.clientId == request.auth.uid ||
+        resource.data.trainerId == request.auth.uid
+      );
+      allow write: if false;
+    }
+
+    match /Payouts/{payoutId} {
+      allow read: if signedIn() &&
+        resource.data.trainerId == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /WebhookEvents/{eventId} {
+      allow read, write: if false;
     }
   }
 }

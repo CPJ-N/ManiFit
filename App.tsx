@@ -55,8 +55,8 @@ function AppContent() {
     );
   }
 
-  // Show loading if auth is still initializing
-  if (authLoading) {
+  // Show loading until both auth and the authenticated user's profile settle.
+  if (authLoading || (isAuthenticated && userLoading)) {
     return (
       <View style={{ flex: 1 }}>
         <LoadingScreen />

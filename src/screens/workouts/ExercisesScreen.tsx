@@ -191,7 +191,7 @@ export default function ExercisesScreen({ navigation, route }: Props) {
         <StatusBar style="light" />
         <LinearGradient
           colors={['rgba(255, 210, 10, 0.1)', 'transparent', 'rgba(255, 210, 10, 0.05)']}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
         <VStack space="md" style={styles.loadingContent}>
           <ActivityIndicator size="large" color="#FFD20A" />
@@ -209,7 +209,7 @@ export default function ExercisesScreen({ navigation, route }: Props) {
       {/* Background Gradient */}
       <LinearGradient
         colors={['rgba(255, 210, 10, 0.08)', 'transparent', 'rgba(255, 210, 10, 0.03)']}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
 
       {/* Enhanced Header */}

@@ -234,7 +234,7 @@ export default function HomeScreen({ navigation }: Props) {
       {/* Modern Background */}
       <LinearGradient
         colors={['#161616', '#1E1E1E', '#242424']}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
       
       {/* Subtle Background Elements */}

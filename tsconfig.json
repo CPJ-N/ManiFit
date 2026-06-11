@@ -7,11 +7,14 @@
       "@/*": [
         "./*"
       ],
+      "tailwind-variants/dist/config": [
+        "./node_modules/tailwind-variants/dist/config.d.ts"
+      ],
       "tailwind.config": [
         "./tailwind.config.js"
       ]
     },
-    "target": "es5",
+    "target": "es2017",
     "lib": [
       "dom",
       "dom.iterable",
@@ -25,10 +28,14 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-native"
+    "jsx": "react-native",
+    "types": [
+      "jest",
+      "node"
+    ]
   },
   "extends": "expo/tsconfig.base",
   "include": [

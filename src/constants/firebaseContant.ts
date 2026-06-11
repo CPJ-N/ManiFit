@@ -11,6 +11,10 @@ export const firebaseCollection = {
     userDetails: 'UsersDetails',
     transactionDetails: 'TransactionDetails',
     subscriptions: 'Subscriptions',
+    plans: 'Plans',
+    webhookEvents: 'WebhookEvents',
+    charges: 'Charges',
+    payouts: 'Payouts',
     
     // ===== New Collections =====
     workoutSessions: 'WorkoutSessions', // Real-time workout tracking

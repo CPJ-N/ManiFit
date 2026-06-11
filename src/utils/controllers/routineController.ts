@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc, query, where } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { firebaseCollection } from "../../constants/firebaseContant";
 import { Assignee, Routine } from "../../constants/dataModels/routine.model";
@@ -6,7 +6,10 @@ import { Assignee, Routine } from "../../constants/dataModels/routine.model";
 
 export const addRoutine = async (routine: Routine) => {
     try {
-      const docRef = await addDoc(collection(db, firebaseCollection.routines), routine);
+      const docRef = await addDoc(collection(db, firebaseCollection.routines), {
+        ...routine,
+        assigneeIds: routine.assigneeIds || routine.assignees?.map((assignee) => assignee.traineeId) || [],
+      });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -64,15 +67,11 @@ export const deleteRoutine = async (routineId: string) => {
 //get all routines filtered by it's property named 'createdBy'
 export const getRoutinesByTrainer = async (trainerId: string) => {
     try {
-      const querySnapshot = await getDocs(collection(db, firebaseCollection.routines));
-      const routines: any[] = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.createdBy === trainerId) {
-          routines.push({ id: doc.id, ...data });
-        }
-      });
-      return routines;
+      const routinesRef = collection(db, firebaseCollection.routines);
+      const routinesQuery = query(routinesRef, where("createdBy", "==", trainerId));
+      const querySnapshot = await getDocs(routinesQuery);
+
+      return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
       console.error("Error getting routines: ", error);
       throw new Error("Failed to get routines");
@@ -91,19 +90,24 @@ export const assignRoutineToTrainee= async (routineId: string, traineeId: string
 
       const routineData = routineSnapshot.data() as Routine;
 
-      // Ensure assignees is defined
-    const assignees = routineData.assignees || [];
+      const assignees = routineData.assignees || [];
+      const assigneeIds = routineData.assigneeIds || assignees.map((assignee) => assignee.traineeId);
   
       // Create the Assignee object
       const newAssignee: Assignee = {
         traineeId,
         date: assignedDate,
         status: 'planned', // Set the initial status
+        assignedAt: new Date().toISOString(),
       };
   
       // Update the routine with the new assignee
       const updatedAssignees = [...assignees, newAssignee];
-      await updateDoc(routineRef, { assignees: updatedAssignees });
+      const updatedAssigneeIds = Array.from(new Set([...assigneeIds, traineeId]));
+      await updateDoc(routineRef, {
+        assignees: updatedAssignees,
+        assigneeIds: updatedAssigneeIds,
+      });
   
       console.log(`Routine assigned to trainee ${traineeId} on ${assignedDate}`);
     } catch (error) {
@@ -114,18 +118,11 @@ export const assignRoutineToTrainee= async (routineId: string, traineeId: string
   //get routines that are assigned to a specific trainee
 export const getRoutinesByTrainee = async (traineeId: string) => {
   try {
-    const querySnapshot = await getDocs(collection(db, firebaseCollection.routines));
-    const routines: any[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      const assignees = data.assignees || [];
-      const isAssigned = assignees.some((assignee: Assignee) => assignee.traineeId === traineeId);
+    const routinesRef = collection(db, firebaseCollection.routines);
+    const routinesQuery = query(routinesRef, where("assigneeIds", "array-contains", traineeId));
+    const querySnapshot = await getDocs(routinesQuery);
 
-      if (isAssigned) {
-        routines.push({ id: doc.id, ...data });
-      }
-    });
-    return routines;
+    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error("Error getting routines: ", error);
     throw new Error("Failed to get routines");

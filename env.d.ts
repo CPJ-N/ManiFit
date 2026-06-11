@@ -1,7 +1,5 @@
-declare module '@env' {r
+declare module '@env' {
     export const RAZORPAY_API_KEY_ID: string;
-    export const RAZORPAY_API_KEY_SECRET: string;
-    export const RAZORPAY_API_URL: string;
     export const FIREBASE_API_KEY: string;
     export const FIREBASE_AUTH_DOMAIN: string;
     export const FIREBASE_PROJECT_ID: string;

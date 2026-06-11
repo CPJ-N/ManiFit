@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Alert, View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import { ROUTES } from '../../constants/navigation';
 import { Ionicons } from '@expo/vector-icons';
@@ -99,6 +99,39 @@ export default function LoginScreen({ navigation }: Props) {
     }
   };
 
+  const handleForgotPassword = async () => {
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      setError('Enter your email address first');
+      return;
+    }
+
+    if (!validateEmail(trimmedEmail)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await sendPasswordResetEmail(auth, trimmedEmail);
+      Alert.alert(
+        'Password reset sent',
+        'Check your email for a link to reset your password.'
+      );
+    } catch (error: any) {
+      console.error('💥 Password reset failed:', {
+        code: error.code,
+        message: error.message
+      });
+      setError(getErrorMessage(error.code));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -106,7 +139,7 @@ export default function LoginScreen({ navigation }: Props) {
       {/* Background Gradient */}
       <LinearGradient
         colors={['rgba(255, 210, 10, 0.05)', 'transparent', 'rgba(255, 210, 10, 0.02)']}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
 
       <KeyboardAvoidingView 
@@ -248,7 +281,11 @@ export default function LoginScreen({ navigation }: Props) {
                 </TouchableOpacity>
 
                 {/* Forgot Password Link */}
-                <TouchableOpacity style={styles.forgotPasswordLink}>
+                <TouchableOpacity
+                  style={styles.forgotPasswordLink}
+                  onPress={handleForgotPassword}
+                  disabled={loading}
+                >
                   <Text style={styles.forgotPasswordText}>
                     Forgot your password?
                   </Text>

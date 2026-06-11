@@ -196,13 +196,15 @@ GOOGLE_SERVICE_PLIST=./GoogleService-Info.plist
 
 # Razorpay (Payment Gateway)
 RAZORPAY_API_KEY_ID=your_razorpay_key
-RAZORPAY_API_KEY_SECRET=your_razorpay_secret
-RAZORPAY_API_URL=your_razorpay_url
 
 # GitHub (Exercise Data)
 GITHUB_EXERCISE_IMAGE_URL_PREFIX=your_github_url
 GITHUB_EXERCISES_URL=your_exercises_url
 ```
+
+Razorpay secrets must not be added to the mobile app environment. Keep
+`RAZORPAY_API_KEY_SECRET` and webhook secrets in Firebase Secret Manager for
+Cloud Functions only.
 
 ### Important Security Notes
 
@@ -222,4 +224,3 @@ Navigation: Managed using React Navigation.
 State Management: Handled using Redux.
 Firebase Integration: Provides backend services.
 This structure ensures maintainability, scalability, and ease of understanding.
-
