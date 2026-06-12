@@ -1,7 +1,12 @@
 import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, deleteDoc, getDoc, query, where } from "firebase/firestore";
+import Constants from "expo-constants";
 import { Exercise } from "../../constants/dataModels/exercise.model";
 import { firebaseCollection } from "../../constants/firebaseContant";
 import { db } from "../../config/firebase";
+
+const GITHUB_EXERCISE_IMAGE_PREFIX =
+  Constants.expoConfig?.extra?.githubExerciseImageUrlPrefix ||
+  "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises";
 
 export const addExercise = async (exercise: Exercise) => {
   try {
@@ -113,14 +118,20 @@ export const getAllExercisesFromUrl = async (): Promise<Exercise[]> => {
   }
 };
 
-// Get exercises filtered by body part/category
+// Get exercises filtered by a category tile. The tile name comes from the
+// dataset's own vocabulary and may refer to EITHER a primaryMuscles value
+// (e.g. "calves", "quadriceps") OR a `category` value (e.g. "cardio",
+// "stretching"). Matching both lets every tile resolve and supports future
+// custom tiles using either vocabulary.
 export const getExercisesByBodyPart = async (bodyPart: string): Promise<Exercise[]> => {
   try {
     const allExercises = await getAllExercisesFromUrl();
-    const filteredExercises = allExercises.filter((exercise: any) => 
-      exercise.bodyPart?.toLowerCase() === bodyPart.toLowerCase() ||
-      exercise.primaryMuscles?.some((muscle: string) => 
-        muscle.toLowerCase().includes(bodyPart.toLowerCase())
+    const term = bodyPart.toLowerCase();
+    const filteredExercises = allExercises.filter((exercise: any) =>
+      exercise.category?.toLowerCase() === term ||
+      exercise.bodyPart?.toLowerCase() === term ||
+      exercise.primaryMuscles?.some((muscle: string) =>
+        muscle.toLowerCase().includes(term)
       )
     );
     return filteredExercises;
@@ -131,8 +142,12 @@ export const getExercisesByBodyPart = async (bodyPart: string): Promise<Exercise
 };
 
 // Get exercise image URL with GitHub prefix
-export const getExerciseImageUrl = (exerciseName: string): string => {
-  const baseUrl = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises";
-  const sanitizedName = exerciseName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-  return `${baseUrl}/${sanitizedName}/0.jpg`;
+// Build an exercise image URL from the dataset's own `images` paths
+// (e.g. "3_4_Sit-Up/0.jpg"). The folder is named after the exercise id with
+// original casing/underscores — NOT a slug of the name — so we must use the
+// path the dataset already provides. Returns undefined when no image exists.
+export const getExerciseImageUrl = (exercise: { images?: string[]; [key: string]: unknown } | null | undefined): string | undefined => {
+  const imagePath = exercise?.images?.[0];
+  if (!imagePath) return undefined;
+  return `${GITHUB_EXERCISE_IMAGE_PREFIX}/${imagePath}`;
 };

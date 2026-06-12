@@ -20,7 +20,7 @@ export const exerciseCategories = [
       image: require('../assets/images/lowerArms.png'),
     },
     {
-      name: 'lower legs',
+      name: 'calves',
       image: require('../assets/images/lowerLegs.png'),
     },
     {
@@ -40,7 +40,7 @@ export const exerciseCategories = [
       image: require('../assets/images/upperArms.png'),
     },
     {
-      name: 'upper legs',
+      name: 'quadriceps',
       image: require('../assets/images/upperLegs.png'),
     },
     {

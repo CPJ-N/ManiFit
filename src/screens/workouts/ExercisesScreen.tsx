@@ -49,8 +49,12 @@ const ExerciseCard = ({
         <HStack space="md" style={styles.exerciseCardContent}>
           {/* Exercise Image */}
           <View style={[styles.exerciseImageContainer, isSelected && styles.exerciseImageContainerSelected]}>
-            <Image 
-              source={{ uri: getExerciseImageUrl(exercise.name) }} 
+            <Image
+              source={
+                getExerciseImageUrl(exercise)
+                  ? { uri: getExerciseImageUrl(exercise) }
+                  : require('../../assets/images/cardio.png')
+              }
               style={styles.exerciseImage}
               defaultSource={require('../../assets/images/cardio.png')}
             />
