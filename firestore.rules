@@ -18,23 +18,15 @@ service cloud.firestore {
     function isSafeUserCreate(userId) {
       return isOwner(userId) &&
         request.resource.data.uid == request.auth.uid &&
+        (!request.resource.data.keys().hasAny(['role']) ||
+          request.resource.data.role == 'aspirant') &&
+        (!request.resource.data.keys().hasAny(['coachVerificationStatus']) ||
+          request.resource.data.coachVerificationStatus == 'not_applied') &&
+        request.resource.data.isTrainer == false &&
         request.resource.data.isSubscribed == false &&
         !request.resource.data.keys().hasAny(['subscriptionId']) &&
-        (
-          (
-            request.resource.data.isTrainer == true &&
-            !request.resource.data.keys().hasAny(['linkedTrainer']) &&
-            (
-              !request.resource.data.keys().hasAny(['linkedTrainees']) ||
-              request.resource.data.linkedTrainees.size() == 0
-            )
-          ) ||
-          (
-            request.resource.data.isTrainer == false &&
-            request.resource.data.linkedTrainer == '' &&
-            !request.resource.data.keys().hasAny(['linkedTrainees'])
-          )
-        );
+        request.resource.data.linkedTrainer == '' &&
+        !request.resource.data.keys().hasAny(['linkedTrainees']);
     }
 
     function isSafeUserUpdate() {

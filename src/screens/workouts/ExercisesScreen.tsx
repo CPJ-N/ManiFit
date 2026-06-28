@@ -1,351 +1,257 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator, Dimensions, TextInput } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  ListRenderItem,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { getExercisesByBodyPart, getExerciseImageUrl } from '../../utils/controllers/exerciseController';
-import { ROUTES } from '../../constants/navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-// Gluestack UI Components
-import { Box } from '../../../components/ui/box';
-import { VStack } from '../../../components/ui/vstack';
-import { HStack } from '../../../components/ui/hstack';
-import { Heading } from '../../../components/ui/heading';
-import { Card } from '../../../components/ui/card';
-
-const { width } = Dimensions.get('window');
+import {
+  getExerciseImageUrl,
+  getExercisesByCategoryId,
+  normalizeExerciseInstructions,
+} from '../../utils/controllers/exerciseController';
+import { getExerciseCategoryById } from '../../constants/exerciseCatalog';
 
 interface Props {
   navigation: any;
   route: {
     params: {
-      categoryName: string;
-      categoryImage: any;
+      categoryId: string;
     };
   };
 }
 
-// Enhanced Exercise Card Component
-const ExerciseCard = ({ 
-  exercise, 
-  isSelected, 
-  onPress 
-}: { 
-  exercise: any; 
-  isSelected: boolean; 
-  onPress: () => void;
-}) => (
-  <TouchableOpacity 
-    onPress={onPress} 
-    activeOpacity={0.8} 
-    style={[styles.exerciseCardWrapper, isSelected && styles.exerciseCardWrapperSelected]}
-  >
-    <Card style={[styles.exerciseCard, isSelected && styles.exerciseCardSelected]}>
-      <LinearGradient
-        colors={isSelected ? ['#FFD20A', '#FFA500'] : ['#2A2A2A', '#333']}
-        style={styles.exerciseCardGradient}
-      >
-        <HStack space="md" style={styles.exerciseCardContent}>
-          {/* Exercise Image */}
-          <View style={[styles.exerciseImageContainer, isSelected && styles.exerciseImageContainerSelected]}>
-            <Image
-              source={
-                getExerciseImageUrl(exercise)
-                  ? { uri: getExerciseImageUrl(exercise) }
-                  : require('../../assets/images/cardio.png')
-              }
-              style={styles.exerciseImage}
-              defaultSource={require('../../assets/images/cardio.png')}
-            />
-            {isSelected && (
-              <View style={styles.selectedOverlay}>
-                <Ionicons name="checkmark-circle" size={24} color="#FFFFFF" />
-              </View>
-            )}
-          </View>
-          
-          {/* Exercise Info */}
-          <VStack space="xs" style={styles.exerciseInfo}>
-            <Text style={[styles.exerciseName, isSelected && styles.exerciseNameSelected]}>
-              {exercise.name}
-            </Text>
-            <HStack space="xs" style={styles.exerciseMetaRow}>
-              <View style={[styles.metaTag, isSelected && styles.metaTagSelected]}>
-                <Ionicons 
-                  name="body" 
-                  size={12} 
-                  color={isSelected ? "#1E1E1E" : "#FFD20A"} 
-                />
-                <Text style={[styles.metaText, isSelected && styles.metaTextSelected]}>
-                  {exercise.bodyPart || exercise.target}
-                </Text>
-              </View>
-            </HStack>
-            <HStack space="xs" style={styles.exerciseMetaRow}>
-              <View style={[styles.metaTag, isSelected && styles.metaTagSelected]}>
-                <Ionicons 
-                  name="fitness" 
-                  size={12} 
-                  color={isSelected ? "#1E1E1E" : "#4CAF50"} 
-                />
-                <Text style={[styles.metaText, isSelected && styles.metaTextSelected]}>
-                  {exercise.equipment?.[0] || 'Body weight'}
-                </Text>
-              </View>
-            </HStack>
-            {exercise.primaryMuscles && (
-              <Text style={[styles.exerciseMuscles, isSelected && styles.exerciseMusclesSelected]}>
-                Targets: {exercise.primaryMuscles.slice(0, 2).join(', ')}
-              </Text>
-            )}
-          </VStack>
-          
-          {/* Selection Indicator */}
-          <View style={styles.selectionIndicator}>
-            {isSelected ? (
-              <LinearGradient
-                colors={['#4CAF50', '#2E7D32']}
-                style={styles.selectedIndicatorGradient}
-              >
-                <Ionicons name="checkmark" size={16} color="#FFFFFF" />
-              </LinearGradient>
-            ) : (
-              <View style={styles.unselectedIndicator}>
-                <Ionicons name="add" size={16} color="#666" />
-              </View>
-            )}
-          </View>
-        </HStack>
-      </LinearGradient>
-    </Card>
-  </TouchableOpacity>
-);
+const fallbackExerciseImage = require('../../assets/images/cardio.png');
+
+const asList = (value: unknown): string[] => {
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  if (typeof value === 'string' && value.trim()) return [value.trim()];
+  return [];
+};
+
+const formatList = (value: unknown, fallback = 'Not specified'): string => {
+  const values = asList(value);
+  return values.length > 0 ? values.join(', ') : fallback;
+};
+
+const exerciseMatchesQuery = (exercise: any, query: string): boolean => {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return true;
+
+  return [
+    exercise.name,
+    exercise.category,
+    exercise.bodyPart,
+    exercise.target,
+    exercise.level,
+    exercise.difficulty,
+    exercise.equipment,
+    exercise.primaryMuscles,
+    exercise.secondaryMuscles,
+  ]
+    .flatMap(asList)
+    .some(value => value.toLowerCase().includes(normalizedQuery));
+};
 
 export default function ExercisesScreen({ navigation, route }: Props) {
-  const { categoryName } = route.params;
-  const [selectedExercises, setSelectedExercises] = useState<any[]>([]);
-  const [exercises, setExercises] = useState<any[]>([]);
-  const [filteredExercises, setFilteredExercises] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { categoryId } = route.params;
+  const category = getExerciseCategoryById(categoryId);
   const insets = useSafeAreaInsets();
+  const [exercises, setExercises] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchExercises = async () => {
+    let isMounted = true;
+
+    const loadExercises = async () => {
       try {
         setLoading(true);
-        const data = await getExercisesByBodyPart(categoryName);
-        setExercises(data);
-        setFilteredExercises(data);
+        setErrorMessage('');
+        const data = await getExercisesByCategoryId(categoryId);
+        if (isMounted) {
+          setExercises(data);
+        }
       } catch (error) {
-        console.error('Error fetching exercises:', error);
+        console.error('Error loading exercises:', error);
+        if (isMounted) {
+          setErrorMessage('Unable to load exercises right now.');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchExercises();
-  }, [categoryName]);
+    loadExercises();
 
-  useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredExercises(exercises);
-    } else {
-      const filtered = exercises.filter(exercise =>
-        exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (exercise.bodyPart && exercise.bodyPart.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (exercise.target && exercise.target.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-      setFilteredExercises(filtered);
-    }
-  }, [searchQuery, exercises]);
+    return () => {
+      isMounted = false;
+    };
+  }, [categoryId]);
 
-  const toggleExerciseSelection = (exercise: any) => {
-    setSelectedExercises(prev => {
-      const isSelected = prev.find(e => e.id === exercise.id);
-      if (isSelected) {
-        return prev.filter(e => e.id !== exercise.id);
-      } else {
-        return [...prev, exercise];
-      }
-    });
-  };
+  const filteredExercises = useMemo(
+    () => exercises.filter(exercise => exerciseMatchesQuery(exercise, searchQuery)),
+    [exercises, searchQuery]
+  );
 
-  const selectAllExercises = () => {
-    setSelectedExercises(filteredExercises);
-  };
+  const renderExercise: ListRenderItem<any> = ({ item }) => {
+    const imageUrl = getExerciseImageUrl(item);
+    const instructions = normalizeExerciseInstructions(item.instructions);
+    const isExpanded = expandedExerciseId === item.id;
 
-  const clearSelection = () => {
-    setSelectedExercises([]);
-  };
-
-  const startWorkout = () => {
-    if (selectedExercises.length === 0) {
-      // If no exercises selected, use all exercises
-      navigation.navigate(ROUTES.WORKOUT, { exercises: filteredExercises });
-    } else {
-      navigation.navigate(ROUTES.WORKOUT, { exercises: selectedExercises });
-    }
-  };
-
-  if (loading) {
     return (
-      <View style={[styles.container, styles.loadingContainer]}>
-        <StatusBar style="light" />
-        <LinearGradient
-          colors={['rgba(255, 210, 10, 0.1)', 'transparent', 'rgba(255, 210, 10, 0.05)']}
-          style={StyleSheet.absoluteFill}
-        />
-        <VStack space="md" style={styles.loadingContent}>
-          <ActivityIndicator size="large" color="#FFD20A" />
-          <Text style={styles.loadingText}>Loading exercises...</Text>
-          <Text style={styles.loadingSubtext}>Finding the best workouts for {categoryName}</Text>
-        </VStack>
-      </View>
+      <TouchableOpacity
+        activeOpacity={0.84}
+        style={styles.exerciseCard}
+        onPress={() => setExpandedExerciseId(isExpanded ? null : item.id)}
+      >
+        <LinearGradient colors={['#272727', '#1F1F1F']} style={styles.exerciseGradient}>
+          <View style={styles.exerciseTopRow}>
+            <Image
+              source={imageUrl ? { uri: imageUrl } : fallbackExerciseImage}
+              defaultSource={fallbackExerciseImage}
+              style={styles.exerciseImage}
+            />
+
+            <View style={styles.exerciseSummary}>
+              <Text style={styles.exerciseName}>{item.name}</Text>
+              <View style={styles.metaRow}>
+                <View style={styles.metaPill}>
+                  <Ionicons name="fitness" size={12} color="#FFD20A" />
+                  <Text style={styles.metaText}>
+                    {formatList(item.primaryMuscles, item.target ?? 'General')}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.exerciseDetail}>
+                {formatList(item.equipment, 'Bodyweight')} | {item.level ?? item.difficulty ?? 'All levels'}
+              </Text>
+            </View>
+
+            <Ionicons
+              name={isExpanded ? 'chevron-up' : 'chevron-down'}
+              size={20}
+              color="#FFD20A"
+            />
+          </View>
+
+          {isExpanded && (
+            <View style={styles.expandedContent}>
+              <View style={styles.detailGrid}>
+                <View style={styles.detailBlock}>
+                  <Text style={styles.detailLabel}>Secondary</Text>
+                  <Text style={styles.detailValue}>{formatList(item.secondaryMuscles)}</Text>
+                </View>
+                <View style={styles.detailBlock}>
+                  <Text style={styles.detailLabel}>Type</Text>
+                  <Text style={styles.detailValue}>{item.category ?? 'Exercise'}</Text>
+                </View>
+              </View>
+
+              {instructions.length > 0 ? (
+                <View style={styles.instructionsBlock}>
+                  <Text style={styles.instructionsTitle}>Instructions</Text>
+                  {instructions.map((instruction, index) => (
+                    <Text key={`${item.id}-instruction-${index}`} style={styles.instruction}>
+                      {index + 1}. {instruction}
+                    </Text>
+                  ))}
+                </View>
+              ) : (
+                <Text style={styles.noInstructions}>No instructions are available for this exercise.</Text>
+              )}
+            </View>
+          )}
+        </LinearGradient>
+      </TouchableOpacity>
     );
-  }
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      
-      {/* Background Gradient */}
       <LinearGradient
-        colors={['rgba(255, 210, 10, 0.08)', 'transparent', 'rgba(255, 210, 10, 0.03)']}
+        colors={['#171717', '#1E1E1E', '#242424']}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Enhanced Header */}
-      <Box style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <VStack space="md">
-          {/* Navigation Header */}
-          <HStack style={styles.headerTop}>
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-            >
-              <Ionicons name="chevron-back" size={24} color="#FFD20A" />
+      <View style={[styles.header, { paddingTop: insets.top + 18 }]}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={22} color="#FFD20A" />
+        </TouchableOpacity>
+
+        <View style={styles.headerCopy}>
+          <Text style={styles.kicker}>{category?.name ?? 'Exercises'}</Text>
+          <Text style={styles.title}>{category?.name ?? categoryId} Exercises</Text>
+          <Text style={styles.subtitle}>
+            {category?.description ?? 'Browse exercises from the GitHub dataset.'}
+          </Text>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={19} color="#777777" />
+          <TextInput
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search exercises"
+            placeholderTextColor="#777777"
+            style={styles.searchInput}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={10}>
+              <Ionicons name="close-circle" size={19} color="#777777" />
             </TouchableOpacity>
-            <VStack space="xs" style={styles.headerTitleContainer}>
-              <Heading size="lg" style={styles.categoryTitle}>
-                {categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} Exercises
-              </Heading>
-            </VStack>
-            <View style={styles.headerSpacer} />
-          </HStack>
+          )}
+        </View>
+      </View>
 
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search exercises..."
-              placeholderTextColor="#666"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity 
-                style={styles.clearSearchButton}
-                onPress={() => setSearchQuery('')}
-              >
-                <Ionicons name="close-circle" size={20} color="#666" />
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {/* Stats & Controls */}
-          <HStack style={styles.controlsRow}>
-            <VStack space="xs" style={styles.statsContainer}>
-              <Text style={styles.statsText}>
-                {filteredExercises.length} exercises • {selectedExercises.length} selected
+      {loading ? (
+        <View style={styles.centerState}>
+          <ActivityIndicator size="large" color="#FFD20A" />
+          <Text style={styles.centerStateText}>Loading GitHub exercises...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredExercises}
+          keyExtractor={(item, index) => item.id ?? `${categoryId}-${index}`}
+          renderItem={renderExercise}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={
+            <View style={styles.countRow}>
+              <Text style={styles.countText}>
+                {filteredExercises.length} of {exercises.length} exercises
               </Text>
-            </VStack>
-            <HStack space="sm">
-              <TouchableOpacity 
-                style={styles.controlButton}
-                onPress={selectAllExercises}
-              >
-                <Text style={styles.controlButtonText}>Select All</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.controlButton}
-                onPress={clearSelection}
-              >
-                <Text style={styles.controlButtonText}>Clear</Text>
-              </TouchableOpacity>
-            </HStack>
-          </HStack>
-        </VStack>
-      </Box>
-
-      {/* Exercises List */}
-      <ScrollView 
-        style={styles.scrollContainer} 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {filteredExercises.length > 0 ? (
-          <VStack space="sm">
-            {filteredExercises.map((exercise: any, index: number) => {
-              const isSelected = selectedExercises.find(e => e.id === exercise.id);
-              
-              return (
-                <ExerciseCard
-                  key={exercise.id}
-                  exercise={exercise}
-                  isSelected={!!isSelected}
-                  onPress={() => toggleExerciseSelection(exercise)}
-                />
-              );
-            })}
-          </VStack>
-        ) : (
-          <Card style={styles.emptyStateCard}>
-            <LinearGradient
-              colors={['#2A2A2A', '#333']}
-              style={styles.emptyStateGradient}
-            >
-              <VStack space="md" style={styles.emptyStateContent}>
-                <Ionicons name="search" size={48} color="#666" />
-                <Text style={styles.emptyStateText}>No exercises found</Text>
-                <Text style={styles.emptyStateSubtext}>
-                  Try adjusting your search or check back later
-                </Text>
-              </VStack>
-            </LinearGradient>
-          </Card>
-        )}
-        
-        {/* Bottom Spacing */}
-        <View style={{ height: 120 }} />
-      </ScrollView>
-
-      {/* Enhanced Start Workout Button */}
-      {filteredExercises.length > 0 && (
-        <Box style={styles.bottomContainer}>
-          <Card style={styles.startButtonCard}>
-            <TouchableOpacity 
-              style={styles.startButton} 
-              onPress={startWorkout}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#FFD20A', '#FFA500']}
-                style={styles.startButtonGradient}
-              >
-                <HStack space="sm" style={styles.startButtonContent}>
-                  <Ionicons name="play" size={20} color="#1E1E1E" />
-                  <Text style={styles.startButtonText}>
-                    Start Workout
-                    {selectedExercises.length > 0 && ` (${selectedExercises.length})`}
-                  </Text>
-                </HStack>
-              </LinearGradient>
-            </TouchableOpacity>
-          </Card>
-        </Box>
+              <Text style={styles.countHint}>Tap an exercise for instructions.</Text>
+            </View>
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Ionicons name="search" size={34} color="#777777" />
+              <Text style={styles.emptyTitle}>No exercises found</Text>
+              <Text style={styles.emptyText}>
+                {errorMessage || 'Try a different search term for this category.'}
+              </Text>
+            </View>
+          }
+        />
       )}
     </View>
   );
@@ -354,286 +260,218 @@ export default function ExercisesScreen({ navigation, route }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E1E1E',
-  },
-  loadingContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingContent: {
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  loadingSubtext: {
-    fontSize: 14,
-    color: '#B0B0B0',
-    textAlign: 'center',
+    backgroundColor: '#171717',
   },
   header: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  headerTop: {
-    alignItems: 'center',
+    paddingBottom: 16,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    alignItems: 'center',
     backgroundColor: 'rgba(255, 210, 10, 0.1)',
+    borderRadius: 8,
+    height: 38,
     justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: 16,
+    width: 38,
   },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: 'center',
+  headerCopy: {
+    marginBottom: 16,
   },
-  categoryTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  kicker: {
+    color: '#FFD20A',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginBottom: 7,
+    textTransform: 'uppercase',
+  },
+  title: {
     color: '#FFFFFF',
-    textAlign: 'center',
+    fontSize: 30,
+    fontWeight: '800',
+    letterSpacing: 0,
   },
-  headerSpacer: {
-    width: 40,
+  subtitle: {
+    color: '#B8B8B8',
+    fontSize: 15,
+    lineHeight: 22,
+    marginTop: 8,
   },
   searchContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginTop: 16,
-  },
-  searchIcon: {
-    marginRight: 12,
+    backgroundColor: '#2B2B2B',
+    borderColor: '#3A3A3A',
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    paddingHorizontal: 13,
   },
   searchInput: {
-    flex: 1,
     color: '#FFFFFF',
+    flex: 1,
     fontSize: 16,
+    minHeight: 46,
+    paddingHorizontal: 10,
   },
-  clearSearchButton: {
-    padding: 4,
-  },
-  controlsRow: {
-    justifyContent: 'space-between',
+  centerState: {
     alignItems: 'center',
-    marginTop: 16,
-  },
-  statsContainer: {
     flex: 1,
+    justifyContent: 'center',
+    padding: 24,
   },
-  statsText: {
-    fontSize: 14,
-    color: '#B0B0B0',
+  centerStateText: {
+    color: '#B8B8B8',
+    fontSize: 15,
+    marginTop: 14,
   },
-  controlButton: {
-    backgroundColor: 'rgba(255, 210, 10, 0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  controlButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFD20A',
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  scrollContent: {
+  listContent: {
     paddingHorizontal: 20,
+    paddingBottom: 28,
   },
-  exerciseCardWrapper: {
+  countRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 12,
   },
-  exerciseCardWrapperSelected: {
-    shadowColor: '#FFD20A',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
+  countText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  countHint: {
+    color: '#9A9A9A',
+    fontSize: 13,
   },
   exerciseCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    marginBottom: 12,
   },
-  exerciseCardSelected: {
-    shadowColor: '#FFD20A',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
+  exerciseGradient: {
+    borderColor: '#333333',
+    borderRadius: 8,
+    borderWidth: 1,
+    padding: 14,
   },
-  exerciseCardGradient: {
-    padding: 16,
-    borderRadius: 16,
-  },
-  exerciseCardContent: {
+  exerciseTopRow: {
     alignItems: 'center',
-  },
-  exerciseImageContainer: {
-    width: 70,
-    height: 70,
-    borderRadius: 12,
-    backgroundColor: '#444',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  exerciseImageContainerSelected: {
-    backgroundColor: '#FFD20A',
+    flexDirection: 'row',
   },
   exerciseImage: {
-    width: '100%',
-    height: '100%',
+    backgroundColor: '#333333',
+    borderRadius: 8,
+    height: 74,
+    marginRight: 14,
     resizeMode: 'cover',
+    width: 74,
   },
-  selectedOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  exerciseInfo: {
+  exerciseSummary: {
     flex: 1,
   },
   exerciseName: {
-    fontSize: 16,
-    fontWeight: 'bold',
     color: '#FFFFFF',
-    textTransform: 'capitalize',
+    fontSize: 17,
+    fontWeight: '800',
     lineHeight: 22,
+    marginBottom: 8,
+    textTransform: 'capitalize',
   },
-  exerciseNameSelected: {
-    color: '#1E1E1E',
-  },
-  exerciseMetaRow: {
-    flexWrap: 'wrap',
-  },
-  metaTag: {
+  metaRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 8,
+  },
+  metaPill: {
     alignItems: 'center',
     backgroundColor: 'rgba(255, 210, 10, 0.1)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginRight: 8,
-    marginBottom: 4,
-  },
-  metaTagSelected: {
-    backgroundColor: 'rgba(30, 30, 30, 0.2)',
+    borderRadius: 999,
+    flexDirection: 'row',
+    maxWidth: '100%',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
   },
   metaText: {
-    fontSize: 12,
-    fontWeight: '500',
     color: '#FFD20A',
-    marginLeft: 4,
-    textTransform: 'capitalize',
-  },
-  metaTextSelected: {
-    color: '#1E1E1E',
-  },
-  exerciseMuscles: {
     fontSize: 12,
-    color: '#888',
-    marginTop: 4,
+    fontWeight: '700',
+    marginLeft: 5,
     textTransform: 'capitalize',
   },
-  exerciseMusclesSelected: {
-    color: '#333',
+  exerciseDetail: {
+    color: '#B8B8B8',
+    fontSize: 13,
+    textTransform: 'capitalize',
   },
-  selectionIndicator: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+  expandedContent: {
+    borderTopColor: '#363636',
+    borderTopWidth: 1,
+    marginTop: 14,
+    paddingTop: 14,
   },
-  selectedIndicatorGradient: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+  detailGrid: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 14,
   },
-  unselectedIndicator: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
+  detailBlock: {
+    backgroundColor: '#242424',
+    borderRadius: 8,
+    flex: 1,
+    padding: 10,
   },
-  emptyStateCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    marginTop: 40,
+  detailLabel: {
+    color: '#8E8E8E',
+    fontSize: 11,
+    fontWeight: '800',
+    marginBottom: 5,
+    textTransform: 'uppercase',
   },
-  emptyStateGradient: {
-    padding: 40,
-    borderRadius: 16,
-  },
-  emptyStateContent: {
-    alignItems: 'center',
-  },
-  emptyStateText: {
-    fontSize: 18,
-    fontWeight: '600',
+  detailValue: {
     color: '#FFFFFF',
+    fontSize: 13,
+    lineHeight: 18,
+    textTransform: 'capitalize',
   },
-  emptyStateSubtext: {
+  instructionsBlock: {
+    backgroundColor: '#242424',
+    borderRadius: 8,
+    padding: 12,
+  },
+  instructionsTitle: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '800',
+    marginBottom: 9,
+  },
+  instruction: {
+    color: '#D2D2D2',
     fontSize: 14,
-    color: '#B0B0B0',
-    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 7,
+  },
+  noInstructions: {
+    color: '#B8B8B8',
+    fontSize: 14,
     lineHeight: 20,
   },
-  bottomContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  startButtonCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#FFD20A',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  startButton: {
-    borderRadius: 16,
-  },
-  startButtonGradient: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-  },
-  startButtonContent: {
-    justifyContent: 'center',
+  emptyState: {
     alignItems: 'center',
+    backgroundColor: '#242424',
+    borderColor: '#333333',
+    borderRadius: 8,
+    borderWidth: 1,
+    padding: 24,
   },
-  startButtonText: {
+  emptyTitle: {
+    color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1E1E1E',
+    fontWeight: '800',
+    marginTop: 12,
   },
-}); 
+  emptyText: {
+    color: '#B8B8B8',
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+});

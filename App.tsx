@@ -2,85 +2,22 @@ import React from 'react';
 import "@/global.css";
 import { GluestackUIProvider } from "./components/ui/gluestack-ui-provider";
 import { StatusBar } from 'expo-status-bar';
-import { Provider } from 'react-redux';
-import { store } from './src/store/reduxStore';
 import { enableScreens } from 'react-native-screens';
-import { View } from 'react-native';
-
-import LoadingScreen from './src/screens/LoadingScreen';
-import RootNavigator from './src/navigation/RootNavigator';
-import { useEffect, useState } from 'react';
-import { requestNotificationPermissions } from './src/config/permissions';
-import { useAuth } from './src/hooks/useAuth';
-import { useUserProfile } from './src/hooks/useUserProfile';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import WorkoutsNavigator from './src/navigation/WorkoutsNavigator';
 
 enableScreens();
 
-function AppContent() {
-  const [showLoadingScreen, setShowLoadingScreen] = useState(true);
-  const { isAuthenticated, authLoading } = useAuth();
-  const { userInfo, isLoading: userLoading } = useUserProfile();
-
-  const hasCompletedProfile = !!userInfo;
-
-  useEffect(() => {
-    requestNotificationPermissions();
-
-    // Show loading screen for at least 2 seconds
-    const timer = setTimeout(() => {
-      setShowLoadingScreen(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Enhanced logging for debugging
-  if (__DEV__) {
-    console.log('📱 App state update:', {
-      showLoadingScreen,
-      authLoading,
-      isAuthenticated,
-      userLoading,
-      hasCompletedProfile,
-      userInfo: userInfo ? { fullName: userInfo.fullName, email: userInfo.email } : null
-    });
-  }
-
-  // Only show loading if explicitly needed
-  if (showLoadingScreen) {
-    return (
-      <View style={{ flex: 1 }}>
-        <LoadingScreen />
-      </View>
-    );
-  }
-
-  // Show loading until both auth and the authenticated user's profile settle.
-  if (authLoading || (isAuthenticated && userLoading)) {
-    return (
-      <View style={{ flex: 1 }}>
-        <LoadingScreen />
-      </View>
-    );
-  }
-
-  return (
-    <View style={{ flex: 1 }}>
-      <RootNavigator
-        hasCompletedProfile={hasCompletedProfile}
-        isLoading={false}
-      />
-    </View>
-  );
-}
-
 export default function App() {
   return (
-    <Provider store={store}>
-      <GluestackUIProvider mode="light">
+    <GluestackUIProvider mode="light">
+      <SafeAreaProvider>
         <StatusBar style="auto" />
-        <AppContent />
-      </GluestackUIProvider>
-    </Provider>
+        <NavigationContainer>
+          <WorkoutsNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </GluestackUIProvider>
   );
 }

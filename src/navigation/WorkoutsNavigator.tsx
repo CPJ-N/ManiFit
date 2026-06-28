@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ROUTES } from '../constants/navigation';
+import { getExerciseCategoryLabel } from '../constants/exerciseCatalog';
 
 // Screens
 import CategoriesScreen from '../screens/workouts/CategoriesScreen';
@@ -9,7 +10,7 @@ import WorkoutScreen from '../screens/workouts/WorkoutScreen';
 
 type WorkoutsStackParamList = {
   [ROUTES.CATEGORIES]: undefined;
-  [ROUTES.EXERCISES]: { categoryName: string; categoryImage: any };
+  [ROUTES.EXERCISES]: { categoryId: string };
   [ROUTES.WORKOUT]: { exercises: any[] };
 };
 
@@ -34,15 +35,16 @@ export default function WorkoutsNavigator() {
         name={ROUTES.CATEGORIES} 
         component={CategoriesScreen}
         options={{
-          title: 'Exercise Categories',
-          headerShown: false, // We'll add a custom header in the component
+          title: 'Exercise Library',
+          headerShown: false,
         }}
       />
       <Stack.Screen 
         name={ROUTES.EXERCISES} 
         component={ExercisesScreen}
         options={({ route }) => ({
-          title: route.params.categoryName.toUpperCase(),
+          title: getExerciseCategoryLabel(route.params.categoryId),
+          headerShown: false,
         })}
       />
       <Stack.Screen 
@@ -50,7 +52,7 @@ export default function WorkoutsNavigator() {
         component={WorkoutScreen}
         options={{
           title: 'Workout',
-          gestureEnabled: false, // Prevent going back during workout
+          gestureEnabled: false,
         }}
       />
     </Stack.Navigator>

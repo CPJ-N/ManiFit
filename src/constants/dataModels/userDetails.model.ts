@@ -1,3 +1,5 @@
+import type { CoachVerificationStatus, UserRole } from '../roles';
+
 // ===== ENHANCED USER DETAILS MODEL =====
 // Extends your existing UserDetails model
 export interface UserDetails {
@@ -6,15 +8,17 @@ export interface UserDetails {
     fullName: string; // Full name of the user
     mobileNumber?: string; // Mobile number of the user
     profilePhotoName?: string; // URL of the profile photo
-    isTrainer: boolean; // Differentiates between trainer and trainee
+    role?: UserRole; // Product role. Defaults to aspirant; coach requires approval.
+    coachVerificationStatus?: CoachVerificationStatus; // Gate for the Coach home layer.
+    isTrainer: boolean; // Legacy compatibility flag for existing trainer/trainee code.
     gender?: 'male' | 'female' | 'other';
     dateOfBirth?: string; // Date of birth of the user
     age?: number; // Age of the user
     weight?: number; // Weight of the user in kilograms
     height?: number; // Height of the user in centimeters
     fitnessGoals?: string[]; // Fitness goals of the user
-    linkedTrainees?: string[]; // Array of trainee IDs (applicable only for trainers)
-    linkedTrainer?: string; // Trainer ID (applicable only for trainees)
+    linkedTrainees?: string[]; // Legacy array of Aspirant IDs for Coach accounts
+    linkedTrainer?: string; // Legacy Coach ID for Aspirant accounts
     subscriptionId?: string; // Subscription ID of the user
     isSubscribed?: boolean; // Subscription status of the user
     
@@ -50,7 +54,7 @@ export interface UserStats {
     currentStreak?: number; // days
     longestStreak?: number; // days
     
-    // For trainers
+    // For Coaches
     totalClients?: number;
     routinesCreated?: number;
     workoutsAssigned?: number;

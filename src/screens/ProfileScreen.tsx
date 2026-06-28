@@ -4,8 +4,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useSelector } from 'react-redux';
 import { signOut } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { SCREEN_FLAGS } from '../config/screenFlags';
 import { RootState } from '../store/reduxStore';
 import { ROUTES } from '../constants/navigation';
+import { COACH_VERIFICATION_STATUS, getPrimaryRoleLabel, isApprovedCoach } from '../constants/roles';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -143,12 +145,62 @@ export default function ProfileScreen({ navigation }: Props) {
     return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
   };
 
+  const handleSubscriptionPress = () => {
+    if (!SCREEN_FLAGS.checkoutEnabled) {
+      Alert.alert('Subscription disabled', 'Checkout is disabled for this test build.');
+      return;
+    }
+
+    navigation.navigate(ROUTES.CHECKOUT);
+  };
+
+  const coachVerificationStatus =
+    userInfo?.coachVerificationStatus ?? COACH_VERIFICATION_STATUS.NOT_APPLIED;
+  const hasApprovedCoachAccess = isApprovedCoach(userInfo);
+  const roleLabel = getPrimaryRoleLabel(userInfo);
+  const hasPendingCoachApplication = coachVerificationStatus === COACH_VERIFICATION_STATUS.PENDING;
+  const hasRejectedCoachApplication = coachVerificationStatus === COACH_VERIFICATION_STATUS.REJECTED;
+
+  const handleCoachVerificationPress = () => {
+    if (hasApprovedCoachAccess) {
+      Alert.alert('Coach verified', 'Your Coach Home is enabled.');
+      return;
+    }
+
+    if (hasPendingCoachApplication) {
+      Alert.alert('Coach verification pending', 'Coach Home will unlock after approval.');
+      return;
+    }
+
+    Alert.alert(
+      hasRejectedCoachApplication ? 'Coach verification' : 'Become a Coach',
+      'Coach applications will collect additional details and require approval before Coach Home is enabled.'
+    );
+  };
+
+  const coachVerificationMenuItem = {
+    icon: hasApprovedCoachAccess ? 'shield-checkmark' : 'ribbon',
+    title: hasApprovedCoachAccess ? 'Coach Verified' : 'Become a Coach',
+    subtitle: hasApprovedCoachAccess
+      ? 'Coach Home is enabled for your account'
+      : hasPendingCoachApplication
+        ? 'Your Coach verification is pending approval'
+        : 'Apply for verification to unlock Coach Home',
+    onPress: handleCoachVerificationPress,
+    gradient: hasApprovedCoachAccess
+      ? ['#4CAF50', '#2E7D32'] as [string, string, ...string[]]
+      : ['#FFD20A', '#FFA500'] as [string, string, ...string[]],
+    showBadge: hasApprovedCoachAccess || hasPendingCoachApplication,
+    badgeText: hasApprovedCoachAccess ? 'ACTIVE' : 'PENDING',
+  };
+
   const menuItems = [
+    coachVerificationMenuItem,
     {
       icon: 'card',
       title: 'Subscription',
       subtitle: userInfo?.isSubscribed ? 'Premium Active' : 'Upgrade to Premium',
-      onPress: () => navigation.navigate('Checkout'),
+      onPress: handleSubscriptionPress,
       gradient: ['#4CAF50', '#2E7D32'] as [string, string, ...string[]],
       showBadge: userInfo?.isSubscribed,
       badgeText: 'ACTIVE',
@@ -157,7 +209,7 @@ export default function ProfileScreen({ navigation }: Props) {
       icon: 'trending-up',
       title: 'Progress',
       subtitle: 'View your fitness journey and stats',
-      onPress: () => navigation.navigate(ROUTES.WORKOUTS),
+      onPress: () => navigation.navigate(ROUTES.ASPIRANT_PROGRESS),
       gradient: ['#6366F1', '#4F46E5'] as [string, string, ...string[]],
     },
     {
@@ -224,9 +276,15 @@ export default function ProfileScreen({ navigation }: Props) {
                     <View style={styles.userBadge}>
                       <Ionicons name="person" size={12} color="#1E1E1E" />
                       <Text style={styles.userBadgeText}>
-                        {userInfo?.isTrainer ? 'Trainer' : 'Member'}
+                        {roleLabel}
                       </Text>
                     </View>
+                    {hasPendingCoachApplication && (
+                      <View style={[styles.userBadge, styles.pendingBadge]}>
+                        <Ionicons name="time" size={12} color="#1E1E1E" />
+                        <Text style={styles.userBadgeText}>Coach Pending</Text>
+                      </View>
+                    )}
                     {userInfo?.isSubscribed && (
                       <View style={[styles.userBadge, styles.premiumBadge]}>
                         <Ionicons name="star" size={12} color="#1E1E1E" />
@@ -421,6 +479,9 @@ const styles = StyleSheet.create({
   premiumBadge: {
     backgroundColor: '#4CAF50',
   },
+  pendingBadge: {
+    backgroundColor: '#FFA500',
+  },
   userBadgeText: {
     fontSize: 12,
     fontWeight: '600',
@@ -595,4 +656,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
-}); 
+});

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Alert, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import Constants from 'expo-constants';
-import RazorpayCheckout from 'react-native-razorpay';
 import { useSelector } from 'react-redux';
 import { auth } from '../config/firebase';
 import { createSubscriptionIntent } from '../utils/controllers/billingClient';
@@ -39,6 +38,7 @@ export default function CheckoutScreen() {
         theme: { color: '#FFD20A' }
       };
 
+      const { default: RazorpayCheckout } = await import('react-native-razorpay');
       await RazorpayCheckout.open(options);
       Alert.alert(
         'Activation pending',

@@ -1,15 +1,20 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ROUTES } from '../constants/navigation';
+import { SCREEN_FLAGS } from '../config/screenFlags';
 
 // Navigators and Screens
 import WorkoutsNavigator from './WorkoutsNavigator';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import CheckoutScreen from '../screens/CheckoutScreen';
+import AspirantRoutinesScreen from '../screens/aspirant/AspirantRoutinesScreen';
+import AspirantRoutineDetailScreen from '../screens/aspirant/AspirantRoutineDetailScreen';
+import AiCoachScreen from '../screens/aspirant/AiCoachScreen';
+import ConnectCoachScreen from '../screens/aspirant/ConnectCoachScreen';
+import AspirantProgressScreen from '../screens/aspirant/AspirantProgressScreen';
 
 type MainTabParamList = {
   [ROUTES.HOME]: undefined;
@@ -20,10 +25,31 @@ type MainTabParamList = {
 type MainStackParamList = {
   [ROUTES.MAIN_TABS]: undefined;
   [ROUTES.CHECKOUT]: undefined;
+  [ROUTES.ASPIRANT_ROUTINES]: { filter?: 'today' | 'all' } | undefined;
+  [ROUTES.ASPIRANT_ROUTINE_DETAIL]: { routine: any };
+  [ROUTES.AI_COACH]: undefined;
+  [ROUTES.CONNECT_COACH]: undefined;
+  [ROUTES.ASPIRANT_PROGRESS]: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<MainStackParamList>();
+
+function DisabledCheckoutScreen() {
+  return (
+    <View style={styles.disabledScreen}>
+      <Text style={styles.disabledTitle}>Subscription disabled</Text>
+      <Text style={styles.disabledText}>
+        Checkout is disabled for this test build.
+      </Text>
+    </View>
+  );
+}
+
+const getCheckoutScreen = () =>
+  SCREEN_FLAGS.checkoutEnabled
+    ? require('../screens/CheckoutScreen').default
+    : DisabledCheckoutScreen;
 
 function MainTabs() {
   return (
@@ -94,7 +120,7 @@ export default function MainNavigator() {
       />
       <Stack.Screen 
         name={ROUTES.CHECKOUT}
-        component={CheckoutScreen}
+        getComponent={getCheckoutScreen}
         options={{
           headerShown: true,
           headerStyle: {
@@ -109,6 +135,48 @@ export default function MainNavigator() {
           title: 'Subscription',
         }}
       />
+      <Stack.Screen
+        name={ROUTES.ASPIRANT_ROUTINES}
+        component={AspirantRoutinesScreen}
+      />
+      <Stack.Screen
+        name={ROUTES.ASPIRANT_ROUTINE_DETAIL}
+        component={AspirantRoutineDetailScreen}
+      />
+      <Stack.Screen
+        name={ROUTES.AI_COACH}
+        component={AiCoachScreen}
+      />
+      <Stack.Screen
+        name={ROUTES.CONNECT_COACH}
+        component={ConnectCoachScreen}
+      />
+      <Stack.Screen
+        name={ROUTES.ASPIRANT_PROGRESS}
+        component={AspirantProgressScreen}
+      />
     </Stack.Navigator>
   );
-} 
+}
+
+const styles = StyleSheet.create({
+  disabledScreen: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1a1a1a',
+    padding: 24,
+  },
+  disabledTitle: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  disabledText: {
+    color: '#B0B0B0',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+});

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { getExerciseImageSource, normalizeWorkoutExercises } from '../../utils/routineDisplay';
 
 interface Props {
   navigation: any;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export default function WorkoutScreen({ navigation, route }: Props) {
-  const { exercises } = route.params;
+  const exercises = normalizeWorkoutExercises(route.params.exercises || []);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [currentSet, setCurrentSet] = useState(1);
   const [isResting, setIsResting] = useState(false);
@@ -21,6 +22,7 @@ export default function WorkoutScreen({ navigation, route }: Props) {
   
   const currentExercise = exercises[currentExerciseIndex];
   const totalExercises = exercises.length;
+  const totalSets = currentExercise?.sets || 3;
   
   // Timer effect
   useEffect(() => {
@@ -37,10 +39,10 @@ export default function WorkoutScreen({ navigation, route }: Props) {
   }, [isResting, timer]);
 
   const handleCompleteSet = () => {
-    if (currentSet < 3) { // Assuming 3 sets per exercise
+    if (currentSet < totalSets) {
       setCurrentSet(prev => prev + 1);
       setIsResting(true);
-      setTimer(60); // 60 second rest
+      setTimer(currentExercise?.restTime || 60);
     } else {
       // Exercise completed, move to next
       handleCompleteExercise();
@@ -79,7 +81,21 @@ export default function WorkoutScreen({ navigation, route }: Props) {
     setTimer(0);
   };
 
-  const progress = ((currentExerciseIndex + (currentSet / 3)) / totalExercises) * 100;
+  const progress = totalExercises > 0
+    ? ((currentExerciseIndex + (currentSet / totalSets)) / totalExercises) * 100
+    : 0;
+
+  if (!currentExercise) {
+    return (
+      <View style={[styles.container, styles.emptyContainer]}>
+        <StatusBar style="light" />
+        <Text style={styles.emptyTitle}>No exercises found</Text>
+        <TouchableOpacity style={styles.completeButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.completeButtonText}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -91,7 +107,7 @@ export default function WorkoutScreen({ navigation, route }: Props) {
           <View style={[styles.progressFill, { width: `${progress}%` }]} />
         </View>
         <Text style={styles.progressText}>
-          Exercise {currentExerciseIndex + 1} of {totalExercises} • Set {currentSet} of 3
+          Exercise {currentExerciseIndex + 1} of {totalExercises} • Set {currentSet} of {totalSets}
         </Text>
       </View>
 
@@ -100,7 +116,7 @@ export default function WorkoutScreen({ navigation, route }: Props) {
         <View style={styles.exerciseContainer}>
           <View style={styles.exerciseImageContainer}>
             <Image 
-              source={{ uri: currentExercise.gifUrl }} 
+              source={getExerciseImageSource(currentExercise)}
               style={styles.exerciseImage}
               defaultSource={require('../../assets/images/cardio.png')}
             />
@@ -109,6 +125,9 @@ export default function WorkoutScreen({ navigation, route }: Props) {
           <Text style={styles.exerciseName}>{currentExercise.name}</Text>
           <Text style={styles.exerciseTarget}>
             Target: {currentExercise.target}
+          </Text>
+          <Text style={styles.exercisePrescription}>
+            {totalSets} sets • {currentExercise.repetitions} reps
           </Text>
           
           {/* Exercise Instructions */}
@@ -138,7 +157,7 @@ export default function WorkoutScreen({ navigation, route }: Props) {
         {/* Set Info */}
         {!isResting && (
           <View style={styles.setContainer}>
-            <Text style={styles.setTitle}>Set {currentSet} of 3</Text>
+            <Text style={styles.setTitle}>Set {currentSet} of {totalSets}</Text>
             <Text style={styles.setInstruction}>
               Complete this set and tap "Set Complete"
             </Text>
@@ -151,7 +170,7 @@ export default function WorkoutScreen({ navigation, route }: Props) {
         {!isResting ? (
           <TouchableOpacity style={styles.completeButton} onPress={handleCompleteSet}>
             <Text style={styles.completeButtonText}>
-              {currentSet < 3 ? 'Set Complete' : 'Exercise Complete'}
+              {currentSet < totalSets ? 'Set Complete' : 'Exercise Complete'}
             </Text>
           </TouchableOpacity>
         ) : (
@@ -184,6 +203,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1E1E1E',
+  },
+  emptyContainer: {
+    justifyContent: 'center',
+    padding: 24,
+  },
+  emptyTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 18,
   },
   progressContainer: {
     padding: 20,
@@ -238,8 +268,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFD20A',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 8,
     textTransform: 'capitalize',
+  },
+  exercisePrescription: {
+    fontSize: 15,
+    color: '#B0B0B0',
+    textAlign: 'center',
+    marginBottom: 20,
+    fontWeight: '600',
   },
   instructionsContainer: {
     backgroundColor: '#2A2A2A',

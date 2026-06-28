@@ -38,12 +38,12 @@ describe('RegisterScreen — first step renders', () => {
     fireEvent.changeText(getByPlaceholderText('Enter your full name'), 'Test User');
     fireEvent.press(getByText('Continue'));
     await waitFor(() => {
-      expect(getByText('How will you use ManiFit?')).toBeTruthy();
+      expect(getByText('Choose your Gender')).toBeTruthy();
     });
   });
 });
 
-// NOTE: Full wizard E2E test (submitting all 8 steps) is skipped here because
+// NOTE: Full wizard E2E test (submitting all steps) is skipped here because
 // Animated transitions in the RN test environment prevent reliable step-through.
 // The isSubmitting-stuck-on-success bug (line 246 RegisterScreen.tsx) is a
 // single-line fix (add finally block) verified manually. The unit tests above

@@ -12,6 +12,13 @@ export const ROUTES = {
   HOME: 'Home',
   WORKOUTS: 'Workouts', 
   PROFILE: 'Profile',
+
+  // Aspirant Stack
+  ASPIRANT_ROUTINES: 'AspirantRoutines',
+  ASPIRANT_ROUTINE_DETAIL: 'AspirantRoutineDetail',
+  AI_COACH: 'AiCoach',
+  CONNECT_COACH: 'ConnectCoach',
+  ASPIRANT_PROGRESS: 'AspirantProgress',
   
   // Workouts Stack
   CATEGORIES: 'Categories',

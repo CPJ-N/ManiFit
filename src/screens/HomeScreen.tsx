@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Animated, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/reduxStore';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ROUTES } from '../constants/navigation';
+import { getHomeLayer, USER_ROLES } from '../constants/roles';
 
 // Gluestack UI Components
 import { Box } from '../../components/ui/box';
@@ -181,7 +183,17 @@ const StatCard = ({
 };
 
 // Modern Header component with enhanced design
-const Header = ({ userInfo, insets }: { userInfo: any; insets: any }) => {
+const Header = ({
+  userInfo,
+  insets,
+  navigation,
+  subtitle,
+}: {
+  userInfo: any;
+  insets: any;
+  navigation: any;
+  subtitle: string;
+}) => {
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';
@@ -205,11 +217,15 @@ const Header = ({ userInfo, insets }: { userInfo: any; insets: any }) => {
         <HStack style={styles.headerTop}>
           <VStack space="xs" style={styles.greetingContainer}>
             <Text style={styles.greeting}>
-              {getGreeting()}, {getUserName()}! 👋
+              {getGreeting()}, {getUserName()}
             </Text>
-            <Text style={styles.subtitle}>Let's crush your fitness goals today</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
           </VStack>
-          <TouchableOpacity style={styles.profileButton} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.profileButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate(ROUTES.PROFILE)}
+          >
             <LinearGradient
               colors={['#FFD20A', '#FFA500']}
               style={styles.profileButtonGradient}
@@ -223,9 +239,327 @@ const Header = ({ userInfo, insets }: { userInfo: any; insets: any }) => {
   );
 };
 
+const showMvpPlaceholder = (title: string, message: string) => {
+  Alert.alert(title, message);
+};
+
+const AspirantHome = ({ navigation }: Props) => (
+  <>
+    {/* Quick Actions Section */}
+    <Box style={styles.section}>
+      <HStack style={styles.sectionHeader}>
+        <View style={styles.sectionIconContainer}>
+          <LinearGradient
+            colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
+            style={styles.sectionIconGradient}
+          >
+            <Ionicons name="flash" size={18} color="#FFD20A" />
+          </LinearGradient>
+        </View>
+        <Heading size="lg" style={styles.sectionTitle}>Aspirant Home</Heading>
+      </HStack>
+      
+      <VStack space="md">
+        <QuickActionCard
+          icon="calendar"
+          title="Today's Routine"
+          subtitle="Open routines assigned by your Coach"
+          onPress={() => navigation.navigate(ROUTES.ASPIRANT_ROUTINES, { filter: 'today' })}
+          gradient={['#6366F1', '#4F46E5']}
+          delay={100}
+        />
+
+        <QuickActionCard
+          icon="hardware-chip"
+          title="AI Coach"
+          subtitle="Generate a routine from your goals and equipment"
+          onPress={() => navigation.navigate(ROUTES.AI_COACH)}
+          gradient={['#00BCD4', '#00838F']}
+          delay={200}
+        />
+
+        <QuickActionCard
+          icon="clipboard"
+          title="My Routines"
+          subtitle="Review assigned and generated plans"
+          onPress={() => navigation.navigate(ROUTES.ASPIRANT_ROUTINES)}
+          gradient={['#4CAF50', '#2E7D32']}
+          delay={250}
+        />
+
+        <QuickActionCard
+          icon="library"
+          title="Browse Exercises"
+          subtitle="Explore exercises while routines are being assigned"
+          onPress={() => navigation.navigate(ROUTES.WORKOUTS)}
+          gradient={['#FFD20A', '#FFA500']}
+          delay={300}
+        />
+      </VStack>
+    </Box>
+
+    {/* Progress Overview Section */}
+    <Box style={styles.section}>
+      <HStack style={styles.sectionHeader}>
+        <View style={styles.sectionIconContainer}>
+          <LinearGradient
+            colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
+            style={styles.sectionIconGradient}
+          >
+            <Ionicons name="trending-up" size={18} color="#FFD20A" />
+          </LinearGradient>
+        </View>
+        <Heading size="lg" style={styles.sectionTitle}>Your Progress</Heading>
+      </HStack>
+      
+      <HStack space="md" style={styles.statsRow}>
+        <StatCard
+          icon="barbell"
+          number="0"
+          label="Total Workouts"
+          gradient={['#4CAF50', '#2E7D32']}
+          delay={400}
+        />
+        <StatCard
+          icon="calendar-outline"
+          number="0"
+          label="This Week"
+          gradient={['#6366F1', '#4F46E5']}
+          delay={500}
+        />
+        <StatCard
+          icon="flame"
+          number="0"
+          label="Day Streak"
+          gradient={['#FF6B6B', '#E53E3E']}
+          delay={600}
+        />
+      </HStack>
+    </Box>
+
+    {/* Recent Activity Section */}
+    <Box style={styles.section}>
+      <HStack style={styles.sectionHeader}>
+        <View style={styles.sectionIconContainer}>
+          <LinearGradient
+            colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
+            style={styles.sectionIconGradient}
+          >
+            <Ionicons name="time" size={18} color="#FFD20A" />
+          </LinearGradient>
+        </View>
+        <Heading size="lg" style={styles.sectionTitle}>Recent Activity</Heading>
+      </HStack>
+      
+      <LinearGradient
+        colors={['rgba(30, 30, 30, 0.95)', 'rgba(42, 42, 42, 0.9)']}
+        style={styles.emptyStateGradient}
+      >
+        <VStack space="lg" style={styles.emptyStateContent}>
+          <View style={styles.emptyIconContainer}>
+            <LinearGradient
+              colors={['rgba(255, 210, 10, 0.15)', 'rgba(255, 165, 0, 0.1)']}
+              style={styles.emptyIconGradient}
+            >
+              <Ionicons name="fitness-outline" size={32} color="#FFD20A" />
+            </LinearGradient>
+          </View>
+          <VStack space="sm" style={styles.emptyTextContainer}>
+            <Text style={styles.emptyText}>No routines yet</Text>
+            <Text style={styles.emptySubtext}>
+              Connect with a Coach or use AI Coach to get your first routine.
+            </Text>
+          </VStack>
+          <TouchableOpacity
+            style={styles.emptyActionButton}
+            activeOpacity={0.8}
+            onPress={() =>
+              navigation.navigate(ROUTES.CONNECT_COACH)
+            }
+          >
+            <LinearGradient
+              colors={['#FFD20A', '#FFA500']}
+              style={styles.emptyActionGradient}
+            >
+              <HStack space="sm" style={styles.emptyActionContent}>
+                <Ionicons name="person-add" size={18} color="#1E1E1E" />
+                <Text style={styles.emptyActionText}>Connect with Coach</Text>
+              </HStack>
+            </LinearGradient>
+          </TouchableOpacity>
+        </VStack>
+      </LinearGradient>
+    </Box>
+  </>
+);
+
+const CoachHome = () => (
+  <>
+    {/* Quick Actions Section */}
+    <Box style={styles.section}>
+      <HStack style={styles.sectionHeader}>
+        <View style={styles.sectionIconContainer}>
+          <LinearGradient
+            colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
+            style={styles.sectionIconGradient}
+          >
+            <Ionicons name="shield-checkmark" size={18} color="#FFD20A" />
+          </LinearGradient>
+        </View>
+        <Heading size="lg" style={styles.sectionTitle}>Coach Home</Heading>
+      </HStack>
+      
+      <VStack space="md">
+        <QuickActionCard
+          icon="people"
+          title="Aspirants"
+          subtitle="Manage linked Aspirants and assignments"
+          onPress={() =>
+            showMvpPlaceholder(
+              'Aspirants',
+              'The Coach roster will show linked Aspirants and their routine status.'
+            )
+          }
+          gradient={['#6366F1', '#4F46E5']}
+          delay={100}
+        />
+
+        <QuickActionCard
+          icon="create"
+          title="Create Routine"
+          subtitle="Build a workout plan for one or more Aspirants"
+          onPress={() =>
+            showMvpPlaceholder(
+              'Create Routine',
+              'The routine builder will save routines that can be assigned to Aspirants.'
+            )
+          }
+          gradient={['#4CAF50', '#2E7D32']}
+          delay={200}
+        />
+
+        <QuickActionCard
+          icon="library"
+          title="Routine Library"
+          subtitle="Review templates and recent assignments"
+          onPress={() =>
+            showMvpPlaceholder(
+              'Routine Library',
+              'The library will list your human-created routines and assignment history.'
+            )
+          }
+          gradient={['#FFD20A', '#FFA500']}
+          delay={300}
+        />
+      </VStack>
+    </Box>
+
+    {/* Coach Overview Section */}
+    <Box style={styles.section}>
+      <HStack style={styles.sectionHeader}>
+        <View style={styles.sectionIconContainer}>
+          <LinearGradient
+            colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
+            style={styles.sectionIconGradient}
+          >
+            <Ionicons name="analytics" size={18} color="#FFD20A" />
+          </LinearGradient>
+        </View>
+        <Heading size="lg" style={styles.sectionTitle}>Coach Overview</Heading>
+      </HStack>
+      
+      <HStack space="md" style={styles.statsRow}>
+        <StatCard
+          icon="people"
+          number="0"
+          label="Aspirants"
+          gradient={['#6366F1', '#4F46E5']}
+          delay={400}
+        />
+        <StatCard
+          icon="clipboard"
+          number="0"
+          label="Routines"
+          gradient={['#4CAF50', '#2E7D32']}
+          delay={500}
+        />
+        <StatCard
+          icon="checkmark-done"
+          number="0"
+          label="Completed"
+          gradient={['#FF6B6B', '#E53E3E']}
+          delay={600}
+        />
+      </HStack>
+    </Box>
+
+    {/* Coach Activity Section */}
+    <Box style={styles.section}>
+      <HStack style={styles.sectionHeader}>
+        <View style={styles.sectionIconContainer}>
+          <LinearGradient
+            colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
+            style={styles.sectionIconGradient}
+          >
+            <Ionicons name="time" size={18} color="#FFD20A" />
+          </LinearGradient>
+        </View>
+        <Heading size="lg" style={styles.sectionTitle}>Recent Assignments</Heading>
+      </HStack>
+      
+      <LinearGradient
+        colors={['rgba(30, 30, 30, 0.95)', 'rgba(42, 42, 42, 0.9)']}
+        style={styles.emptyStateGradient}
+      >
+        <VStack space="lg" style={styles.emptyStateContent}>
+          <View style={styles.emptyIconContainer}>
+            <LinearGradient
+              colors={['rgba(255, 210, 10, 0.15)', 'rgba(255, 165, 0, 0.1)']}
+              style={styles.emptyIconGradient}
+            >
+              <Ionicons name="clipboard-outline" size={32} color="#FFD20A" />
+            </LinearGradient>
+          </View>
+          <VStack space="sm" style={styles.emptyTextContainer}>
+            <Text style={styles.emptyText}>No assignments yet</Text>
+            <Text style={styles.emptySubtext}>
+              Add Aspirants, create routines, and assign the first training plan.
+            </Text>
+          </VStack>
+          <TouchableOpacity
+            style={styles.emptyActionButton}
+            activeOpacity={0.8}
+            onPress={() =>
+              showMvpPlaceholder(
+                'Add Aspirant',
+                'The invite flow will let verified Coaches link Aspirants safely.'
+              )
+            }
+          >
+            <LinearGradient
+              colors={['#FFD20A', '#FFA500']}
+              style={styles.emptyActionGradient}
+            >
+              <HStack space="sm" style={styles.emptyActionContent}>
+                <Ionicons name="person-add" size={18} color="#1E1E1E" />
+                <Text style={styles.emptyActionText}>Add Aspirant</Text>
+              </HStack>
+            </LinearGradient>
+          </TouchableOpacity>
+        </VStack>
+      </LinearGradient>
+    </Box>
+  </>
+);
+
 export default function HomeScreen({ navigation }: Props) {
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const insets = useSafeAreaInsets();
+  const homeLayer = getHomeLayer(userInfo);
+  const isCoachHome = homeLayer === USER_ROLES.COACH;
+  const headerSubtitle = isCoachHome
+    ? 'Coach workspace for routines and Aspirants'
+    : 'Aspirant workspace for routines and AI Coach';
 
   return (
     <View style={styles.container}>
@@ -243,168 +577,23 @@ export default function HomeScreen({ navigation }: Props) {
       <View style={styles.backgroundElement3} />
 
       {/* Header */}
-      <Header userInfo={userInfo} insets={insets} />
+      <Header
+        userInfo={userInfo}
+        insets={insets}
+        navigation={navigation}
+        subtitle={headerSubtitle}
+      />
 
       <ScrollView 
         style={styles.scrollContainer} 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Quick Actions Section */}
-        <Box style={styles.section}>
-          <HStack style={styles.sectionHeader}>
-            <View style={styles.sectionIconContainer}>
-              <LinearGradient
-                colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
-                style={styles.sectionIconGradient}
-              >
-                <Ionicons name="flash" size={18} color="#FFD20A" />
-              </LinearGradient>
-            </View>
-            <Heading size="lg" style={styles.sectionTitle}>Quick Start</Heading>
-          </HStack>
-          
-          <VStack space="md">
-            <QuickActionCard
-              icon="fitness"
-              title="Start Quick Workout"
-              subtitle="Jump into a 15-min power session"
-              onPress={() => navigation.navigate('Workouts')}
-              gradient={['#4CAF50', '#2E7D32']}
-              delay={100}
-            />
-
-            <QuickActionCard
-              icon="calendar"
-              title="Today's Routine"
-              subtitle="Your personalized workout plan"
-              onPress={() => navigation.navigate('Workouts')}
-              gradient={['#6366F1', '#4F46E5']}
-              delay={200}
-            />
-
-            <QuickActionCard
-              icon="library"
-              title="Browse Exercises"
-              subtitle="Explore workout categories"
-              onPress={() => navigation.navigate('Workouts')}
-              gradient={['#FFD20A', '#FFA500']}
-              delay={300}
-            />
-          </VStack>
-        </Box>
-
-        {/* Progress Overview Section */}
-        <Box style={styles.section}>
-          <HStack style={styles.sectionHeader}>
-            <View style={styles.sectionIconContainer}>
-              <LinearGradient
-                colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
-                style={styles.sectionIconGradient}
-              >
-                <Ionicons name="trending-up" size={18} color="#FFD20A" />
-              </LinearGradient>
-            </View>
-            <Heading size="lg" style={styles.sectionTitle}>Your Progress</Heading>
-          </HStack>
-          
-          <HStack space="md" style={styles.statsRow}>
-            <StatCard
-              icon="barbell"
-              number="0"
-              label="Total Workouts"
-              gradient={['#4CAF50', '#2E7D32']}
-              delay={400}
-            />
-            <StatCard
-              icon="calendar-outline"
-              number="0"
-              label="This Week"
-              gradient={['#6366F1', '#4F46E5']}
-              delay={500}
-            />
-            <StatCard
-              icon="flame"
-              number="0"
-              label="Day Streak"
-              gradient={['#FF6B6B', '#E53E3E']}
-              delay={600}
-            />
-          </HStack>
-        </Box>
-
-        {/* Daily Motivation Card */}
-        <Box style={styles.section}>
-          <LinearGradient
-            colors={['rgba(30, 30, 30, 0.95)', 'rgba(42, 42, 42, 0.9)']}
-            style={styles.motivationGradient}
-          >
-            <VStack space="lg" style={styles.motivationContent}>
-              <View style={styles.motivationIconContainer}>
-                <LinearGradient
-                  colors={['#FFD20A', '#FFA500']}
-                  style={styles.motivationIconGradient}
-                >
-                  <Ionicons name="trophy" size={26} color="#1E1E1E" />
-                </LinearGradient>
-              </View>
-              <Text style={styles.motivationText}>
-                "Success is the sum of small efforts repeated daily."
-              </Text>
-              <Text style={styles.motivationAuthor}>
-                Your fitness journey starts now! 🚀
-              </Text>
-            </VStack>
-          </LinearGradient>
-        </Box>
-
-        {/* Recent Activity Section */}
-        <Box style={styles.section}>
-          <HStack style={styles.sectionHeader}>
-            <View style={styles.sectionIconContainer}>
-              <LinearGradient
-                colors={['rgba(255, 210, 10, 0.2)', 'rgba(255, 210, 10, 0.1)']}
-                style={styles.sectionIconGradient}
-              >
-                <Ionicons name="time" size={18} color="#FFD20A" />
-              </LinearGradient>
-            </View>
-            <Heading size="lg" style={styles.sectionTitle}>Recent Activity</Heading>
-          </HStack>
-          
-          <LinearGradient
-            colors={['rgba(30, 30, 30, 0.95)', 'rgba(42, 42, 42, 0.9)']}
-            style={styles.emptyStateGradient}
-          >
-            <VStack space="lg" style={styles.emptyStateContent}>
-              <View style={styles.emptyIconContainer}>
-                <LinearGradient
-                  colors={['rgba(255, 210, 10, 0.15)', 'rgba(255, 165, 0, 0.1)']}
-                  style={styles.emptyIconGradient}
-                >
-                  <Ionicons name="fitness-outline" size={32} color="#FFD20A" />
-                </LinearGradient>
-              </View>
-              <VStack space="sm" style={styles.emptyTextContainer}>
-                <Text style={styles.emptyText}>No workouts yet</Text>
-                <Text style={styles.emptySubtext}>
-                  Ready to start your fitness journey? Your first workout is just a tap away!
-                </Text>
-              </VStack>
-              <TouchableOpacity style={styles.emptyActionButton} activeOpacity={0.8} onPress={() => navigation.navigate('Workouts')}>
-                <LinearGradient
-                  colors={['#FFD20A', '#FFA500']}
-                  style={styles.emptyActionGradient}
-                >
-                  <HStack space="sm" style={styles.emptyActionContent}>
-                    <Ionicons name="play" size={18} color="#1E1E1E" />
-                    <Text style={styles.emptyActionText}>Start First Workout</Text>
-                  </HStack>
-                </LinearGradient>
-              </TouchableOpacity>
-            </VStack>
-          </LinearGradient>
-        </Box>
+        {isCoachHome ? (
+          <CoachHome />
+        ) : (
+          <AspirantHome navigation={navigation} />
+        )}
 
         {/* Bottom Spacing */}
         <View style={{ height: 100 }} />

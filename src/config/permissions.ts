@@ -12,10 +12,14 @@ export const requestMediaLibraryPermissions = async (): Promise<boolean> => {
 
 // Request permissions for notifications
 export const requestNotificationPermissions = async () => {
-  const { status } = await Notifications.requestPermissionsAsync();
-  if (status !== 'granted') {
-    console.log('You need to enable notifications in settings');
-  } else {
-    console.log('Notification permission granted');
+  try {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('You need to enable notifications in settings');
+    } else {
+      console.log('Notification permission granted');
+    }
+  } catch (error) {
+    console.warn('Notification permission request skipped:', error);
   }
 };

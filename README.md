@@ -1,3 +1,23 @@
+# ManiFit
+
+ManiFit is currently simplified for open-source use as an individual exercise
+browser. The active app boots directly into a no-auth exercise library where
+users browse GitHub-backed exercises by categories such as Back, Arms, Chest,
+Shoulders, Legs, Core, Cardio, and Neck.
+
+The coach, aspirant, auth, billing, and routine-management code is still in the
+repository for reference and future product work, but it is no longer part of
+the active app entry flow.
+
+## Quick Start
+
+```bash
+npm install
+npm run start
+```
+
+## Legacy Product Notes
+
 General Descripiton 
 
 In simple terms, this application aims to be the best fitness platform for gym trainers and coaches who need to:
